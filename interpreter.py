@@ -3,12 +3,16 @@ Cubit Language Interpreter - Evaluates the Abstract Syntax Tree
 """
 
 from typing import Any, Dict
-from parser import *
+from parser import (
+    ASTNode, NumberNode, StringNode, VariableNode, BinaryOpNode,
+    AssignmentNode, PrintNode, BlockNode, IfNode, WhileNode, Parser
+)
 
 
 class Interpreter:
     def __init__(self):
         self.variables: Dict[str, Any] = {}
+        self.output_produced = False
     
     def evaluate(self, node: ASTNode) -> Any:
         if isinstance(node, NumberNode):
@@ -59,6 +63,7 @@ class Interpreter:
         elif isinstance(node, PrintNode):
             value = self.evaluate(node.expression)
             print(value)
+            self.output_produced = True
             return value
         
         elif isinstance(node, BlockNode):
@@ -86,6 +91,9 @@ class Interpreter:
     
     def run(self, source: str) -> Any:
         from lexer import Lexer
+        
+        # Reset output flag
+        self.output_produced = False
         
         # Tokenize
         lexer = Lexer(source)

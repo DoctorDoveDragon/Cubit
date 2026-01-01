@@ -40,8 +40,8 @@ def run_repl():
             # Evaluate
             result = interpreter.run(line)
             
-            # Print result if it's not None and not from a print statement
-            if result is not None and 'print' not in line.lower():
+            # Print result if it's not None and no output was produced
+            if result is not None and not interpreter.output_produced:
                 print(f"=> {result}")
         
         except KeyboardInterrupt:
