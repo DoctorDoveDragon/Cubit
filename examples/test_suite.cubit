@@ -1,0 +1,73 @@
+# Comprehensive Test of Cubit Language Features
+
+print "=== Cubit Language Test Suite ==="
+print ""
+
+# 1. Variables and Arithmetic
+print "1. Variables and Arithmetic"
+let a = 10
+let b = 5
+print a + b
+print a - b
+print a * b
+print a / b
+print ""
+
+# 2. String handling
+print "2. String Handling"
+print "Hello, Cubit!"
+let greeting = "Welcome"
+print greeting
+print ""
+
+# 3. Comparisons
+print "3. Comparison Operators"
+let x = 10
+let y = 20
+print x == y
+print x != y
+print x < y
+print x > y
+print x <= 10
+print y >= 20
+print ""
+
+# 4. Conditional Logic
+print "4. Conditional Logic"
+if x < y {
+    print "x is less than y"
+}
+
+if x > y {
+    print "This should not print"
+} else {
+    print "x is not greater than y"
+}
+print ""
+
+# 5. Loops
+print "5. Loop Example - Count to 5"
+let counter = 1
+while counter <= 5 {
+    print counter
+    counter = counter + 1
+}
+print ""
+
+# 6. Complex expressions
+print "6. Complex Expressions"
+let result = (a + b) * (a - b) / 5
+print result
+print ""
+
+# 7. Variable reassignment
+print "7. Variable Reassignment"
+let value = 1
+print value
+value = 2
+print value
+value = value * 10
+print value
+print ""
+
+print "=== All Tests Complete ==="
