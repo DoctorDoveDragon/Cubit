@@ -1,0 +1,11 @@
+# Example 1: Basic arithmetic and variables
+let x = 10
+let y = 20
+print x + y
+
+# Example 2: String output
+print "Hello from Cubit!"
+
+# Example 3: Calculations
+let result = (x * 2) + (y / 4)
+print result
