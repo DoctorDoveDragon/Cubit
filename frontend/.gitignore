@@ -1,0 +1,8 @@
+node_modules
+.next
+.out
+.vscode
+.env.local
+.env
+.DS_Store
+storybook-static
