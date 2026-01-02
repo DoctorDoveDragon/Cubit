@@ -2,6 +2,21 @@ import React, { useState } from 'react'
 import Button from './Button'
 import Toast from './Toast'
 
+const THEMES = {
+  light: {
+    '--color-bg': '#f8fafc',
+    '--color-surface': '#ffffff',
+    '--color-accent': '#7c3aed',
+    '--color-muted': '#475569',
+  },
+  dark: {
+    '--color-bg': '#0f172a',
+    '--color-surface': '#0b1220',
+    '--color-accent': '#7c3aed',
+    '--color-muted': '#94a3b8',
+  },
+} as const
+
 export default function CommandsPanel({ onGenerate }: { onGenerate: (text: string) => void }) {
   const [toast, setToast] = useState<string | null>(null)
 
@@ -14,15 +29,21 @@ export default function CommandsPanel({ onGenerate }: { onGenerate: (text: strin
 
   const handleExportTokens = async () => {
     const tokens = Array.from(document.styleSheets)
-      .flatMap((sheet: any) => Array.from(sheet.cssRules || []))
-      .filter((r: any) => r.selectorText === ':root')
-      .map((r: any) => r.cssText)
+      .flatMap((sheet) => {
+        try {
+          return Array.from(sheet.cssRules || [])
+        } catch {
+          return []
+        }
+      })
+      .filter((r): r is CSSStyleRule => r instanceof CSSStyleRule && r.selectorText === ':root')
+      .map((r) => r.cssText)
       .join('\n')
 
     try {
       await navigator.clipboard.writeText(tokens || '/* tokens not found */')
       setToast('Design tokens copied to clipboard')
-    } catch (e) {
+    } catch {
       setToast('Copy failed — check clipboard permissions')
     }
   }
@@ -36,22 +57,14 @@ export default function CommandsPanel({ onGenerate }: { onGenerate: (text: strin
   const handleToggleTheme = () => {
     const root = document.documentElement
     const current = root.getAttribute('data-theme') || 'dark'
-    if (current === 'dark') {
-      // light theme tokens
-      root.style.setProperty('--color-bg', '#f8fafc')
-      root.style.setProperty('--color-surface', '#ffffff')
-      root.style.setProperty('--color-accent', '#7c3aed')
-      root.style.setProperty('--color-muted', '#475569')
-      root.setAttribute('data-theme', 'light')
-      setToast('Switched to light theme')
-    } else {
-      root.style.setProperty('--color-bg', '#0f172a')
-      root.style.setProperty('--color-surface', '#0b1220')
-      root.style.setProperty('--color-accent', '#7c3aed')
-      root.style.setProperty('--color-muted', '#94a3b8')
-      root.setAttribute('data-theme', 'dark')
-      setToast('Switched to dark theme')
-    }
+    const newTheme = current === 'dark' ? 'light' : 'dark'
+    const themeConfig = THEMES[newTheme]
+
+    Object.entries(themeConfig).forEach(([key, value]) => {
+      root.style.setProperty(key, value)
+    })
+    root.setAttribute('data-theme', newTheme)
+    setToast(`Switched to ${newTheme} theme`)
   }
 
   return (
