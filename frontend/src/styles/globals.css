@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 /* Design tokens (CSS variables) */
-:root{
+:root {
   --color-bg:  #0f172a; /* deep navy default */
   --color-surface: #0b1220;
   --color-accent: #7c3aed; /* violet */
