@@ -58,7 +58,7 @@ print ""
 
 # 5. Practical Example: Grade Calculator
 print "5. PRACTICAL EXAMPLE: Grade Statistics"
-let grades = [88, 92, 76, 95, 84, 90]
+let grades = [85, 92, 78, 95, 88]
 print "Grades:"
 print grades
 
@@ -67,11 +67,11 @@ let count = len(grades)
 print count
 
 print "Highest grade:"
-let highest = max(88, 92, 76, 95, 84, 90)
+let highest = max(85, 92, 78, 95, 88)
 print highest
 
 print "Lowest grade:"
-let lowest = min(88, 92, 76, 95, 84, 90)
+let lowest = min(85, 92, 78, 95, 88)
 print lowest
 
 # Sort to find median
