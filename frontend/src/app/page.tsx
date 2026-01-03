@@ -1,4 +1,3 @@
-import React from 'react'
 'use client'
 
 import React, { useState } from 'react'
@@ -6,9 +5,6 @@ import Header from '../components/Header'
 import Sidebar from '../components/Sidebar'
 import Card from '../components/Card'
 import Button from '../components/Button'
-import { motion } from 'framer-motion'
-
-export default function Page() {
 import CommandsPanel from '../components/CommandsPanel'
 import { motion } from 'framer-motion'
 
@@ -26,10 +22,6 @@ export default function Page() {
               <h3 className="text-lg font-semibold mb-2">Project overview</h3>
               <p className="text-sm text-[var(--color-muted)]">A clean canvas for designers — tokens, components, and Storybook included.</p>
               <div className="mt-4 flex gap-3">
-                <Button variant="primary">Get started</Button>
-                <Button>Open Figma</Button>
-              </div>
-            </Card>
                 <Button variant="primary" onClick={() => alert('Starter scaffold — open Storybook to explore components')}>Get started</Button>
                 <Button onClick={() => window.open('https://www.figma.com/', '_blank')}>Open Figma</Button>
               </div>
