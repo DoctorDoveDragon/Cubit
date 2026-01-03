@@ -1,0 +1,91 @@
+# List/Array Module Examples
+
+print "=== List Module Examples ==="
+print ""
+
+# Create a list
+let numbers = [1, 2, 3, 4, 5]
+print "Original list:"
+print numbers
+
+# Access elements
+print ""
+print "First element (index 0):"
+print numbers[0]
+print "Third element (index 2):"
+print numbers[2]
+print "Last element (index -1):"
+print numbers[-1]
+
+# List length
+print ""
+print "List length:"
+print len(numbers)
+
+# Append
+print ""
+print "Appending 6 to list..."
+append(numbers, 6)
+print "After append:"
+print numbers
+
+# Pop
+print ""
+print "Popping last element:"
+let popped = pop(numbers)
+print "Popped value:"
+print popped
+print "List after pop:"
+print numbers
+
+# Insert
+print ""
+print "Inserting 10 at index 2:"
+insert(numbers, 2, 10)
+print "After insert:"
+print numbers
+
+# Min and max of list
+print ""
+print "Min of list:"
+print min(1, 2, 3, 10, 5)
+print "Max of list:"
+print max(1, 2, 3, 10, 5)
+
+# Sort
+let unsorted = [5, 2, 8, 1, 9]
+print ""
+print "Unsorted list:"
+print unsorted
+print "Sorting..."
+sort(unsorted)
+print "Sorted list:"
+print unsorted
+
+# Reverse
+print ""
+print "Reversing list..."
+reverse(unsorted)
+print "Reversed list:"
+print unsorted
+
+# Mixed type lists
+let mixed = [1, "hello", 3.14, "world"]
+print ""
+print "Mixed type list:"
+print mixed
+print "Second element:"
+print mixed[1]
+
+# Nested lists
+let matrix = [[1, 2], [3, 4], [5, 6]]
+print ""
+print "Nested list (matrix):"
+print matrix
+print "First row:"
+print matrix[0]
+print "Element at [1][1]:"
+print matrix[1][1]
+
+print ""
+print "=== List Module Tests Complete ==="

@@ -1,0 +1,49 @@
+# Random Module Examples
+
+print "=== Random Module Examples ==="
+print ""
+
+# Random float between 0 and 1
+print "Random float (0-1):"
+print random()
+
+# Random integers
+print ""
+print "Random integer between 1 and 10:"
+print randint(1, 10)
+
+print "Another random integer between 1 and 100:"
+print randint(1, 100)
+
+# Random choice from list
+let colors = ["red", "blue", "green", "yellow", "purple"]
+print ""
+print "List of colors:"
+print colors
+print "Random choice:"
+print choice(colors)
+print "Another random choice:"
+print choice(colors)
+
+# Shuffle a list
+let deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+print ""
+print "Original deck:"
+print deck
+print "Shuffling..."
+shuffle(deck)
+print "Shuffled deck:"
+print deck
+
+# Simulate dice rolls
+print ""
+print "=== Dice Roll Simulation ==="
+let i = 0
+while i < 5 {
+    let roll = randint(1, 6)
+    print roll
+    i = i + 1
+}
+
+print ""
+print "=== Random Module Tests Complete ==="

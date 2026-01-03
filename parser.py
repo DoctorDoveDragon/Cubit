@@ -64,6 +64,23 @@ class WhileNode(ASTNode):
     body: ASTNode
 
 
+@dataclass
+class FunctionCallNode(ASTNode):
+    function_name: str
+    arguments: List[ASTNode]
+
+
+@dataclass
+class ListNode(ASTNode):
+    elements: List[ASTNode]
+
+
+@dataclass
+class IndexNode(ASTNode):
+    list_expr: ASTNode
+    index: ASTNode
+
+
 class Parser:
     def __init__(self, tokens: List[Token]):
         self.tokens = tokens
@@ -245,15 +262,50 @@ class Parser:
         return left
     
     def parse_multiplicative(self) -> ASTNode:
-        left = self.parse_primary()
+        left = self.parse_postfix()
         
         while self.current_token().type in (TokenType.MULTIPLY, TokenType.DIVIDE):
             operator_token = self.current_token()
             self.advance()
-            right = self.parse_primary()
+            right = self.parse_postfix()
             left = BinaryOpNode(left, operator_token.value, right)
         
         return left
+    
+    def parse_postfix(self) -> ASTNode:
+        """Parse postfix expressions like function calls and array indexing"""
+        node = self.parse_primary()
+        
+        while True:
+            if self.current_token().type == TokenType.LPAREN:
+                # Function call
+                if not isinstance(node, VariableNode):
+                    raise Exception(f"Cannot call non-identifier at line {self.current_token().line}")
+                node = self.parse_function_call(node.name)
+            elif self.current_token().type == TokenType.LBRACKET:
+                # Array indexing
+                self.advance()
+                index = self.parse_expression()
+                self.expect(TokenType.RBRACKET)
+                node = IndexNode(node, index)
+            else:
+                break
+        
+        return node
+    
+    def parse_function_call(self, function_name: str) -> FunctionCallNode:
+        """Parse a function call"""
+        self.expect(TokenType.LPAREN)
+        
+        arguments = []
+        if self.current_token().type != TokenType.RPAREN:
+            arguments.append(self.parse_expression())
+            while self.current_token().type == TokenType.COMMA:
+                self.advance()
+                arguments.append(self.parse_expression())
+        
+        self.expect(TokenType.RPAREN)
+        return FunctionCallNode(function_name, arguments)
     
     def parse_primary(self) -> ASTNode:
         token = self.current_token()
@@ -272,9 +324,26 @@ class Parser:
             expression = self.parse_expression()
             self.expect(TokenType.RPAREN)
             return expression
+        elif token.type == TokenType.LBRACKET:
+            # List literal
+            return self.parse_list()
         elif token.type == TokenType.MINUS:
             self.advance()
             expression = self.parse_primary()
             return BinaryOpNode(NumberNode(0), '-', expression)
         else:
             raise Exception(f"Unexpected token {token.type} at line {token.line}")
+    
+    def parse_list(self) -> ListNode:
+        """Parse a list literal [1, 2, 3]"""
+        self.expect(TokenType.LBRACKET)
+        
+        elements = []
+        if self.current_token().type != TokenType.RBRACKET:
+            elements.append(self.parse_expression())
+            while self.current_token().type == TokenType.COMMA:
+                self.advance()
+                elements.append(self.parse_expression())
+        
+        self.expect(TokenType.RBRACKET)
+        return ListNode(elements)

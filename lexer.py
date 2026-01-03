@@ -39,6 +39,9 @@ class TokenType(Enum):
     RPAREN = auto()
     LBRACE = auto()
     RBRACE = auto()
+    LBRACKET = auto()
+    RBRACKET = auto()
+    COMMA = auto()
     SEMICOLON = auto()
     
     # Special
@@ -235,6 +238,15 @@ class Lexer:
                 self.advance()
             elif current_char == '}':
                 self.tokens.append(Token(TokenType.RBRACE, '}', line, column))
+                self.advance()
+            elif current_char == '[':
+                self.tokens.append(Token(TokenType.LBRACKET, '[', line, column))
+                self.advance()
+            elif current_char == ']':
+                self.tokens.append(Token(TokenType.RBRACKET, ']', line, column))
+                self.advance()
+            elif current_char == ',':
+                self.tokens.append(Token(TokenType.COMMA, ',', line, column))
                 self.advance()
             elif current_char == ';':
                 self.tokens.append(Token(TokenType.SEMICOLON, ';', line, column))
