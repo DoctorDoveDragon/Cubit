@@ -1,18 +1,20 @@
 #!/bin/bash
-# Deployment script for Cubit API Server
-# Installs dependencies and starts the FastAPI server
 
-set -e  # Exit on error
+echo "🚀 Starting Cubit Programming Language..."
+echo ""
 
-echo "Installing Python dependencies..."
-pip install -r requirements.txt
+# Start backend API in background
+echo "Starting backend API on http://localhost:8080..."
+python3 api.py &
+BACKEND_PID=$!
 
-echo "Starting Cubit API Server..."
-# Use PORT environment variable from Railway if available, otherwise default to 8080
-PORT=${PORT:-8080}
+# Wait a moment for backend to start
+sleep 2
 
-# Start the server with uvicorn
-# --host 0.0.0.0: Listen on all network interfaces
-# --port: Use the specified port
-# --workers 1: Single worker for simplicity (can be increased for production)
-exec uvicorn api:app --host 0.0.0.0 --port "$PORT" --workers 1
+# Start frontend
+echo "Starting frontend on http://localhost:3000..."
+cd frontend
+npm run dev
+
+# When frontend is killed, also kill backend
+kill $BACKEND_PID

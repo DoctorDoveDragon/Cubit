@@ -91,8 +91,14 @@ The code executor requires the Cubit backend API to be running.
 
 2. Install Python dependencies:
    ```bash
-   pip install -r requirements.txt
+   # From project root
+   pip3 install -r requirements.txt
    ```
+   
+   Required packages:
+   - fastapi>=0.109.1
+   - uvicorn[standard]>=0.27.0
+   - pydantic>=2.5.0
 
 3. Start the API server:
    ```bash
