@@ -1,5 +1,8 @@
 import React from 'react'
 
+export default function Card({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="card">
 interface CardProps {
   children: React.ReactNode
   className?: string
