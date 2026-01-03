@@ -8,6 +8,7 @@ import Button from '../components/Button'
 import CommandsPanel from '../components/CommandsPanel'
 import CodeExecutor from '../components/CodeExecutor'
 import CreativeCommandsPanel from '../components/CreativeCommandsPanel'
+import ErrorBoundary from '../components/ErrorBoundary'
 import { motion } from 'framer-motion'
 
 export default function Page() {
@@ -64,7 +65,9 @@ export default function Page() {
                   {showCreativePanel ? 'Hide' : 'Show'} Creative Commands
                 </Button>
               </div>
-              <CodeExecutor />
+              <ErrorBoundary>
+                <CodeExecutor />
+              </ErrorBoundary>
             </Card>
 
             {generated && (

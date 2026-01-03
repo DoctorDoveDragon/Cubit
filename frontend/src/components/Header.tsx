@@ -1,4 +1,5 @@
 import React from 'react'
+import ApiHealthIndicator from './ApiHealthIndicator'
 
 export default function Header() {
   return (
@@ -8,6 +9,7 @@ export default function Header() {
         <p className="text-sm text-[var(--color-muted)] mt-1">Designer-focused component scaffold</p>
       </div>
       <div className="flex gap-3 items-center">
+        <ApiHealthIndicator />
         <span className="text-xs text-[var(--color-muted)]">v1.0.0</span>
       </div>
     </header>

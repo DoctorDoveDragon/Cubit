@@ -577,19 +577,98 @@ app.add_middleware(
 
 #### Troubleshooting
 
-**Frontend shows "Failed to fetch" errors:**
-- Verify `NEXT_PUBLIC_API_URL` is set correctly in Railway
-- Check that the backend service is running and accessible
-- Environment variables starting with `NEXT_PUBLIC_` must be set at build time
+##### Common Deployment Issues
 
-**Backend not accessible:**
-- Ensure the `PORT` environment variable is being used
-- Check Railway logs for startup errors
-- Verify `requirements.txt` dependencies are installing correctly
+**Frontend shows "Failed to fetch" errors or "API Disconnected":**
+- **Issue**: Frontend cannot connect to the backend API
+- **Solutions**:
+  1. Verify `NEXT_PUBLIC_API_URL` is set correctly in Railway frontend service
+  2. Ensure the backend service is running and accessible (check Railway logs)
+  3. Test backend URL directly: `https://your-backend-service.railway.app/health`
+  4. Remember: Environment variables starting with `NEXT_PUBLIC_` must be set at build time
+  5. After setting/changing environment variables, trigger a **redeploy** of the frontend service
+  6. Check for HTTPS issues: Railway uses HTTPS, make sure URL starts with `https://`
 
-**Changes not reflecting:**
-- Railway requires a redeploy after environment variable changes
-- Frontend must be rebuilt when `NEXT_PUBLIC_API_URL` changes
+**Backend not accessible or returns 404:**
+- **Issue**: Backend service not starting or not exposing the correct port
+- **Solutions**:
+  1. Check Railway logs for Python errors or dependency installation failures
+  2. Verify `requirements.txt` includes all necessary dependencies:
+     - `fastapi`
+     - `uvicorn`
+     - `pydantic`
+  3. Ensure the `PORT` environment variable is being used correctly
+  4. Test the root endpoint: `https://your-backend-service.railway.app/`
+  5. Check that `nixpacks.toml` is present and properly configured
+
+**Frontend build fails:**
+- **Issue**: Next.js build process fails during deployment
+- **Solutions**:
+  1. Check Railway build logs for specific error messages
+  2. Verify all dependencies are in `package.json`
+  3. Ensure Node.js version is compatible (configured in `nixpacks.toml`)
+  4. Check for TypeScript errors in your components
+  5. Try building locally: `cd frontend && npm install && npm run build`
+
+**Changes not reflecting after deployment:**
+- **Issue**: New code or configuration changes not visible
+- **Solutions**:
+  1. Railway requires a redeploy after environment variable changes
+  2. Frontend must be rebuilt when `NEXT_PUBLIC_API_URL` changes
+  3. Clear browser cache or try incognito/private browsing mode
+  4. Verify the deployment completed successfully in Railway logs
+  5. Check the commit hash in Railway matches your latest changes
+
+**Health indicator always shows "Disconnected":**
+- **Issue**: Health check endpoint not working
+- **Solutions**:
+  1. Verify backend `/health` endpoint is accessible
+  2. Check browser console for CORS errors
+  3. Ensure backend CORS settings allow frontend domain
+  4. Test health endpoint directly: `curl https://your-backend-service.railway.app/health`
+  5. Check Railway logs for backend startup errors
+
+**CSS styles not loading or appearing broken:**
+- **Issue**: Tailwind CSS not properly configured
+- **Solutions**:
+  1. Ensure `@import "tailwindcss"` is at the top of `globals.css`
+  2. Verify `tailwind.config.js` and `postcss.config.mjs` are present
+  3. Check that Tailwind v4 syntax is used consistently
+  4. Clear Next.js cache: `rm -rf frontend/.next`
+  5. Rebuild: `npm run build`
+
+##### Local Development Issues
+
+**Backend API fails to start locally:**
+- **Solutions**:
+  1. Ensure Python 3.11+ is installed: `python3 --version`
+  2. Install dependencies: `pip install -r requirements.txt`
+  3. Check port 8080 is not already in use: `lsof -i :8080` (Mac/Linux)
+  4. Try a different port: `PORT=8081 python3 api.py`
+
+**Frontend cannot connect to local backend:**
+- **Solutions**:
+  1. Ensure backend is running on port 8080
+  2. Create `frontend/.env.local` with: `NEXT_PUBLIC_API_URL=http://localhost:8080`
+  3. Restart frontend dev server after creating `.env.local`
+  4. Check browser console for CORS or network errors
+
+**npm install fails in frontend:**
+- **Solutions**:
+  1. Use Node.js 18+ (check with `node --version`)
+  2. Clear npm cache: `npm cache clean --force`
+  3. Delete `node_modules` and `package-lock.json`, then reinstall
+  4. Try `npm install --legacy-peer-deps` if dependency conflicts occur
+
+##### Getting Help
+
+If issues persist:
+1. Check Railway deployment logs for detailed error messages
+2. Review browser console for frontend errors
+3. Test individual components in isolation
+4. Ensure environment variables are correctly set in Railway dashboard
+5. Verify your GitHub repository is properly connected to Railway
+6. Try redeploying from scratch if configuration changes aren't taking effect
 
 ### Interactive Documentation
 
