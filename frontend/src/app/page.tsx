@@ -6,17 +6,21 @@ import Sidebar from '../components/Sidebar'
 import Card from '../components/Card'
 import Button from '../components/Button'
 import CommandsPanel from '../components/CommandsPanel'
+import CodeExecutor from '../components/CodeExecutor'
+import CreativeCommandsPanel from '../components/CreativeCommandsPanel'
 import { motion } from 'framer-motion'
 
 export default function Page() {
   const [generated, setGenerated] = useState<string>('')
+  const [showCreativePanel, setShowCreativePanel] = useState<boolean>(false)
 
   return (
     <div className="flex h-screen">
       <Sidebar />
-      <div className="flex-1 p-6">
+      <div className="flex-1 p-6 overflow-y-auto">
         <Header />
-        <main className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <main className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column - Project Overview & Commands */}
           <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
             <Card>
               <h3 className="text-lg font-semibold mb-2">Project overview</h3>
@@ -31,41 +35,72 @@ export default function Page() {
               <h4 className="font-medium mb-2">Commands</h4>
               <CommandsPanel onGenerate={(t) => setGenerated(t)} />
             </Card>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}>
-            <Card>
-              <h3 className="text-lg font-semibold mb-2">Live preview</h3>
-              <div className="h-28 rounded-md bg-gradient-to-br from-[rgba(124,58,237,0.12)] to-transparent flex items-center justify-center text-[var(--color-muted)]">
-                Canvas preview
-              </div>
-              {generated && (
-                <div className="mt-4 bg-[var(--color-surface)] p-3 rounded-md text-sm text-[var(--color-muted)]">
-                  <strong className="text-white">Generated output:</strong>
-                  <div className="mt-2">{generated}</div>
-                </div>
-              )}
-            </Card>
 
             <Card className="mt-4">
-              <h3 className="text-lg font-semibold mb-2">Instructions</h3>
-              <ol className="text-sm text-[var(--color-muted)] list-decimal list-inside space-y-2">
-                <li>Use the "Generate description" button to simulate creating content from a prompt. The result appears in the Live preview card.</li>
-                <li>Click "Export tokens" to copy CSS tokens to your clipboard (for designers to import into tools).</li>
-                <li>"Open Figma" opens Figma in a new tab — replace the URL with your file link if desired.</li>
-                <li>Use "Toggle theme" to switch between a light and dark token set.</li>
-              </ol>
-            </Card>
-          </motion.div>
-
-          <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.18 }}>
-            <Card>
               <h3 className="text-lg font-semibold mb-2">Tokens</h3>
               <ul className="text-sm text-[var(--color-muted)] space-y-1">
                 <li>Spacing • 8 / 16 / 24</li>
                 <li>Radius • 8 / 12</li>
                 <li>Typography • Inter / system fonts</li>
               </ul>
+            </Card>
+          </motion.div>
+
+          {/* Middle Column - Code Executor */}
+          <motion.div 
+            initial={{ opacity: 0, y: 6 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            transition={{ delay: 0.12 }}
+            className="lg:col-span-2"
+          >
+            <Card>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold">Cubit Code Executor</h3>
+                <Button 
+                  variant="secondary" 
+                  onClick={() => setShowCreativePanel(!showCreativePanel)}
+                  className="text-xs"
+                >
+                  {showCreativePanel ? 'Hide' : 'Show'} Creative Commands
+                </Button>
+              </div>
+              <CodeExecutor />
+            </Card>
+
+            {generated && (
+              <Card className="mt-4">
+                <h3 className="text-lg font-semibold mb-2">Generated Output</h3>
+                <div className="bg-[var(--color-surface)] p-3 rounded-md text-sm text-[var(--color-muted)]">
+                  <strong className="text-white">Result:</strong>
+                  <div className="mt-2">{generated}</div>
+                </div>
+              </Card>
+            )}
+
+            {/* Creative Commands Panel (Collapsible) */}
+            {showCreativePanel && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <Card className="mt-4">
+                  <h3 className="text-lg font-semibold mb-4">Creative Commands</h3>
+                  <CreativeCommandsPanel />
+                </Card>
+              </motion.div>
+            )}
+
+            <Card className="mt-4">
+              <h3 className="text-lg font-semibold mb-2">Instructions</h3>
+              <ol className="text-sm text-[var(--color-muted)] list-decimal list-inside space-y-2">
+                <li>Write or select Cubit code from the examples dropdown</li>
+                <li>Click "Run Code" to execute it via the backend API</li>
+                <li>View output, results, and any errors in real-time</li>
+                <li>Use "Show Creative Commands" to access AI features, design tools, and code intelligence</li>
+                <li>Original commands: Generate description, Export tokens, Toggle theme</li>
+              </ol>
             </Card>
           </motion.div>
         </main>
