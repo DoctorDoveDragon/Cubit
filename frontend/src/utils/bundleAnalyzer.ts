@@ -126,7 +126,7 @@ function categorizeResources(
 
     // Convert to BundleItem array, filter out empty categories
     return Object.entries(categories)
-        .filter(([_, size]) => size > 0)
+        .filter(([, size]) => size > 0)
         .map(([name, size]) => ({
             name,
             size,
