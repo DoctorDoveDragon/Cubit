@@ -22,9 +22,7 @@ echo "✅ Node.js found: $(node --version)"
 # Install Python dependencies
 echo ""
 echo "📦 Installing Python dependencies..."
-pip3 install -r requirements.txt
-
-if [ $? -eq 0 ]; then
+if pip3 install -r requirements.txt; then
     echo "✅ Python dependencies installed"
 else
     echo "❌ Failed to install Python dependencies"
@@ -35,9 +33,7 @@ fi
 echo ""
 echo "📦 Installing frontend dependencies..."
 cd frontend
-npm install
-
-if [ $? -eq 0 ]; then
+if npm install; then
     echo "✅ Frontend dependencies installed"
 else
     echo "❌ Failed to install frontend dependencies"
