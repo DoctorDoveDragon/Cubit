@@ -17,6 +17,58 @@ Cubit is a simple, educational programming language with a clean syntax designed
 - **Function Calls**: Call built-in functions
 - **Advanced Modules**: Math, String, List, and Random modules
 
+## Quick Start
+
+### Automated Setup (Recommended)
+
+**Unix/Linux/Mac:**
+```bash
+chmod +x setup.sh
+./setup.sh
+```
+
+**Windows:**
+```batch
+setup.bat
+```
+
+### Manual Setup
+
+**1. Install Python dependencies:**
+```bash
+pip3 install -r requirements.txt
+```
+
+**2. Install frontend dependencies:**
+```bash
+cd frontend
+npm install
+```
+
+**3. Start the backend API (Terminal 1):**
+```bash
+python3 api.py
+```
+
+**4. Start the frontend (Terminal 2):**
+```bash
+cd frontend
+npm run dev
+```
+
+**5. Open your browser:**
+Visit http://localhost:3000
+
+### Using the REPL (Command Line)
+
+```bash
+# Interactive REPL
+python3 cubit.py
+
+# Run a file
+python3 cubit.py examples/basic.cubit
+```
+
 ## Installation
 
 No installation required! Just Python 3.6+ needed.
@@ -302,7 +354,7 @@ Start the server:
 
 ```bash
 # Using the deployment script
-./start.sh
+./start-api.sh
 
 # Or directly with uvicorn
 uvicorn api:app --host 0.0.0.0 --port 8080
@@ -441,7 +493,7 @@ The API server is ready for deployment on Railway or Railpack:
 
 1. Push your code to GitHub
 2. Connect your repository to Railway
-3. Railway will automatically detect and use `start.sh`
+3. Railway will automatically detect and use `start-api.sh`
 4. The server will be available at your Railway-provided URL
 
 **Environment Variables:**
