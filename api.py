@@ -5,9 +5,9 @@ Provides REST API endpoints for executing Cubit code
 """
 
 import sys
-import json
 from io import StringIO
 from typing import Optional, Any
+from contextlib import redirect_stdout
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, ConfigDict
@@ -24,7 +24,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Allow all origins for frontend integration
-    allow_credentials=True,
+    allow_credentials=False,  # Credentials not needed for public API
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -79,16 +79,16 @@ async def execute_code(request: ExecuteRequest):
     # Create a new interpreter instance for each request to ensure clean state
     interpreter = Interpreter()
     
-    # Capture stdout
-    old_stdout = sys.stdout
-    sys.stdout = StringIO()
+    # Capture stdout using context manager to avoid race conditions
+    output_buffer = StringIO()
     
     try:
-        # Execute the code
-        result = interpreter.run(request.code)
+        # Execute the code with stdout redirected
+        with redirect_stdout(output_buffer):
+            result = interpreter.run(request.code)
         
         # Get the output
-        output = sys.stdout.getvalue()
+        output = output_buffer.getvalue()
         
         # Return success response
         return ExecuteResponse(
@@ -99,7 +99,7 @@ async def execute_code(request: ExecuteRequest):
     
     except Exception as e:
         # Get any partial output before the error
-        output = sys.stdout.getvalue()
+        output = output_buffer.getvalue()
         
         # Return error response
         return ExecuteResponse(
@@ -107,10 +107,6 @@ async def execute_code(request: ExecuteRequest):
             result=None,
             error=str(e)
         )
-    
-    finally:
-        # Restore stdout
-        sys.stdout = old_stdout
 
 
 if __name__ == "__main__":
