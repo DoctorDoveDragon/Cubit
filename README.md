@@ -479,25 +479,117 @@ console.log(result);
 // Output: { output: "20\n", result: 20, error: null }
 ```
 
-### Deployment to Railway/Railpack
+### Deployment to Railway (Full Stack)
 
-The API server is ready for deployment on Railway or Railpack:
+Cubit supports deployment of both the backend API and frontend GUI as separate Railway services from the same repository.
 
-1. **Automatic Deployment**: The `start.sh` script automatically installs dependencies and starts the server.
+#### Architecture Overview
 
-2. **Port Configuration**: The server uses the `PORT` environment variable (provided by Railway) or defaults to 8080.
+- **Backend Service**: FastAPI server serving the Cubit execution API
+- **Frontend Service**: Next.js application providing the interactive playground GUI
+- **Communication**: Frontend calls backend API via `NEXT_PUBLIC_API_URL`
 
-3. **CORS Support**: CORS is enabled for all origins to allow frontend integration.
+#### Deployment Steps
 
-**Deployment Steps:**
+##### 1. Deploy Backend Service
 
-1. Push your code to GitHub
-2. Connect your repository to Railway
-3. Railway will automatically detect and use `start-api.sh`
-4. The server will be available at your Railway-provided URL
+1. **Create a new Railway project** from your GitHub repository
+2. **Configure the backend service:**
+   - **Root Directory**: `/` (project root)
+   - **Build Command**: Automatic (uses `nixpacks.toml` or `Procfile`)
+   - **Start Command**: `uvicorn api:app --host 0.0.0.0 --port $PORT`
+3. **Railway will automatically:**
+   - Detect Python and install dependencies from `requirements.txt`
+   - Use the `Procfile` or `nixpacks.toml` configuration
+   - Set the `PORT` environment variable
+4. **Note your backend URL**: `https://your-backend-service.railway.app`
 
-**Environment Variables:**
+##### 2. Deploy Frontend Service
+
+1. **Add a new service** to the same Railway project
+2. **Configure the frontend service:**
+   - **Root Directory**: `/frontend`
+   - **Build Command**: `npm run build`
+   - **Start Command**: `npm run start`
+3. **Set environment variables** (critical):
+   - `NEXT_PUBLIC_API_URL`: Your backend service URL from step 1
+   - Example: `https://your-backend-service.railway.app`
+4. **Railway will automatically:**
+   - Detect Node.js and install dependencies from `package.json`
+   - Build the Next.js application
+   - Start the production server on the Railway-provided port
+
+##### 3. Access Your Deployment
+
+- **Backend API**: `https://your-backend-service.railway.app`
+  - Test with: `https://your-backend-service.railway.app/docs`
+- **Frontend GUI**: `https://your-frontend-service.railway.app`
+  - Users will see the full interactive Cubit playground
+
+#### Configuration Files
+
+The repository includes Railway-specific configuration files:
+
+- **`nixpacks.toml`** (root): Primary backend build and start configuration (takes precedence)
+- **`railway.json`** (root): Backend deployment policies (restart settings)
+- **`frontend/nixpacks.toml`**: Frontend build and start configuration
+- **`Procfile`** (root): Fallback start command (only used if nixpacks.toml is removed)
+
+#### Environment Variables
+
+##### Backend Service
 - `PORT` - Server port (automatically set by Railway)
+
+##### Frontend Service
+- `NEXT_PUBLIC_API_URL` - Backend API URL (must be set manually)
+  - **Required**: Yes
+  - **Format**: `https://your-backend-service.railway.app`
+  - **Example**: `https://cubit-api-production.up.railway.app`
+
+To set in Railway dashboard:
+1. Go to your frontend service settings
+2. Navigate to "Variables" tab
+3. Add `NEXT_PUBLIC_API_URL` with your backend URL
+4. Redeploy the frontend service
+
+#### Local Development with Environment Variables
+
+Create a `.env.local` file in the `frontend/` directory for local development:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:8080
+```
+
+See `frontend/.env.example` for reference.
+
+#### CORS Configuration
+
+The backend API is configured to allow requests from any origin, supporting the frontend deployment on a different domain. CORS settings are in `api.py`:
+
+```python
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows frontend from any domain
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+```
+
+#### Troubleshooting
+
+**Frontend shows "Failed to fetch" errors:**
+- Verify `NEXT_PUBLIC_API_URL` is set correctly in Railway
+- Check that the backend service is running and accessible
+- Environment variables starting with `NEXT_PUBLIC_` must be set at build time
+
+**Backend not accessible:**
+- Ensure the `PORT` environment variable is being used
+- Check Railway logs for startup errors
+- Verify `requirements.txt` dependencies are installing correctly
+
+**Changes not reflecting:**
+- Railway requires a redeploy after environment variable changes
+- Frontend must be rebuilt when `NEXT_PUBLIC_API_URL` changes
 
 ### Interactive Documentation
 
