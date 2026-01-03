@@ -33,6 +33,25 @@ const getApiBaseUrl = (): string => {
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
 
 /**
+ * Check if error is a network-related error
+ */
+const isNetworkError = (error: unknown): boolean => {
+  if (error instanceof TypeError) {
+    // TypeError is commonly thrown for network failures in fetch
+    return true
+  }
+  if (error instanceof Error) {
+    const message = error.message.toLowerCase()
+    return message.includes('fetch') || 
+           message.includes('network') || 
+           message.includes('failed to fetch') ||
+           message.includes('networkerror') ||
+           message.includes('connection')
+  }
+  return false
+}
+
+/**
  * Execute Cubit code via the backend API with retry logic
  * @param code - The Cubit code to execute
  * @param retries - Number of retries (default: 2)
@@ -40,6 +59,7 @@ const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
  */
 export async function executeCode(code: string, retries: number = 2): Promise<ExecuteResponse> {
   const apiUrl = getApiBaseUrl()
+  let lastError: unknown = null
   
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
@@ -58,18 +78,11 @@ export async function executeCode(code: string, retries: number = 2): Promise<Ex
       const data: ExecuteResponse = await response.json()
       return data
     } catch (error) {
+      lastError = error
+      
       // If this is the last attempt, return error response
       if (attempt === retries) {
-        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
-        const isNetworkError = errorMessage.includes('fetch') || errorMessage.includes('network')
-        
-        return {
-          output: null,
-          result: null,
-          error: isNetworkError 
-            ? `Unable to connect to the backend API at ${apiUrl}. Please ensure the backend is running and NEXT_PUBLIC_API_URL is set correctly.`
-            : errorMessage
-        }
+        break
       }
       
       // Wait before retrying (exponential backoff)
@@ -77,11 +90,15 @@ export async function executeCode(code: string, retries: number = 2): Promise<Ex
     }
   }
   
-  // This should never be reached, but TypeScript needs it
+  // Return error response after all retries failed
+  const errorMessage = lastError instanceof Error ? lastError.message : 'Unknown error occurred'
+  
   return {
     output: null,
     result: null,
-    error: 'Unexpected error in retry logic'
+    error: isNetworkError(lastError)
+      ? `Unable to connect to the backend API at ${apiUrl}. Please ensure the backend is running and NEXT_PUBLIC_API_URL is set correctly.`
+      : errorMessage
   }
 }
 

@@ -1,29 +1,87 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { checkApiHealth } from '../utils/api'
 
 export default function ApiHealthIndicator() {
   const [isHealthy, setIsHealthy] = useState<boolean | null>(null)
   const [isChecking, setIsChecking] = useState<boolean>(true)
+  const [checkInterval, setCheckInterval] = useState<number>(30000) // Start with 30 seconds
+  const intervalRef = useRef<NodeJS.Timeout | null>(null)
+  const consecutiveFailures = useRef<number>(0)
 
   useEffect(() => {
     // Check health immediately on mount
     checkHealth()
 
-    // Check health every 30 seconds
-    const interval = setInterval(checkHealth, 30000)
+    // Set up interval-based health checks
+    const setupInterval = () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+      }
+      intervalRef.current = setInterval(checkHealth, checkInterval)
+    }
 
-    return () => clearInterval(interval)
-  }, [])
+    setupInterval()
+
+    // Clean up interval on unmount
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+      }
+    }
+  }, [checkInterval])
+
+  // Pause health checks when tab is not visible
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        // Pause checks when tab is hidden
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current)
+          intervalRef.current = null
+        }
+      } else {
+        // Resume checks when tab is visible
+        checkHealth()
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current)
+        }
+        intervalRef.current = setInterval(checkHealth, checkInterval)
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange)
+  }, [checkInterval])
 
   const checkHealth = async () => {
     setIsChecking(true)
     try {
       const healthy = await checkApiHealth()
       setIsHealthy(healthy)
+      
+      if (healthy) {
+        // Reset interval and failure count on success
+        consecutiveFailures.current = 0
+        if (checkInterval !== 30000) {
+          setCheckInterval(30000)
+        }
+      } else {
+        // Increase interval on failure (exponential backoff, max 5 minutes)
+        consecutiveFailures.current++
+        const newInterval = Math.min(30000 * Math.pow(2, consecutiveFailures.current), 300000)
+        if (newInterval !== checkInterval) {
+          setCheckInterval(newInterval)
+        }
+      }
     } catch {
       setIsHealthy(false)
+      consecutiveFailures.current++
+      const newInterval = Math.min(30000 * Math.pow(2, consecutiveFailures.current), 300000)
+      if (newInterval !== checkInterval) {
+        setCheckInterval(newInterval)
+      }
     } finally {
       setIsChecking(false)
     }
