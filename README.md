@@ -286,6 +286,171 @@ Cubit is implemented in Python with three main components:
 2. **Parser** (`parser.py`) - Builds an Abstract Syntax Tree (AST) from tokens
 3. **Interpreter** (`interpreter.py`) - Evaluates the AST and executes the code
 
+## API Server
+
+Cubit now includes a FastAPI web server that provides REST API endpoints for executing Cubit code. This enables web-based code execution and integration with frontend applications.
+
+### Running the API Server Locally
+
+Install the required dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Start the server:
+
+```bash
+# Using the deployment script
+./start.sh
+
+# Or directly with uvicorn
+uvicorn api:app --host 0.0.0.0 --port 8080
+
+# Or with Python
+python3 api.py
+```
+
+The API server will be available at `http://localhost:8080`
+
+### API Endpoints
+
+#### GET `/`
+Welcome endpoint with API information.
+
+**Response:**
+```json
+{
+  "message": "Welcome to Cubit Programming Language API",
+  "version": "1.0.0",
+  "endpoints": {
+    "/": "API information (this page)",
+    "/health": "Health check endpoint",
+    "/execute": "Execute Cubit code (POST)"
+  },
+  "documentation": "/docs"
+}
+```
+
+#### GET `/health`
+Health check endpoint for monitoring.
+
+**Response:**
+```json
+{
+  "status": "healthy"
+}
+```
+
+#### POST `/execute`
+Execute Cubit code and return the output.
+
+**Request:**
+```json
+{
+  "code": "let x = 10\nprint x * 2"
+}
+```
+
+**Response (Success):**
+```json
+{
+  "output": "20\n",
+  "result": 20,
+  "error": null
+}
+```
+
+**Response (Error):**
+```json
+{
+  "output": null,
+  "result": null,
+  "error": "Undefined variable: y"
+}
+```
+
+### API Usage Examples
+
+#### Using curl
+
+```bash
+# Execute simple code
+curl -X POST http://localhost:8080/execute \
+  -H "Content-Type: application/json" \
+  -d '{"code": "let x = 10\nprint x * 2"}'
+
+# Execute code with error
+curl -X POST http://localhost:8080/execute \
+  -H "Content-Type: application/json" \
+  -d '{"code": "print undefined_var"}'
+
+# Health check
+curl http://localhost:8080/health
+```
+
+#### Using Python requests
+
+```python
+import requests
+
+# Execute Cubit code
+response = requests.post('http://localhost:8080/execute', json={
+    'code': '''
+let numbers = [1, 2, 3, 4, 5]
+let sum = 0
+let i = 0
+while i < len(numbers) {
+    sum = sum + numbers[i]
+    i = i + 1
+}
+print sum
+'''
+})
+
+print(response.json())
+# Output: {'output': '15\n', 'result': 15, 'error': None}
+```
+
+#### Using JavaScript/TypeScript
+
+```javascript
+// Execute Cubit code
+const response = await fetch('http://localhost:8080/execute', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ code: 'let x = 10\nprint x * 2' })
+});
+
+const result = await response.json();
+console.log(result);
+// Output: { output: "20\n", result: 20, error: null }
+```
+
+### Deployment to Railway/Railpack
+
+The API server is ready for deployment on Railway or Railpack:
+
+1. **Automatic Deployment**: The `start.sh` script automatically installs dependencies and starts the server.
+
+2. **Port Configuration**: The server uses the `PORT` environment variable (provided by Railway) or defaults to 8080.
+
+3. **CORS Support**: CORS is enabled for all origins to allow frontend integration.
+
+**Deployment Steps:**
+
+1. Push your code to GitHub
+2. Connect your repository to Railway
+3. Railway will automatically detect and use `start.sh`
+4. The server will be available at your Railway-provided URL
+
+**Environment Variables:**
+- `PORT` - Server port (automatically set by Railway)
+
+### Interactive Documentation
+
+Once the server is running, visit `http://localhost:8080/docs` to access the interactive API documentation powered by Swagger UI.
+
 ## Advanced Modules
 
 Cubit now includes several advanced modules:
