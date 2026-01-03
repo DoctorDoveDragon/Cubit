@@ -15,4 +15,4 @@ PORT=${PORT:-8080}
 # --host 0.0.0.0: Listen on all network interfaces
 # --port: Use the specified port
 # --workers 1: Single worker for simplicity (can be increased for production)
-exec uvicorn api:app --host 0.0.0.0 --port $PORT --workers 1
+exec uvicorn api:app --host 0.0.0.0 --port "$PORT" --workers 1

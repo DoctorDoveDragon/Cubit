@@ -4,11 +4,10 @@ FastAPI Web Server for Cubit Programming Language
 Provides REST API endpoints for executing Cubit code
 """
 
-import sys
 from io import StringIO
 from typing import Optional, Any
 from contextlib import redirect_stdout
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, ConfigDict
 from interpreter import Interpreter
