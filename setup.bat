@@ -52,14 +52,17 @@ echo ✨ Setup complete! 🎉
 echo.
 echo To start Cubit:
 echo.
-echo Terminal 1 (Backend API):
-echo   python api.py
+echo Option 1 - Manual (Two terminals):
+echo   Terminal 1 (Backend API):
+echo     python api.py
 echo.
-echo Terminal 2 (Frontend):
-echo   cd frontend
-echo   npm run dev
+echo   Terminal 2 (Frontend):
+echo     cd frontend
+echo     npm run dev
 echo.
 echo Then visit: http://localhost:3000
+echo.
+echo Note: For automated startup on Unix/Linux/Mac, use ./start.sh
 echo.
 
 pause
