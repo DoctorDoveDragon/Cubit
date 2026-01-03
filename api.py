@@ -5,11 +5,12 @@ Provides REST API endpoints for executing Cubit code
 """
 
 import sys
+import json
 from io import StringIO
-from typing import Optional
+from typing import Optional, Any
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from interpreter import Interpreter
 
 # Initialize FastAPI app
@@ -36,9 +37,11 @@ class ExecuteRequest(BaseModel):
 
 class ExecuteResponse(BaseModel):
     """Response model for code execution"""
-    output: Optional[str]
-    result: Optional[any]
-    error: Optional[str]
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+    
+    output: Optional[str] = None
+    result: Any = None
+    error: Optional[str] = None
 
 
 @app.get("/")
