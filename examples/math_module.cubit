@@ -1,0 +1,41 @@
+# Math Module Examples
+
+print "=== Math Module Examples ==="
+print ""
+
+# Basic math functions
+print "Square root of 16:"
+print sqrt(16)
+
+print "2 to the power of 8:"
+print pow(2, 8)
+
+print "Absolute value of -42:"
+print abs(-42)
+
+print "Minimum of 5, 2, 8, 1:"
+print min(5, 2, 8, 1)
+
+print "Maximum of 5, 2, 8, 1:"
+print max(5, 2, 8, 1)
+
+# Floor and ceiling
+let pi = 3.14159
+print "Pi:"
+print pi
+print "Floor of pi:"
+print floor(pi)
+print "Ceiling of pi:"
+print ceil(pi)
+print "Rounded pi:"
+print round(pi)
+
+# Trigonometric functions
+print ""
+print "Sin(0):"
+print sin(0)
+print "Cos(0):"
+print cos(0)
+
+print ""
+print "=== Math Module Tests Complete ==="

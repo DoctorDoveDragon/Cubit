@@ -64,25 +64,42 @@ class WhileNode(ASTNode):
     body: ASTNode
 
 
+@dataclass
+class FunctionCallNode(ASTNode):
+    function_name: str
+    arguments: List[ASTNode]
+
+
+@dataclass
+class ListNode(ASTNode):
+    elements: List[ASTNode]
+
+
+@dataclass
+class IndexNode(ASTNode):
+    list_expr: ASTNode
+    index: ASTNode
+
+
 class Parser:
     def __init__(self, tokens: List[Token]):
         self.tokens = tokens
-        self.pos = 0
+        self.position = 0
     
     def current_token(self) -> Token:
-        if self.pos >= len(self.tokens):
+        if self.position >= len(self.tokens):
             return self.tokens[-1]  # Return EOF
-        return self.tokens[self.pos]
+        return self.tokens[self.position]
     
     def peek_token(self, offset: int = 1) -> Token:
-        pos = self.pos + offset
-        if pos >= len(self.tokens):
+        peek_position = self.position + offset
+        if peek_position >= len(self.tokens):
             return self.tokens[-1]
-        return self.tokens[pos]
+        return self.tokens[peek_position]
     
     def advance(self):
-        if self.pos < len(self.tokens) - 1:
-            self.pos += 1
+        if self.position < len(self.tokens) - 1:
+            self.position += 1
     
     def expect(self, token_type: TokenType) -> Token:
         token = self.current_token()
@@ -100,9 +117,9 @@ class Parser:
         self.skip_newlines()
         
         while self.current_token().type != TokenType.EOF:
-            stmt = self.parse_statement()
-            if stmt:
-                statements.append(stmt)
+            statement = self.parse_statement()
+            if statement:
+                statements.append(statement)
             self.skip_newlines()
         
         return BlockNode(statements)
@@ -125,18 +142,18 @@ class Parser:
                 return self.parse_assignment()
             else:
                 # Expression statement
-                expr = self.parse_expression()
+                expression = self.parse_expression()
                 self.skip_statement_end()
-                return expr
+                return expression
         elif token.type == TokenType.LBRACE:
             return self.parse_block()
         elif token.type in (TokenType.NEWLINE, TokenType.SEMICOLON):
             self.advance()
             return None
         else:
-            expr = self.parse_expression()
+            expression = self.parse_expression()
             self.skip_statement_end()
-            return expr
+            return expression
     
     def skip_statement_end(self):
         """Skip semicolons and newlines that mark end of statement"""
@@ -145,9 +162,9 @@ class Parser:
     
     def parse_print(self) -> PrintNode:
         self.expect(TokenType.PRINT)
-        expr = self.parse_expression()
+        expression = self.parse_expression()
         self.skip_statement_end()
-        return PrintNode(expr)
+        return PrintNode(expression)
     
     def parse_assignment(self) -> AssignmentNode:
         if self.current_token().type == TokenType.LET:
@@ -164,13 +181,13 @@ class Parser:
         self.expect(TokenType.IF)
         
         # Optional parentheses around condition
-        has_paren = self.current_token().type == TokenType.LPAREN
-        if has_paren:
+        has_parentheses = self.current_token().type == TokenType.LPAREN
+        if has_parentheses:
             self.advance()
         
         condition = self.parse_expression()
         
-        if has_paren:
+        if has_parentheses:
             self.expect(TokenType.RPAREN)
         
         self.skip_newlines()
@@ -189,13 +206,13 @@ class Parser:
         self.expect(TokenType.WHILE)
         
         # Optional parentheses around condition
-        has_paren = self.current_token().type == TokenType.LPAREN
-        if has_paren:
+        has_parentheses = self.current_token().type == TokenType.LPAREN
+        if has_parentheses:
             self.advance()
         
         condition = self.parse_expression()
         
-        if has_paren:
+        if has_parentheses:
             self.expect(TokenType.RPAREN)
         
         self.skip_newlines()
@@ -209,9 +226,9 @@ class Parser:
         
         statements = []
         while self.current_token().type != TokenType.RBRACE and self.current_token().type != TokenType.EOF:
-            stmt = self.parse_statement()
-            if stmt:
-                statements.append(stmt)
+            statement = self.parse_statement()
+            if statement:
+                statements.append(statement)
             self.skip_newlines()
         
         self.expect(TokenType.RBRACE)
@@ -226,10 +243,10 @@ class Parser:
         while self.current_token().type in (TokenType.EQUAL, TokenType.NOT_EQUAL,
                                             TokenType.LESS, TokenType.GREATER,
                                             TokenType.LESS_EQUAL, TokenType.GREATER_EQUAL):
-            op_token = self.current_token()
+            operator_token = self.current_token()
             self.advance()
             right = self.parse_additive()
-            left = BinaryOpNode(left, op_token.value, right)
+            left = BinaryOpNode(left, operator_token.value, right)
         
         return left
     
@@ -237,23 +254,58 @@ class Parser:
         left = self.parse_multiplicative()
         
         while self.current_token().type in (TokenType.PLUS, TokenType.MINUS):
-            op_token = self.current_token()
+            operator_token = self.current_token()
             self.advance()
             right = self.parse_multiplicative()
-            left = BinaryOpNode(left, op_token.value, right)
+            left = BinaryOpNode(left, operator_token.value, right)
         
         return left
     
     def parse_multiplicative(self) -> ASTNode:
-        left = self.parse_primary()
+        left = self.parse_postfix()
         
         while self.current_token().type in (TokenType.MULTIPLY, TokenType.DIVIDE):
-            op_token = self.current_token()
+            operator_token = self.current_token()
             self.advance()
-            right = self.parse_primary()
-            left = BinaryOpNode(left, op_token.value, right)
+            right = self.parse_postfix()
+            left = BinaryOpNode(left, operator_token.value, right)
         
         return left
+    
+    def parse_postfix(self) -> ASTNode:
+        """Parse postfix expressions like function calls and array indexing"""
+        node = self.parse_primary()
+        
+        while True:
+            if self.current_token().type == TokenType.LPAREN:
+                # Function call
+                if not isinstance(node, VariableNode):
+                    raise Exception(f"Cannot call non-identifier at line {self.current_token().line}")
+                node = self.parse_function_call(node.name)
+            elif self.current_token().type == TokenType.LBRACKET:
+                # Array indexing
+                self.advance()
+                index = self.parse_expression()
+                self.expect(TokenType.RBRACKET)
+                node = IndexNode(node, index)
+            else:
+                break
+        
+        return node
+    
+    def parse_function_call(self, function_name: str) -> FunctionCallNode:
+        """Parse a function call"""
+        self.expect(TokenType.LPAREN)
+        
+        arguments = []
+        if self.current_token().type != TokenType.RPAREN:
+            arguments.append(self.parse_expression())
+            while self.current_token().type == TokenType.COMMA:
+                self.advance()
+                arguments.append(self.parse_expression())
+        
+        self.expect(TokenType.RPAREN)
+        return FunctionCallNode(function_name, arguments)
     
     def parse_primary(self) -> ASTNode:
         token = self.current_token()
@@ -269,12 +321,29 @@ class Parser:
             return VariableNode(token.value)
         elif token.type == TokenType.LPAREN:
             self.advance()
-            expr = self.parse_expression()
+            expression = self.parse_expression()
             self.expect(TokenType.RPAREN)
-            return expr
+            return expression
+        elif token.type == TokenType.LBRACKET:
+            # List literal
+            return self.parse_list()
         elif token.type == TokenType.MINUS:
             self.advance()
-            expr = self.parse_primary()
-            return BinaryOpNode(NumberNode(0), '-', expr)
+            expression = self.parse_primary()
+            return BinaryOpNode(NumberNode(0), '-', expression)
         else:
             raise Exception(f"Unexpected token {token.type} at line {token.line}")
+    
+    def parse_list(self) -> ListNode:
+        """Parse a list literal [1, 2, 3]"""
+        self.expect(TokenType.LBRACKET)
+        
+        elements = []
+        if self.current_token().type != TokenType.RBRACKET:
+            elements.append(self.parse_expression())
+            while self.current_token().type == TokenType.COMMA:
+                self.advance()
+                elements.append(self.parse_expression())
+        
+        self.expect(TokenType.RBRACKET)
+        return ListNode(elements)

@@ -1,0 +1,83 @@
+# Comprehensive Module Demo
+# This file demonstrates all advanced modules in Cubit
+
+print "=== Cubit Advanced Modules Demo ==="
+print ""
+
+# 1. Math Module
+print "1. MATH MODULE"
+print "Square root of 25:"
+print sqrt(25)
+print "3 to the power of 4:"
+print pow(3, 4)
+let radius = 5
+let area = 3.14159 * pow(radius, 2)
+print "Area of circle with radius 5:"
+print area
+print ""
+
+# 2. String Module
+print "2. STRING MODULE"
+let message = "hello cubit"
+print "Original:"
+print message
+print "Uppercase:"
+print upper(message)
+let words = split(message, " ")
+print "Split into words:"
+print words
+print "Joined with underscores:"
+print join("_", words)
+print ""
+
+# 3. List/Array Module
+print "3. LIST MODULE"
+let scores = [85, 92, 78, 95, 88]
+print "Test scores:"
+print scores
+print "Number of scores:"
+print len(scores)
+print "Highest score:"
+print max(85, 92, 78, 95, 88)
+print "Lowest score:"
+print min(85, 92, 78, 95, 88)
+sort(scores)
+print "Sorted scores:"
+print scores
+print ""
+
+# 4. Random Module
+print "4. RANDOM MODULE"
+let lottery = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+shuffle(lottery)
+print "Shuffled lottery numbers:"
+print lottery
+print "Lucky number (1-100):"
+print randint(1, 100)
+print ""
+
+# 5. Practical Example: Grade Calculator
+print "5. PRACTICAL EXAMPLE: Grade Statistics"
+let grades = [85, 92, 78, 95, 88]
+print "Grades:"
+print grades
+
+print "Number of grades:"
+let count = len(grades)
+print count
+
+print "Highest grade:"
+let highest = max(85, 92, 78, 95, 88)
+print highest
+
+print "Lowest grade:"
+let lowest = min(85, 92, 78, 95, 88)
+print lowest
+
+# Sort to find median
+sort(grades)
+print "Sorted grades:"
+print grades
+
+print ""
+print "=== Demo Complete ==="

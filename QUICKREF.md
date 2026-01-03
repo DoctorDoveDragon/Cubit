@@ -28,6 +28,16 @@ y = 20            # or assign directly
 42                # integers
 3.14              # floats
 "Hello"           # strings
+[1, 2, 3]         # lists/arrays
+```
+
+### Lists/Arrays
+```cubit
+let nums = [1, 2, 3, 4, 5]    # create list
+print nums[0]                  # access by index (first element)
+print nums[-1]                 # negative indexing (last element)
+let matrix = [[1, 2], [3, 4]] # nested lists
+print matrix[0][1]             # access nested element
 ```
 
 ### Arithmetic Operators
@@ -88,6 +98,46 @@ while i < 10 {
 (a + b) * c
 ```
 
+### Function Calls
+```cubit
+# Math functions
+sqrt(16)              # square root
+pow(2, 8)             # power
+abs(-5)               # absolute value
+min(1, 2, 3)          # minimum
+max(1, 2, 3)          # maximum
+floor(3.7)            # floor
+ceil(3.2)             # ceiling
+round(3.5)            # round
+
+# String functions
+len("hello")          # length
+upper("hello")        # uppercase
+lower("HELLO")        # lowercase
+split("a,b,c", ",")   # split string
+join("-", [1, 2, 3])  # join list
+
+# List functions
+append(list, item)    # add to list
+pop(list)             # remove last
+sort(list)            # sort in-place
+reverse(list)         # reverse in-place
+
+# Random functions
+random()              # random 0.0-1.0
+randint(1, 10)        # random integer
+choice([1, 2, 3])     # random choice
+shuffle(list)         # shuffle in-place
+
+# Type conversion
+int(3.14)             # to integer
+float(42)             # to float
+str(123)              # to string
+
+# Input
+input("Enter: ")      # get user input
+```
+
 ## REPL Commands
 
 - `help` - Show help
@@ -102,3 +152,8 @@ See the `examples/` directory for complete programs:
 - `conditionals.cubit` - If-else logic
 - `countdown.cubit` - While loop example
 - `test_suite.cubit` - Comprehensive feature test
+- `math_module.cubit` - Math module examples
+- `string_module.cubit` - String module examples
+- `list_module.cubit` - List/array module examples
+- `random_module.cubit` - Random module examples
+- `advanced_demo.cubit` - All modules demo

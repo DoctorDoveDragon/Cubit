@@ -1,0 +1,60 @@
+# String Module Examples
+
+print "=== String Module Examples ==="
+print ""
+
+# String operations
+let greeting = "Hello, World!"
+print "Original string:"
+print greeting
+
+print ""
+print "Length:"
+print len(greeting)
+
+print "Uppercase:"
+print upper(greeting)
+
+print "Lowercase:"
+print lower(greeting)
+
+# String methods
+let text = "  hello world  "
+print ""
+print "Original with spaces:"
+print text
+print "Stripped:"
+print strip(text)
+
+# Split and join
+let sentence = "apple banana cherry"
+print ""
+print "Original sentence:"
+print sentence
+print "Split by space:"
+let words = split(sentence, " ")
+print words
+
+print "Joined with dashes:"
+print join("-", words)
+
+# Replace
+let original = "I like cats"
+print ""
+print "Original:"
+print original
+print "After replace:"
+print replace(original, "cats", "dogs")
+
+# Startswith and endswith
+let filename = "document.txt"
+print ""
+print "Filename:"
+print filename
+print "Ends with .txt:"
+print endswith(filename, ".txt")
+print "Starts with doc:"
+print startswith(filename, "doc")
+
+print ""
+print "=== String Module Tests Complete ==="
