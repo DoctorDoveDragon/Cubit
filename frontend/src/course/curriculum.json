@@ -1,0 +1,72 @@
+{
+    "modules": [
+        {
+            "title": "Introduction to Cubit",
+            "description": "Get started with the Cubit language, its philosophy, and setup.",
+            "lessons": [
+                {
+                    "title": "What is Cubit?",
+                    "content": "Cubit is a modern, educational programming language designed for learning and creativity. In this lesson, you'll learn about its goals, syntax, and unique features."
+                },
+                {
+                    "title": "Setting Up Cubit",
+                    "content": "Learn how to install and run Cubit locally or in the cloud. Step-by-step instructions for different platforms."
+                },
+                {
+                    "title": "Hello, World!",
+                    "content": "Write your first Cubit program and see how code execution works. Example:\n\nlet message = 'Hello, World!'\nprint message"
+                }
+            ]
+        },
+        {
+            "title": "Cubit Basics",
+            "description": "Learn the core syntax and concepts of Cubit.",
+            "lessons": [
+                {
+                    "title": "Variables and Types",
+                    "content": "Understand how to declare variables and use basic types in Cubit. Example:\n\nlet x = 5\nlet name = 'Alice'\nprint x\nprint name"
+                },
+                {
+                    "title": "Operators and Expressions",
+                    "content": "Explore arithmetic, comparison, and logical operators. Example:\n\nlet a = 10\nlet b = 3\nprint a + b\nprint a > b"
+                },
+                {
+                    "title": "Control Flow",
+                    "content": "Learn about if statements, loops, and flow control. Example:\n\nlet n = 5\nif n > 0 {\n  print 'Positive'\n} else {\n  print 'Non-positive'\n}\n\nfor i in 1..5 {\n  print i\n}"
+                }
+            ]
+        },
+        {
+            "title": "Functions and Modules",
+            "description": "Write reusable code and organize your Cubit programs.",
+            "lessons": [
+                {
+                    "title": "Defining Functions",
+                    "content": "How to define and call functions in Cubit. Example:\n\nfn greet(name) {\n  print 'Hello, ' + name\n}\ngreet('World')"
+                },
+                {
+                    "title": "Using Modules",
+                    "content": "Import and use modules for math, strings, and more. Example:\n\nimport math\nprint math.sqrt(16)"
+                }
+            ]
+        },
+        {
+            "title": "Advanced Cubit",
+            "description": "Explore advanced features and best practices.",
+            "lessons": [
+                {
+                    "title": "Lists and Iteration",
+                    "content": "Work with lists and iterate over data. Example:\n\nlet nums = [1, 2, 3, 4]\nfor n in nums {\n  print n\n}"
+                },
+                {
+                    "title": "Error Handling",
+                    "content": "Handle errors gracefully in Cubit. Example:\n\ntry {\n  let x = 1 / 0\n} catch e {\n  print 'Error: ' + e\n}"
+                },
+                {
+                    "title": "Project: Build a Countdown",
+                    "content": "Apply your knowledge to build a countdown program in Cubit. Example:\n\nlet n = 5\nwhile n > 0 {\n  print n\n  n = n - 1\n}\nprint 'Liftoff!'"
+                }
+            ]
+        }
+    ]
+}

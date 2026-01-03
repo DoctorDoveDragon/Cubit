@@ -3,6 +3,8 @@
 import React, { useState } from 'react'
 import Button from './Button'
 import Toast from './Toast'
+import { analyzeBundleSize, generateBundleReport } from '../utils/bundleAnalyzer'
+import { getProgress, getConceptGraph } from '../utils/api'
 
 type CommandCategory = 'ai' | 'design' | 'workflow' | 'intelligence'
 
@@ -264,14 +266,67 @@ export default function CreativeCommandsPanel() {
     {
       name: 'Bundle Analyzer',
       description: 'Show size breakdown',
-      action: () => {
+      action: async () => {
         showToast('Analyzing bundle size...')
-        setTimeout(() => {
+        try {
+          const analysis = await analyzeBundleSize()
+          const report = generateBundleReport(analysis)
+          showModalDialog('Bundle Analysis', report)
+        } catch (error) {
           showModalDialog(
-            'Bundle Analysis',
-            'Total bundle size: 245 KB\n\n📦 React: 120 KB (49%)\n📦 Framer Motion: 65 KB (27%)\n📦 Components: 45 KB (18%)\n📦 Utils: 15 KB (6%)\n\n[Mock bundle data]'
+            'Bundle Analysis Error',
+            `Failed to analyze bundle:\n\n${error instanceof Error ? error.message : 'Unknown error'}\n\nPlease ensure the app is built or running in development mode.`
           )
-        }, 1200)
+        }
+      }
+    },
+    {
+      name: 'Learning Progress',
+      description: 'View your programming progress',
+      action: async () => {
+        showToast('Fetching learning progress...')
+        try {
+          const progress = await getProgress()
+          showModalDialog(
+            'Learning Progress',
+            `${progress.message}\n\n${progress.info || 'No detailed progress information available yet. Start coding with Teaching Mode enabled to track your progress!'}`
+          )
+        } catch (error) {
+          showModalDialog(
+            'Progress Error',
+            `Failed to fetch progress:\n\n${error instanceof Error ? error.message : 'Unknown error'}\n\nMake sure the backend API is running and Teaching Mode has been used.`
+          )
+        }
+      }
+    },
+    {
+      name: 'Concept Explorer',
+      description: 'Browse programming concepts',
+      action: async () => {
+        showToast('Loading concept graph...')
+        try {
+          const concepts = await getConceptGraph()
+          const beginnerCount = concepts.concepts.beginner.length
+          const intermediateCount = concepts.concepts.intermediate.length
+          const advancedCount = concepts.concepts.advanced.length
+
+          const report = `📚 Programming Concepts Library\n\n` +
+            `🟢 Beginner: ${beginnerCount} concepts\n` +
+            `${concepts.concepts.beginner.slice(0, 5).join(', ')}${beginnerCount > 5 ? '...' : ''}\n\n` +
+            `🔵 Intermediate: ${intermediateCount} concepts\n` +
+            `${concepts.concepts.intermediate.slice(0, 5).join(', ')}${intermediateCount > 5 ? '...' : ''}\n\n` +
+            `🟣 Advanced: ${advancedCount} concepts\n` +
+            `${concepts.concepts.advanced.slice(0, 5).join(', ')}${advancedCount > 5 ? '...' : ''}\n\n` +
+            `Total: ${beginnerCount + intermediateCount + advancedCount} concepts tracked\n\n` +
+            `View the Progress Dashboard for detailed concept information!`
+
+          showModalDialog('Concept Explorer', report)
+        } catch (error) {
+          showModalDialog(
+            'Concept Error',
+            `Failed to load concepts:\n\n${error instanceof Error ? error.message : 'Unknown error'}`
+          )
+        }
       }
     },
     {

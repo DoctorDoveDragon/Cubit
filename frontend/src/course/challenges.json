@@ -1,0 +1,28 @@
+{
+    "challenges": [
+        {
+            "title": "FizzBuzz",
+            "description": "Write a Cubit program that prints the numbers from 1 to 20. For multiples of 3, print 'Fizz' instead of the number, for multiples of 5 print 'Buzz', and for numbers which are multiples of both 3 and 5 print 'FizzBuzz'.",
+            "starter": "for i in 1..20 {\n  print i\n}",
+            "solution": "for i in 1..20 {\n  if i % 3 == 0 && i % 5 == 0 {\n    print 'FizzBuzz'\n  } else if i % 3 == 0 {\n    print 'Fizz'\n  } else if i % 5 == 0 {\n    print 'Buzz'\n  } else {\n    print i\n  }\n}"
+        },
+        {
+            "title": "Palindrome Checker",
+            "description": "Write a Cubit function that checks if a string is a palindrome (reads the same forwards and backwards). Print 'Yes' if it is, 'No' otherwise.",
+            "starter": "fn is_palindrome(s) {\n  return false\n}\nprint is_palindrome('level')",
+            "solution": "fn is_palindrome(s) {\n  return s == s[::-1]\n}\nprint is_palindrome('level')"
+        },
+        {
+            "title": "Sum of List",
+            "description": "Write a Cubit program that calculates the sum of all numbers in a list and prints the result.",
+            "starter": "let nums = [1, 2, 3, 4, 5]\nlet total = 0\nprint total",
+            "solution": "let nums = [1, 2, 3, 4, 5]\nlet total = 0\nfor n in nums {\n  total = total + n\n}\nprint total"
+        },
+        {
+            "title": "Guess the Number Game",
+            "description": "Create a simple number guessing game. The program should pick a random number between 1 and 10, and the user should guess until they get it right.",
+            "starter": "import random\nlet secret = random.randint(1, 10)\nlet guess = 0\nprint 'Guess a number between 1 and 10'",
+            "solution": "import random\nlet secret = random.randint(1, 10)\nlet guess = 0\nwhile guess != secret {\n  guess = input('Guess the number: ')\n  if guess == secret {\n    print 'Correct!'\n  } else {\n    print 'Try again.'\n  }\n}"
+        }
+    ]
+}

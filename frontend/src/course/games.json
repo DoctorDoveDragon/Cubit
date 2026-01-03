@@ -1,0 +1,39 @@
+{
+    "games": [
+        {
+            "title": "Treasure Hunt",
+            "description": "Navigate a grid to find the hidden treasure using Cubit code. Practice loops, conditionals, and logic.",
+            "instructions": "Write Cubit code to move your player (P) to the treasure (T) on a 5x5 grid. Use commands like move_up(), move_down(), move_left(), move_right().",
+            "starter": "// Example: move_right()\n// Your code here",
+            "solution": "move_right()\nmove_right()\nmove_down()\nmove_down()"
+        },
+        {
+            "title": "Code Race",
+            "description": "Race to the finish line by solving Cubit puzzles quickly. Compete against a timer or AI.",
+            "instructions": "Complete each Cubit challenge as fast as possible. Each correct solution moves your racer forward.",
+            "starter": "// Solve: let x = 3 + 4\nprint x",
+            "solution": "let x = 3 + 4\nprint x"
+        },
+        {
+            "title": "Animated Art",
+            "description": "Create generative art with Cubit code. See your code come to life with colors and shapes.",
+            "instructions": "Use Cubit to draw shapes, patterns, or animations. Try: draw_circle(x, y, r), set_color('red'), animate().",
+            "starter": "set_color('blue')\ndraw_circle(50, 50, 20)",
+            "solution": "set_color('blue')\ndraw_circle(50, 50, 20)"
+        },
+        {
+            "title": "STEM Project: Solar System",
+            "description": "Model the solar system with Cubit. Animate planets orbiting the sun.",
+            "instructions": "Use Cubit to create and animate planets. Try: create_planet('Earth', 100, 'blue'), orbit('Earth', 'Sun', 365).",
+            "starter": "create_planet('Earth', 100, 'blue')\norbit('Earth', 'Sun', 365)",
+            "solution": "create_planet('Earth', 100, 'blue')\norbit('Earth', 'Sun', 365)"
+        },
+        {
+            "title": "Graphing Calculator",
+            "description": "Plot mathematical functions and data with Cubit code.",
+            "instructions": "Use plot(x, y) to graph points or functions. Try: plot([1,2,3], [1,4,9]) for y = x^2.",
+            "starter": "let x = [1,2,3]\nlet y = [1,4,9]\nplot(x, y)",
+            "solution": "let x = [1,2,3]\nlet y = [1,4,9]\nplot(x, y)"
+        }
+    ]
+}

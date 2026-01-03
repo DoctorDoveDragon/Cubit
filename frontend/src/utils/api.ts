@@ -1,15 +1,40 @@
 /**
- * API client for the Cubit backend
+ * API client for the Cubit backend with pedagogical features
  */
 
 export interface ExecuteRequest {
   code: string
+  teaching_enabled?: boolean
+  verbosity?: 'minimal' | 'normal' | 'detailed'
+}
+
+export interface Progress {
+  total_calls: number
+  method_diversity: string[]
+  mastered_concepts?: string[]
 }
 
 export interface ExecuteResponse {
   output: string | null
   result: any
   error: string | null
+  skill_level?: string
+  progress?: Progress
+  suggestions?: string[]
+}
+
+export interface ConceptGraph {
+  concepts: {
+    beginner: string[]
+    intermediate: string[]
+    advanced: string[]
+  }
+  graph: {
+    [key: string]: {
+      prerequisites: string[]
+      difficulty: string
+    }
+  }
 }
 
 /**
@@ -42,25 +67,25 @@ const isNetworkError = (error: unknown): boolean => {
   }
   if (error instanceof Error) {
     const message = error.message.toLowerCase()
-    return message.includes('fetch') || 
-           message.includes('network') || 
-           message.includes('failed to fetch') ||
-           message.includes('networkerror') ||
-           message.includes('connection')
+    return message.includes('fetch') ||
+      message.includes('network') ||
+      message.includes('failed to fetch') ||
+      message.includes('networkerror') ||
+      message.includes('connection')
   }
   return false
 }
 
 /**
- * Execute Cubit code via the backend API with retry logic
- * @param code - The Cubit code to execute
+ * Execute Cubit code via the backend API with retry logic and pedagogical features
+ * @param request - The execution request with code and optional teaching settings
  * @param retries - Number of retries (default: 2)
  * @returns Promise with execution results
  */
-export async function executeCode(code: string, retries: number = 2): Promise<ExecuteResponse> {
+export async function executeCode(request: ExecuteRequest, retries: number = 2): Promise<ExecuteResponse> {
   const apiUrl = getApiBaseUrl()
   let lastError: unknown = null
-  
+
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
       const response = await fetch(`${apiUrl}/execute`, {
@@ -68,31 +93,31 @@ export async function executeCode(code: string, retries: number = 2): Promise<Ex
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ code } as ExecuteRequest)
+        body: JSON.stringify(request)
       })
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
-      
+
       const data: ExecuteResponse = await response.json()
       return data
     } catch (error) {
       lastError = error
-      
+
       // If this is the last attempt, return error response
       if (attempt === retries) {
         break
       }
-      
+
       // Wait before retrying (exponential backoff)
       await sleep(Math.pow(2, attempt) * 500)
     }
   }
-  
+
   // Return error response after all retries failed
   const errorMessage = lastError instanceof Error ? lastError.message : 'Unknown error occurred'
-  
+
   return {
     output: null,
     result: null,
@@ -107,18 +132,46 @@ export async function executeCode(code: string, retries: number = 2): Promise<Ex
  */
 export async function checkApiHealth(): Promise<boolean> {
   const apiUrl = getApiBaseUrl()
-  
+
   try {
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 second timeout
-    
+
     const response = await fetch(`${apiUrl}/health`, {
       signal: controller.signal
     })
-    
+
     clearTimeout(timeoutId)
     return response.ok
   } catch {
     return false
   }
+}
+
+/**
+ * Get concept graph and suggestions
+ */
+export async function getConceptGraph(): Promise<ConceptGraph> {
+  const apiUrl = getApiBaseUrl()
+  const response = await fetch(`${apiUrl}/concepts`)
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`)
+  }
+
+  return response.json()
+}
+
+/**
+ * Get learning progress information
+ */
+export async function getProgress(): Promise<{ message: string; info: string }> {
+  const apiUrl = getApiBaseUrl()
+  const response = await fetch(`${apiUrl}/progress`)
+
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`)
+  }
+
+  return response.json()
 }
