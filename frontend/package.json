@@ -6,9 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "lint": "next lint"
   },
   "dependencies": {
     "framer-motion": "^12.23.26",
@@ -26,9 +24,6 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.1",
     "tailwindcss": "^4",
-    "typescript": "^5",
-    "storybook": "^7.6.21",
-    "@storybook/nextjs": "^7.6.21",
-    "@storybook/addon-essentials": "^7.6.21"
+    "typescript": "^5"
   }
 }
