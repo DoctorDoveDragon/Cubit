@@ -22,7 +22,8 @@ export default function NaturalLanguageInput({ onCode }: Props) {
             if (!res.ok) throw new Error('API error');
             const data = await res.json();
             onCode(data.code || '// AI: No code generated.');
-        } catch (e) {
+        } catch (err) {
+            console.error(err);
             setError('Failed to generate code.');
         }
         setLoading(false);

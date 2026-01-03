@@ -24,7 +24,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       model: 'deepseek-chat',
     });
     res.status(200).json({ code: completion.choices[0].message.content });
-  } catch (error: any) {
-    res.status(500).json({ error: error.message || 'Unknown error' });
+  } catch (error: unknown) {
+    let msg = 'Unknown error';
+    if (error && typeof error === 'object' && 'message' in error) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      msg = (error as any).message || msg;
+    } else if (typeof error === 'string') {
+      msg = error;
+    }
+    res.status(500).json({ error: msg });
   }
 }

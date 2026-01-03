@@ -51,6 +51,34 @@ export default function Flowchart() {
         return () => { if (runRef.current) window.clearInterval(runRef.current); };
     }, []);
 
+    // For one-shot flash animation when candidate edges change
+    const prevCandidateRef = useRef<Set<number>>(new Set());
+    const [flashEdges, setFlashEdges] = useState<number[]>([]);
+    const flashTimeoutRef = useRef<number | null>(null);
+
+    // When candidate edges change, flash newly-candidate edges once
+    useEffect(() => {
+        const info = getCandidateInfo();
+        const currentSet = new Set<number>(Array.from(info.keys()));
+        const prevSet = prevCandidateRef.current;
+
+        const newly: number[] = [];
+        currentSet.forEach(i => { if (!prevSet.has(i)) newly.push(i); });
+
+        if (newly.length > 0) {
+            setFlashEdges(newly);
+            if (flashTimeoutRef.current) {
+                window.clearTimeout(flashTimeoutRef.current);
+            }
+            flashTimeoutRef.current = window.setTimeout(() => {
+                setFlashEdges([]);
+                flashTimeoutRef.current = null;
+            }, 950);
+        }
+
+        prevCandidateRef.current = currentSet;
+    }, [nodes, edges, contextVars, selected, current]);
+
     const addNode = (x: number, y: number) => {
         const id = nextId;
         setNextId(id + 1);
@@ -567,6 +595,7 @@ export default function Flowchart() {
                     {(() => {
                         const candidateInfo = getCandidateInfo();
                         const candidateSet = new Set<number>(Array.from(candidateInfo.keys()));
+                        const flashEdgesSet = new Set<number>(flashEdges);
                         return edges.map((e, i) => {
                             const a = nodes.find(n => n.id === e.from);
                             const b = nodes.find(n => n.id === e.to);
@@ -585,8 +614,10 @@ export default function Flowchart() {
                             const textColor = isSelected ? '#ffd54f' : (isCandidate ? '#bfdbfe' : '#cbd5e1');
                             const angleDeg = Math.atan2(dy, dx) * 180 / Math.PI;
                             const edgeClass = isSelected ? 'edge-selected' : (isCandidate ? 'edge-candidate' : '');
+                            const isFlashing = flashEdgesSet.has(i);
+                            const combinedClass = `${edgeClass} ${isFlashing ? 'edge-flash' : ''}`.trim();
                             return (
-                                <g key={i} className={edgeClass} onMouseEnter={() => { hoverEdgeRef.current = i }} onMouseLeave={() => { hoverEdgeRef.current = null }}>
+                                <g key={i} className={combinedClass} onMouseEnter={() => { hoverEdgeRef.current = i }} onMouseLeave={() => { hoverEdgeRef.current = null }}>
                                     <title>{reason || (isCandidate ? 'candidate' : 'edge')}</title>
                                     <line onClick={(ev) => { ev.stopPropagation(); setSelectedEdge(i); setSelected(null); }} x1={startX} y1={startY} x2={endX} y2={endY} stroke={strokeColor} strokeWidth={strokeWidth} />
                                     {/* inline arrowhead so we can animate it per-edge */}
@@ -619,6 +650,13 @@ export default function Flowchart() {
                             }
                             .edge-candidate .arrow-head { animation: pulse 900ms ease-in-out infinite; }
                             .edge-selected .arrow-head { animation: pulse 600ms ease-in-out infinite; }
+                            /* one-shot flash when candidate set changes */
+                            @keyframes flash {
+                                0% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(96,165,250,0.0)); opacity: 0.9 }
+                                50% { transform: scale(1.5); filter: drop-shadow(0 0 8px rgba(96,165,250,0.85)); opacity: 1 }
+                                100% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(96,165,250,0.0)); opacity: 0.9 }
+                            }
+                            .edge-flash .arrow-head { animation: flash 900ms ease-in-out 1; }
                         `}</style>
                     </defs>
 

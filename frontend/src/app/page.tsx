@@ -179,10 +179,10 @@ export default function MainPage() {
               <ol className="text-sm text-[var(--color-muted)] list-decimal list-inside space-y-2">
                 <li>Write or select Cubit code from the examples dropdown</li>
                 <li>Enable <strong className="text-white">Teaching Mode</strong> to receive learning insights</li>
-                <li>Click "Run Code" to execute it via the backend API</li>
+                <li>Click &quot;Run Code&quot; to execute it via the backend API</li>
                 <li>View output, skill level, progress, and suggestions in real-time</li>
-                <li>Use "Show Progress" to view your learning dashboard and concept explorer</li>
-                <li>Use "Show Creative Commands" to access AI features and code intelligence</li>
+                <li>Use &quot;Show Progress&quot; to view your learning dashboard and concept explorer</li>
+                <li>Use &quot;Show Creative Commands&quot; to access AI features and code intelligence</li>
                 <li>Adjust verbosity level to control the depth of teaching explanations</li>
               </ol>
             </Card>

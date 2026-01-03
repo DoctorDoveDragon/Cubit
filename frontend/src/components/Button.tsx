@@ -1,5 +1,4 @@
 import React from 'react'
-import cx from 'classnames'
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary'

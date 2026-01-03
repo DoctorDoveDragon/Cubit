@@ -16,7 +16,7 @@ export interface Progress {
 
 export interface ExecuteResponse {
   output: string | null
-  result: any
+  result: unknown
   error: string | null
   skill_level?: string
   progress?: Progress

@@ -1,0 +1,113 @@
+{
+  "generated_at": "2026-01-03T16:45:21.714220Z",
+  "manifest": [
+    {
+      "path": "PATENT_PACKAGE/Provisional_Draft.md",
+      "sha256": "26b6362b3c85273ac53324b1c547a439d10d1691f88d975a16e99e7453d553fa",
+      "mtime": "2026-01-03T16:45:20.190148Z",
+      "size": 7640
+    },
+    {
+      "path": "PATENT_PACKAGE/Claims_Draft.md",
+      "sha256": "cafe89e4996fceb10c8588a9598d389bc395c1f542f21c28cb9e23a7b4711669",
+      "mtime": "2026-01-03T16:31:33.185567Z",
+      "size": 4955
+    },
+    {
+      "path": "PATENT_PACKAGE/Disclosure_1_Invention_Disclosure.md",
+      "sha256": "93a3f81beb0bd72146be484a901e7339ce909a1913a80b31f60386d5be182b36",
+      "mtime": "2026-01-03T16:29:18.815285Z",
+      "size": 2291
+    },
+    {
+      "path": "PATENT_PACKAGE/Disclosure_2_Invention_Disclosure.md",
+      "sha256": "1eb90263785cbc3282505e8a01598fa9827cb676e636d4a67176240bbd49054e",
+      "mtime": "2026-01-03T16:29:18.866048Z",
+      "size": 1637
+    },
+    {
+      "path": "PATENT_PACKAGE/PriorArt_Search_Plan.md",
+      "sha256": "147bd815e0b0264e18cc7b1a30bcb24c06d900dea0c1934f91662b79ac0259ca",
+      "mtime": "2026-01-03T16:31:33.392912Z",
+      "size": 2191
+    },
+    {
+      "path": "PATENT_DRAWINGS/Patent_Figures_Letter.pdf",
+      "sha256": "0e9f53ce511705f6fc5fe8e6054383fa12ae658b8d468079bc4ffabd8e017299",
+      "mtime": "2026-01-03T16:29:23.056383Z",
+      "size": 44850
+    },
+    {
+      "path": "PATENT_DRAWINGS/ComputationalGeometry_Export_2026-01-03T15-54-25-231Z.svg",
+      "sha256": "940c9a6f8a31333fa1e9f99f3637dffee5d1463ac8522dec96d5ba4b7fe12aa2",
+      "mtime": "2026-01-03T15:54:25.239787Z",
+      "size": 1698
+    },
+    {
+      "path": "PATENT_DRAWINGS/Figure_6_Line.png",
+      "sha256": "d088efc647dc2079fd433e1316e237766c870d2491d41679d4e3f5cbd0a206ad",
+      "mtime": "2026-01-03T15:44:59.949166Z",
+      "size": 55907
+    },
+    {
+      "path": "PATENT_DRAWINGS/Figure_7_Arc.png",
+      "sha256": "ac21e3b0f83c44a9106f45cc9bc64d40ff48e688b9a191dee4f3327c86fdc025",
+      "mtime": "2026-01-03T15:45:00.253235Z",
+      "size": 58166
+    },
+    {
+      "path": "PATENT_DRAWINGS/Figure_3_Circle.png",
+      "sha256": "212a2dda34242f1edb7b1f48532ad49ba2c64dd27f65ed2dab585af321d1440c",
+      "mtime": "2026-01-03T15:44:59.050118Z",
+      "size": 59475
+    },
+    {
+      "path": "PATENT_DRAWINGS/ComputationalGeometry_Export_2026-01-03T15-57-35-040Z.svg",
+      "sha256": "899c63f60822daf3bcd804b79e19b5cf9c8bfea463b5129213ca6ca693395ecf",
+      "mtime": "2026-01-03T15:57:35.041380Z",
+      "size": 1699
+    },
+    {
+      "path": "PATENT_DRAWINGS/Figure_4_Square.png",
+      "sha256": "c5bdf233183b4e98c70703edf53b4742379e45529752fd6734a4e6b8e220a03e",
+      "mtime": "2026-01-03T15:44:59.352394Z",
+      "size": 58401
+    },
+    {
+      "path": "PATENT_DRAWINGS/ComputationalGeometry_Export_2026-01-03T16-08-55-094Z.svg",
+      "sha256": "3400a569eade25571488c4f977402a68f0bcde243b8d09fba2df6ba580c1714b",
+      "mtime": "2026-01-03T16:08:55.095402Z",
+      "size": 1718
+    },
+    {
+      "path": "PATENT_DRAWINGS/ComputationalGeometry_Export_2026-01-03T15-59-00-237Z.svg",
+      "sha256": "af438310253d5f0b4e77490af1c74924625ee813c87228cb7e5a24ea4b998eea",
+      "mtime": "2026-01-03T15:59:00.238838Z",
+      "size": 1699
+    },
+    {
+      "path": "PATENT_DRAWINGS/Figure_8_Matrix.png",
+      "sha256": "6e579b56bf398058b0aa066407e1265bf2001e041520b07e78ec917b1b507630",
+      "mtime": "2026-01-03T15:45:00.552627Z",
+      "size": 56895
+    },
+    {
+      "path": "PATENT_DRAWINGS/Figure_5_Triangle.png",
+      "sha256": "a353ec26e09b5d97e4abc7547771c4a6c9c8ff7c93133ea5ec4be9e8e27092da",
+      "mtime": "2026-01-03T15:44:59.652475Z",
+      "size": 58126
+    },
+    {
+      "path": "PATENT_DRAWINGS/Figure_2_Node.png",
+      "sha256": "e496752114d28ec6fae8d0f2d93fcb54e8a9ec38694c5ac8672d233198f35239",
+      "mtime": "2026-01-03T15:44:58.754868Z",
+      "size": 57183
+    },
+    {
+      "path": "PATENT_DRAWINGS/Figure_9_UI_Complete.png",
+      "sha256": "d2090ef4f9e1eb0f82a1bf1a0486534894eb8b1ed8f3e0d7bc21bba8fa5d58f2",
+      "mtime": "2026-01-03T15:45:00.851806Z",
+      "size": 59718
+    }
+  ]
+}
