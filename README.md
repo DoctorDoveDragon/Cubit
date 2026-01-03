@@ -530,10 +530,10 @@ Cubit supports deployment of both the backend API and frontend GUI as separate R
 
 The repository includes Railway-specific configuration files:
 
-- **`railway.json`**: Backend service configuration (root)
-- **`nixpacks.toml`**: Backend build configuration (root)
-- **`frontend/nixpacks.toml`**: Frontend build configuration
-- **`Procfile`**: Fallback backend start command
+- **`nixpacks.toml`** (root): Primary backend build and start configuration
+- **`railway.json`** (root): Backend deployment policies (restart settings)
+- **`frontend/nixpacks.toml`**: Frontend build and start configuration
+- **`Procfile`** (root): Alternative backend start command (used if nixpacks.toml is not present)
 
 #### Environment Variables
 
