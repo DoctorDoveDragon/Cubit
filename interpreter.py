@@ -101,7 +101,7 @@ class Interpreter:
         
         # Parse
         parser = Parser(tokens)
-        ast = parser.parse()
+        syntax_tree = parser.parse()
         
         # Evaluate
-        return self.evaluate(ast)
+        return self.evaluate(syntax_tree)
