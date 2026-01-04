@@ -42,3 +42,29 @@ jobs:
       - name: Run pytest smoke tests
         run: |
           pytest -q
+
+      - name: Upload api.log artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-log
+          path: api.log
+
+      - name: Comment on PR with run + artifact links
+        if: ${{ github.event_name == 'pull_request' && failure() }}
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const runId = process.env.GITHUB_RUN_ID;
+            const repo = process.env.GITHUB_REPOSITORY;
+            const prNumber = context.payload.pull_request.number;
+            const runUrl = `https://github.com/${repo}/actions/runs/${runId}`;
+            const artifactsUrl = `https://github.com/${repo}/suites/${runId}/artifacts`;
+            const body = `⚠️ CI failed — I've uploaded the server logs as an artifact.\n\nRun logs: ${runUrl}\nArtifacts: ${artifactsUrl}`;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              body,
+            });
