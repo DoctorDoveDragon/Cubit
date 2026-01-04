@@ -1,0 +1,12 @@
+category,file,snippet
+ESLINT_DISABLE,frontend/src/components/games/AnimatedArt.tsx,"/* eslint-disable @typescript-eslint/no-unused-vars */"
+TODO,frontend/src/course/GameTabs.tsx,"// TODO: Replace with real API call to backend Cubit executor/visualizer"
+TODO,frontend/src/course/ChallengeTabs.tsx,"// TODO: Replace with real API call to backend Cubit executor"
+BROAD_CATCH,tools/extract_svg_headless.js,"catch (e) {"
+BROAD_CATCH,tools/screenshot-geometries.js,"catch (err) {"
+BROAD_CATCH,frontend/src/components/NaturalLanguageInput.tsx,"catch (err) {"
+CONSOLE_LOG,tools/ui_smoke_test/playwright_smoke_test.js,"console.log('Using base URL:', base)"
+CONSOLE_LOG,frontend/src/pages/api/generate-cubit.ts,"console.error('Missing API key')"
+PROCESS_ENV,frontend/src/pages/api/generate-cubit.ts,"process.env.DEEPSEEK_API_KEY"
+LOCKFILE,package-lock.json,"package-lock.json at repo root"
+LOCKFILE,frontend/package-lock.json,"frontend/package-lock.json"

@@ -16,8 +16,21 @@ const FONT_FAMILIES = [
 ]
 
 export default function SettingsPanel() {
-    const [palette, setPalette] = useState(0)
-    const [font, setFont] = useState(0)
+    // Initialize from localStorage when available (safe lazy initializer)
+    const [palette, setPalette] = useState<number>(() => {
+        if (typeof window !== 'undefined') {
+            const saved = localStorage.getItem('cubit_palette');
+            return saved ? Number(saved) : 0;
+        }
+        return 0;
+    });
+    const [font, setFont] = useState<number>(() => {
+        if (typeof window !== 'undefined') {
+            const saved = localStorage.getItem('cubit_font');
+            return saved ? Number(saved) : 0;
+        }
+        return 0;
+    });
 
     useEffect(() => {
         const p = COLOR_PALETTES[palette]
@@ -35,12 +48,7 @@ export default function SettingsPanel() {
         localStorage.setItem('cubit_font', String(font))
     }, [font])
 
-    useEffect(() => {
-        const savedPalette = localStorage.getItem('cubit_palette')
-        const savedFont = localStorage.getItem('cubit_font')
-        if (savedPalette) setPalette(Number(savedPalette))
-        if (savedFont) setFont(Number(savedFont))
-    }, [])
+    // No mount effect needed to populate state: lazy initializers read localStorage
 
     return (
         <div className="space-y-4 p-4">

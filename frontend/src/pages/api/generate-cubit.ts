@@ -59,7 +59,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } else {
       try {
         msg = JSON.stringify(error);
-      } catch (_) {
+      } catch {
         // keep default
       }
     }

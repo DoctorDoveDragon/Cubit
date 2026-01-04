@@ -16,7 +16,7 @@ export interface Progress {
 
 export interface ExecuteResponse {
   output: string | null
-  result: any
+  result: unknown
   error: string | null
   skill_level?: string
   progress?: Progress
@@ -82,6 +82,8 @@ const isNetworkError = (error: unknown): boolean => {
  * @param retries - Number of retries (default: 2)
  * @returns Promise with execution results
  */
+import { safeErrorMessage } from './safeError'
+
 export async function executeCode(request: ExecuteRequest, retries: number = 2): Promise<ExecuteResponse> {
   const apiUrl = getApiBaseUrl()
   let lastError: unknown = null
@@ -102,7 +104,7 @@ export async function executeCode(request: ExecuteRequest, retries: number = 2):
 
       const data: ExecuteResponse = await response.json()
       return data
-    } catch (error) {
+    } catch (error: unknown) {
       lastError = error
 
       // If this is the last attempt, return error response
@@ -116,8 +118,7 @@ export async function executeCode(request: ExecuteRequest, retries: number = 2):
   }
 
   // Return error response after all retries failed
-  const errorMessage = lastError instanceof Error ? lastError.message : 'Unknown error occurred'
-
+  const errorMessage = safeErrorMessage(lastError)
   return {
     output: null,
     result: null,
