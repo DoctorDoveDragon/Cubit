@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { safeErrorMessage } from '../utils/safeError';
 
 interface Props {
     onCode: (code: string) => void;
@@ -22,7 +23,8 @@ export default function NaturalLanguageInput({ onCode }: Props) {
             if (!res.ok) throw new Error('API error');
             const data = await res.json();
             onCode(data.code || '// AI: No code generated.');
-        } catch (e) {
+        } catch (err: unknown) {
+            console.error('generateCode error', safeErrorMessage(err));
             setError('Failed to generate code.');
         }
         setLoading(false);

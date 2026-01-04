@@ -1,6 +1,4 @@
 import React from 'react'
-import cx from 'classnames'
-
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary'
   children: React.ReactNode
@@ -18,3 +16,4 @@ export default function Button({ variant = 'secondary', children, className = ''
     </button>
   )
 }
+

@@ -19,6 +19,8 @@ export interface BundleAnalysis {
  * Estimate bundle sizes based on actual dependencies and build
  * This provides real-time analysis without requiring a full build
  */
+import { safeErrorMessage } from './safeError'
+
 export async function analyzeBundleSize(): Promise<BundleAnalysis> {
     try {
         // Try to fetch build stats if available
@@ -29,8 +31,8 @@ export async function analyzeBundleSize(): Promise<BundleAnalysis> {
 
         // Fallback: Estimate from dependencies
         return estimateBundleSize()
-    } catch (error) {
-        console.error('Bundle analysis error:', error)
+    } catch (error: unknown) {
+        console.error('Bundle analysis error:', safeErrorMessage(error))
         return estimateBundleSize()
     }
 }
@@ -126,7 +128,7 @@ function categorizeResources(
 
     // Convert to BundleItem array, filter out empty categories
     return Object.entries(categories)
-        .filter(([_, size]) => size > 0)
+        .filter(([, size]) => size > 0)
         .map(([name, size]) => ({
             name,
             size,

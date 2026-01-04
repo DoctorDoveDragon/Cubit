@@ -4,6 +4,12 @@ Context Analyzer for understanding the calling context
 
 import inspect
 from typing import Dict, Any, Optional, List
+from types import FrameType as _FrameType
+
+# Some Python versions (older runners) don't expose inspect.FrameType.
+# Provide a compatibility alias that prefers inspect.FrameType but falls
+# back to types.FrameType so annotations work on Python 3.10 and 3.11.
+FrameType = getattr(inspect, "FrameType", _FrameType)
 from pathlib import Path
 
 
@@ -12,7 +18,7 @@ class ContextAnalyzer:
     Analyzes the context in which methods are called to provide better insights
     """
     
-    def analyze(self, frame: Optional[inspect.FrameType]) -> Dict[str, Any]:
+    def analyze(self, frame: Optional['FrameType']) -> Dict[str, Any]:
         """
         Analyze the calling context
         
@@ -50,7 +56,7 @@ class ContextAnalyzer:
             'code_snippet': ''
         }
     
-    def _get_file_info(self, frame: inspect.FrameType) -> str:
+    def _get_file_info(self, frame: 'FrameType') -> str:
         """Get the file path from the frame"""
         try:
             file_path = frame.f_code.co_filename
@@ -58,14 +64,14 @@ class ContextAnalyzer:
         except:
             return 'unknown'
     
-    def _get_function_info(self, frame: inspect.FrameType) -> str:
+    def _get_function_info(self, frame: 'FrameType') -> str:
         """Get the function name from the frame"""
         try:
             return frame.f_code.co_name
         except:
             return 'unknown'
     
-    def _get_local_variables(self, frame: inspect.FrameType) -> Dict[str, str]:
+    def _get_local_variables(self, frame: 'FrameType') -> Dict[str, str]:
         """
         Get local variables from the frame (types only for privacy)
         
@@ -84,7 +90,7 @@ class ContextAnalyzer:
         except:
             return {}
     
-    def _get_call_chain(self, frame: inspect.FrameType) -> List[str]:
+    def _get_call_chain(self, frame: 'FrameType') -> List[str]:
         """
         Get the call chain leading to this point
         
@@ -109,14 +115,14 @@ class ContextAnalyzer:
         except:
             return []
     
-    def _get_module_info(self, frame: inspect.FrameType) -> str:
+    def _get_module_info(self, frame: 'FrameType') -> str:
         """Get the module name from the frame"""
         try:
             return frame.f_globals.get('__name__', 'unknown')
         except:
             return 'unknown'
     
-    def _get_code_snippet(self, frame: inspect.FrameType, context_lines: int = 3) -> str:
+    def _get_code_snippet(self, frame: 'FrameType', context_lines: int = 3) -> str:
         """
         Get the code snippet around the calling line
         

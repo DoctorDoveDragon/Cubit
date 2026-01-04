@@ -176,6 +176,7 @@ export default function MainPage() {
 
             <Card className="mt-4">
               <h3 className="text-lg font-semibold mb-2">Instructions</h3>
+              {/* eslint-disable react/no-unescaped-entities -- instructional text contains quoted labels */}
               <ol className="text-sm text-[var(--color-muted)] list-decimal list-inside space-y-2">
                 <li>Write or select Cubit code from the examples dropdown</li>
                 <li>Enable <strong className="text-white">Teaching Mode</strong> to receive learning insights</li>
@@ -185,6 +186,7 @@ export default function MainPage() {
                 <li>Use "Show Creative Commands" to access AI features and code intelligence</li>
                 <li>Adjust verbosity level to control the depth of teaching explanations</li>
               </ol>
+              {/* eslint-enable react/no-unescaped-entities */}
             </Card>
           </motion.div>
         </main>
