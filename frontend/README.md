@@ -161,7 +161,7 @@ NEXT_PUBLIC_API_URL=https://your-backend-api.railway.app
 
 - `npm run dev` - Start development server (http://localhost:3000)
 - `npm run build` - Build for production
-- `npm run start` - Start production server
+- `npm run start` - Start production server (uses standalone mode: `node .next/standalone/frontend/server.js`)
 - `npm run lint` - Run ESLint
 - `npm run storybook` - Start Storybook (http://localhost:6006)
 - `npm run build-storybook` - Build Storybook for deployment
@@ -227,7 +227,7 @@ Railway supports deploying both backend and frontend from the same repository as
 **Required Configuration:**
 - **Root Directory**: `/frontend`
 - **Build Command**: `npm run build`
-- **Start Command**: `npm run start`
+- **Start Command**: `npm run start` (runs `node .next/standalone/server.js` for standalone mode)
 - **Node Version**: 18+ (configured in `nixpacks.toml`)
 
 **Environment Variables:**
@@ -298,8 +298,10 @@ npm run build         # Build production bundle
 
 **Start Commands:**
 ```bash
-npm run start         # Start Next.js production server
+npm run start         # Start Next.js production server (standalone mode)
 ```
+
+**Note:** The frontend uses Next.js standalone mode (`output: 'standalone'`), which creates an optimized, self-contained server. The start command runs `node .next/standalone/server.js` instead of `next start`.
 
 ### Troubleshooting
 
