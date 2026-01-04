@@ -212,13 +212,17 @@ frontend/
 
 ## Deployment
 
+**📖 For Railway deployment (recommended), see [../RAILWAY.md](../RAILWAY.md) for the complete step-by-step guide.**
+
 The frontend is a Next.js application that can be deployed to various hosting platforms.
 
 ### Deployment Platforms
 
-#### Railway (Recommended for Full-Stack)
+#### Railway (Recommended - Primary Platform)
 
-Railway supports deploying both backend and frontend from the same repository.
+**Complete Railway deployment guide available in [../RAILWAY.md](../RAILWAY.md)**
+
+Railway supports deploying both backend and frontend from the same repository as separate services.
 
 **Required Configuration:**
 - **Root Directory**: `/frontend`

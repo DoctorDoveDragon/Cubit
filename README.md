@@ -19,7 +19,15 @@ Cubit is a simple, educational programming language with a clean syntax designed
 
 ## Quick Start
 
-### Automated Setup (Recommended)
+### Railway Deployment (Production)
+
+**📖 Deploy to Railway in minutes! See [RAILWAY.md](RAILWAY.md) for the complete deployment guide.**
+
+Railway is the recommended platform for deploying both backend and frontend from this repository.
+
+### Local Development
+
+#### Automated Setup (Recommended)
 
 **Unix/Linux/Mac:**
 ```bash
@@ -479,9 +487,21 @@ console.log(result);
 // Output: { output: "20\n", result: 20, error: null }
 ```
 
-### Deployment to Railway (Full Stack)
+### Deployment to Railway (Primary Platform)
 
-Cubit supports deployment of both the backend API and frontend GUI as separate Railway services from the same repository.
+**📖 See [RAILWAY.md](RAILWAY.md) for the complete, step-by-step Railway deployment guide.**
+
+Cubit is designed for Railway deployment with both backend and frontend services running from the same repository.
+
+#### Quick Start
+
+1. Create Railway project from GitHub repository
+2. Deploy backend (automatic, uses root directory)
+3. Add frontend service (set root directory to `frontend`)
+4. Set `NEXT_PUBLIC_API_URL` environment variable in frontend
+5. Deploy!
+
+For detailed instructions, troubleshooting, and best practices, see **[RAILWAY.md](RAILWAY.md)**.
 
 #### Architecture Overview
 
@@ -489,7 +509,7 @@ Cubit supports deployment of both the backend API and frontend GUI as separate R
 - **Frontend Service**: Next.js application providing the interactive playground GUI
 - **Communication**: Frontend calls backend API via `NEXT_PUBLIC_API_URL`
 
-#### Deployment Steps
+#### Deployment Steps (Summary)
 
 ##### 1. Deploy Backend Service
 
