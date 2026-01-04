@@ -134,13 +134,28 @@ The API server runs on http://localhost:8080 by default.
 
 The frontend connects to the backend API via the `NEXT_PUBLIC_API_URL` environment variable.
 
+### Local Development
+
 Create a `.env.local` file in the frontend directory:
 
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:8080
 ```
 
-Default is `http://localhost:8080` if not specified.
+**Important:** 
+- `.env.local` is excluded from git (see `.env.example` for reference)
+- If not specified, the default is `http://localhost:8080`
+- After creating/modifying `.env.local`, restart the dev server
+
+### Production Deployment
+
+For production deployments, **you must set `NEXT_PUBLIC_API_URL`** as an environment variable in your hosting platform's dashboard:
+
+```env
+NEXT_PUBLIC_API_URL=https://your-backend-api.railway.app
+```
+
+⚠️ **Critical:** Environment variables starting with `NEXT_PUBLIC_` must be set at **build time**. After changing this variable, you must trigger a rebuild/redeploy.
 
 ## Available Scripts
 
@@ -197,16 +212,186 @@ frontend/
 
 ## Deployment
 
-The frontend is a static Next.js app that can be deployed to:
-- Vercel (recommended)
-- Netlify
-- GitHub Pages
-- Any static hosting service
+**📖 For Railway deployment (recommended), see [../RAILWAY.md](../RAILWAY.md) for the complete step-by-step guide.**
 
-For production deployment:
-1. Update `NEXT_PUBLIC_API_URL` to point to your production API
-2. Run `npm run build`
-3. Deploy the `.next` directory
+The frontend is a Next.js application that can be deployed to various hosting platforms.
+
+### Deployment Platforms
+
+#### Railway (Recommended - Primary Platform)
+
+**Complete Railway deployment guide available in [../RAILWAY.md](../RAILWAY.md)**
+
+Railway supports deploying both backend and frontend from the same repository as separate services.
+
+**Required Configuration:**
+- **Root Directory**: `/frontend`
+- **Build Command**: `npm run build`
+- **Start Command**: `npm run start`
+- **Node Version**: 18+ (configured in `nixpacks.toml`)
+
+**Environment Variables:**
+```env
+NEXT_PUBLIC_API_URL=https://your-backend-service.railway.app
+```
+
+**Steps:**
+1. Create a new Railway service from your GitHub repository
+2. Set root directory to `/frontend`
+3. Add `NEXT_PUBLIC_API_URL` environment variable pointing to your backend service
+4. Deploy (Railway will auto-detect Next.js and use `nixpacks.toml`)
+5. After setting environment variables, redeploy to apply changes
+
+#### Vercel (Recommended for Frontend-Only)
+
+**Required Configuration:**
+- **Root Directory**: `frontend`
+- **Build Command**: `npm run build` (auto-detected)
+- **Output Directory**: `.next` (auto-detected)
+- **Install Command**: `npm ci` (auto-detected)
+
+**Environment Variables:**
+```env
+NEXT_PUBLIC_API_URL=https://your-backend-api.example.com
+```
+
+**Steps:**
+1. Import your GitHub repository
+2. Set root directory to `frontend`
+3. Add `NEXT_PUBLIC_API_URL` environment variable
+4. Deploy
+
+#### Netlify
+
+**Required Configuration:**
+- **Base Directory**: `frontend`
+- **Build Command**: `npm run build`
+- **Publish Directory**: `frontend/.next`
+
+**Environment Variables:**
+```env
+NEXT_PUBLIC_API_URL=https://your-backend-api.example.com
+```
+
+**Steps:**
+1. Create a new site from Git
+2. Set base directory to `frontend`
+3. Configure build settings as above
+4. Add `NEXT_PUBLIC_API_URL` environment variable
+5. Deploy
+
+### General Deployment Requirements
+
+**Node.js Version:** 18 or higher
+- Specified in `frontend/nixpacks.toml` for Railway/Nixpacks
+- Configure in your platform's settings for others
+
+**Required Environment Variables:**
+- `NEXT_PUBLIC_API_URL` - **REQUIRED** - URL of your backend API (e.g., `https://api.example.com`)
+
+**Build Commands:**
+```bash
+cd frontend           # Navigate to frontend directory
+npm ci                # Install exact versions from package-lock.json
+npm run build         # Build production bundle
+```
+
+**Start Commands:**
+```bash
+npm run start         # Start Next.js production server
+```
+
+### Troubleshooting
+
+#### Build Failures
+
+**Issue: `next: not found` or similar build errors**
+- **Cause**: Dependencies not installed or wrong Node version
+- **Solution**:
+  1. Ensure Node.js 18+ is installed
+  2. Run `npm ci` before building
+  3. Check platform logs for specific error messages
+
+**Issue: Build succeeds but runtime errors occur**
+- **Cause**: Missing or incorrect `NEXT_PUBLIC_API_URL`
+- **Solution**:
+  1. Verify `NEXT_PUBLIC_API_URL` is set in deployment platform
+  2. Ensure the URL starts with `http://` or `https://`
+  3. Redeploy after changing environment variables
+
+**Issue: Puppeteer installation fails during CI/deployment**
+- **Cause**: Network issues downloading Chrome binary
+- **Solution**: Set `PUPPETEER_SKIP_DOWNLOAD=true` environment variable (already configured in GitHub Actions)
+
+#### Production API Connection Issues
+
+**Issue: Frontend shows "Failed to fetch" or "API Disconnected"**
+- **Cause**: Frontend cannot reach backend API
+- **Solutions**:
+  1. Verify `NEXT_PUBLIC_API_URL` points to the correct backend URL
+  2. Ensure backend service is running (test with `curl https://your-api/health`)
+  3. Check for CORS issues in browser console
+  4. Verify backend allows requests from frontend domain
+  5. After changing `NEXT_PUBLIC_API_URL`, **rebuild** the frontend
+
+**Issue: API health indicator always shows "Disconnected"**
+- **Cause**: Backend `/health` endpoint not accessible
+- **Solutions**:
+  1. Test endpoint directly: `curl https://your-api/health`
+  2. Check backend logs for startup errors
+  3. Verify CORS configuration in backend `api.py`
+  4. Ensure backend is deployed and running
+
+#### Environment Variable Issues
+
+**Issue: Environment variables not taking effect**
+- **Cause**: `NEXT_PUBLIC_` vars must be set at build time
+- **Solutions**:
+  1. Set variables in deployment platform dashboard
+  2. Trigger a **new deployment** after changing variables
+  3. Clear build cache if supported by your platform
+  4. Verify variables are set in build logs
+
+**Issue: API URL shows as "undefined" or "localhost" in production**
+- **Cause**: `NEXT_PUBLIC_API_URL` not set during build
+- **Solutions**:
+  1. Add variable to deployment platform environment settings
+  2. Ensure variable name is exactly `NEXT_PUBLIC_API_URL`
+  3. Redeploy to rebuild with new variable
+
+#### CSS/Styling Issues
+
+**Issue: Styles not loading or appearing broken**
+- **Cause**: Tailwind CSS not properly configured
+- **Solutions**:
+  1. Ensure `@import "tailwindcss"` is at the top of `globals.css`
+  2. Verify `tailwind.config.js` exists
+  3. Clear Next.js cache: `rm -rf .next`
+  4. Rebuild: `npm run build`
+
+### Local Testing Before Deployment
+
+Always test the production build locally before deploying:
+
+```bash
+cd frontend
+
+# Create .env.local with your API URL
+echo "NEXT_PUBLIC_API_URL=http://localhost:8080" > .env.local
+
+# Install dependencies (use PUPPETEER_SKIP_DOWNLOAD if needed)
+npm ci
+
+# Test production build
+npm run build
+
+# Test production server
+npm run start
+
+# Visit http://localhost:3000
+```
+
+If the local production build works, deployment should succeed with proper environment configuration.
 
 ## Contributing
 
