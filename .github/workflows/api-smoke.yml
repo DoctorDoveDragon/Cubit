@@ -25,13 +25,19 @@ jobs:
       - name: Start API server
         run: |
           nohup bash start-api.sh > api.log 2>&1 &
-          # wait for health endpoint
-          for i in {1..30}; do
+          # wait for health endpoint (longer timeout and surface logs on failure)
+          for i in {1..60}; do
             if curl -sSf http://127.0.0.1:8080/health >/dev/null; then
               echo "API ready"; break
             fi
             sleep 1
           done
+          # If still not healthy, dump the api.log for debugging and fail
+          if ! curl -sSf http://127.0.0.1:8080/health >/dev/null; then
+            echo "API failed to start within timeout. Dumping api.log:";
+            tail -n +1 api.log || true
+            exit 1
+          fi
 
       - name: Run pytest smoke tests
         run: |
