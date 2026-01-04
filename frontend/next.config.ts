@@ -5,7 +5,7 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 })
 
 const nextConfig: NextConfig = {
-  output: 'standalone', // Enable standalone output for Railway deployment
+  // Using standard Next.js deployment instead of standalone mode
 };
 
 export default withBundleAnalyzer(nextConfig);
