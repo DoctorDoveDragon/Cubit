@@ -175,14 +175,14 @@ export default function CreativeCommandsPanel() {
   // Workflow & Productivity Commands
   const workflowCommands: Command[] = [
     {
-      name: 'Deploy Preview',
-      description: 'Simulate deployment',
+      name: 'Deploy Preview (Demo)',
+      description: 'Simulate deployment (for demonstration only)',
       action: () => {
-        showToast('Starting deployment...')
+        showToast('Starting simulated deployment...')
         setTimeout(() => {
           showModalDialog(
-            'Deployment Steps',
-            '1. ✓ Building application...\n2. ✓ Running tests...\n3. ✓ Optimizing assets...\n4. ✓ Uploading to CDN...\n5. ✓ Deployment complete!\n\nPreview URL: https://cubit-preview.app\n\n[Simulated deployment]'
+            'Deployment Preview (Simulation)',
+            '1. ✓ Building application...\n2. ✓ Running tests...\n3. ✓ Optimizing assets...\n4. ✓ Uploading to CDN...\n5. ✓ Deployment complete!\n\nPreview URL: https://cubit-preview.app\n\n⚠️ This is a SIMULATED deployment for demonstration purposes.\nFor real deployment, see README.md for instructions on deploying to Railway, Vercel, or Netlify.'
           )
         }, 2000)
       }
