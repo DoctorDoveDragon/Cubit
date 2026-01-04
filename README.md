@@ -531,7 +531,7 @@ For detailed instructions, troubleshooting, and best practices, see **[RAILWAY.m
 2. **Configure the frontend service:**
    - **Root Directory**: `/frontend`
    - **Build Command**: `npm run build`
-   - **Start Command**: `npm run start`
+   - **Start Command**: `npm run start` (runs `node .next/standalone/server.js` for standalone mode)
    - **Node Version**: 18+ (configured in `frontend/nixpacks.toml`)
 3. **Set environment variables** (critical):
    - `NEXT_PUBLIC_API_URL`: Your backend service URL from step 1

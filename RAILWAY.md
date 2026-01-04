@@ -111,7 +111,7 @@ Railway will:
 1. Detect Node.js 20 from `frontend/nixpacks.toml`
 2. Run `npm ci` to install exact dependencies
 3. Run `npm run build` with your environment variables
-4. Start the app with: `npm run start -- -p $PORT`
+4. Start the app with: `node .next/standalone/server.js` (standalone mode)
 5. Assign a public URL like: `https://cubit-frontend-production.up.railway.app`
 
 **Verify Frontend:**
