@@ -5,11 +5,7 @@ nixPkgs = ["nodejs_20", "npm-9_x"]
 cmds = ["npm ci"]
 
 [phases.build]
-cmds = [
-  "npm run build",
-  "cp -r public .next/standalone/frontend/public",
-  "cp -r .next/static .next/standalone/frontend/.next/static"
-]
+cmds = ["npm run build"]
 
 [start]
-cmd = "node .next/standalone/frontend/server.js"
+cmd = "npm run start"
