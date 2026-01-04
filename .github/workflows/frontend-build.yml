@@ -38,9 +38,9 @@ jobs:
           cd frontend
           npm run build
         env:
-          # Set a placeholder API URL for CI builds
-          # In production, this should be set via deployment platform environment variables
-          NEXT_PUBLIC_API_URL: 'http://localhost:8080'
+          # Placeholder API URL for CI builds (not used at runtime, only embedded during build)
+          # In production deployments, set this to your actual backend API URL
+          NEXT_PUBLIC_API_URL: 'https://placeholder-api-for-ci-build.example.com'
 
       - name: Lint (non-blocking)
         run: |

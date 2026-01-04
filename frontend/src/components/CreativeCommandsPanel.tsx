@@ -15,6 +15,18 @@ interface Command {
   icon?: string
 }
 
+// Constants for deployment simulation
+const DEPLOYMENT_SIMULATION_MESSAGE = `1. ✓ Building application...
+2. ✓ Running tests...
+3. ✓ Optimizing assets...
+4. ✓ Uploading to CDN...
+5. ✓ Deployment complete!
+
+Preview URL: https://cubit-preview.app
+
+⚠️ This is a SIMULATED deployment for demonstration purposes.
+For real deployment, see README.md for instructions on deploying to Railway, Vercel, or Netlify.`
+
 export default function CreativeCommandsPanel() {
   const [toast, setToast] = useState<string | null>(null)
   const [expandedCategory, setExpandedCategory] = useState<CommandCategory | null>('ai')
@@ -175,14 +187,14 @@ export default function CreativeCommandsPanel() {
   // Workflow & Productivity Commands
   const workflowCommands: Command[] = [
     {
-      name: 'Deploy Preview (Demo)',
-      description: 'Simulate deployment (for demonstration only)',
+      name: 'Deployment Demo',
+      description: 'Simulate deployment workflow',
       action: () => {
         showToast('Starting simulated deployment...')
         setTimeout(() => {
           showModalDialog(
             'Deployment Preview (Simulation)',
-            '1. ✓ Building application...\n2. ✓ Running tests...\n3. ✓ Optimizing assets...\n4. ✓ Uploading to CDN...\n5. ✓ Deployment complete!\n\nPreview URL: https://cubit-preview.app\n\n⚠️ This is a SIMULATED deployment for demonstration purposes.\nFor real deployment, see README.md for instructions on deploying to Railway, Vercel, or Netlify.'
+            DEPLOYMENT_SIMULATION_MESSAGE
           )
         }, 2000)
       }
