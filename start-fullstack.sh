@@ -51,12 +51,11 @@ for i in {1..10}; do
 done
 
 # Determine frontend directory path
-if [ -d "frontend/.next/standalone/frontend" ]; then
-  FRONTEND_DIR="frontend/.next/standalone/frontend"
-elif [ -d ".next/standalone/frontend" ]; then
-  FRONTEND_DIR=".next/standalone/frontend"
+# After Docker build, the standalone output is copied to ./frontend
+if [ -d "frontend" ] && [ -f "frontend/server.js" ]; then
+  FRONTEND_DIR="frontend"
 else
-  echo "ERROR: Frontend build not found. Expected: frontend/.next/standalone/frontend"
+  echo "ERROR: Frontend build not found. Expected: frontend/server.js"
   kill $BACKEND_PID 2>/dev/null || true
   exit 1
 fi
