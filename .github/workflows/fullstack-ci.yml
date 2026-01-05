@@ -106,11 +106,12 @@ jobs:
 
       - name: Verify standalone output
         run: |
-          if [ ! -f "frontend/.next/standalone/server.js" ]; then
+          if [ ! -f "frontend/.next/standalone/frontend/server.js" ]; then
             echo "❌ Standalone server.js not found!"
+            echo "Expected: frontend/.next/standalone/frontend/server.js"
             exit 1
           fi
-          echo "✅ Standalone build verified"
+          echo "✅ Standalone build verified at frontend/.next/standalone/frontend/server.js"
 
       - name: Lint (non-blocking)
         run: |
