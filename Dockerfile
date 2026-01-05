@@ -54,7 +54,8 @@ COPY pedagogical/ ./pedagogical/
 
 # Copy frontend built files
 # The standalone build includes everything needed to run the frontend
-COPY --from=frontend-builder /app/frontend/.next/standalone ./frontend
+# Next.js standalone output creates a 'frontend' subdirectory inside .next/standalone/
+COPY --from=frontend-builder /app/frontend/.next/standalone/frontend ./frontend
 COPY --from=frontend-builder /app/frontend/.next/static ./frontend/.next/static
 COPY --from=frontend-builder /app/frontend/public ./frontend/public
 
