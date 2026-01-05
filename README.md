@@ -382,8 +382,6 @@ python3 cubit.py examples/random_module.cubit    # Random number generation
 python3 cubit.py examples/advanced_demo.cubit    # Comprehensive demo
 ```
 
-## Using the REPL (Command Line)
-
 ## Language Syntax
 
 ### Variables

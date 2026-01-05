@@ -31,14 +31,15 @@ jobs:
           nohup python3 api.py > api.log 2>&1 &
           echo $! > api.pid
           
-          # Wait for health endpoint
-          for i in {1..60}; do
+          # Wait for health endpoint (30 second timeout)
+          echo "Waiting for backend to be healthy..."
+          for i in {1..30}; do
             if curl -sSf http://127.0.0.1:8080/health >/dev/null 2>&1; then
-              echo "✅ Backend API is healthy"
+              echo "✅ Backend API is healthy and ready"
               break
             fi
-            if [ $i -eq 60 ]; then
-              echo "❌ API failed to start"
+            if [ $i -eq 30 ]; then
+              echo "❌ API failed to start within 30 seconds"
               cat api.log
               exit 1
             fi

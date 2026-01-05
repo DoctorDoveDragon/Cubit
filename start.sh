@@ -53,10 +53,11 @@ fi
 
 # Start Next.js frontend in standalone mode
 echo "Starting Next.js frontend on http://localhost:3000..."
+ORIGINAL_DIR=$(pwd)
 cd frontend/.next/standalone/frontend
 BACKEND_URL=http://localhost:8080 PORT=3000 node server.js &
 FRONTEND_PID=$!
-cd /home/runner/work/Cubit/Cubit
+cd "$ORIGINAL_DIR"
 echo "Frontend PID: $FRONTEND_PID"
 
 # Wait for frontend to start

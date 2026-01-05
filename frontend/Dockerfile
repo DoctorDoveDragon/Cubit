@@ -59,7 +59,8 @@ RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs
 
 # Copy the standalone output from the builder
-# Next.js standalone mode bundles all dependencies into .next/standalone/frontend/
+# Next.js standalone mode creates a self-contained bundle at .next/standalone/frontend/
+# which includes all runtime dependencies and the server.js entry point
 COPY --from=builder /app/.next/standalone/frontend ./
 
 # Copy static assets to the correct location
