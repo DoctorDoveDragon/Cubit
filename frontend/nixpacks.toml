@@ -7,8 +7,8 @@ cmds = ["PUPPETEER_SKIP_DOWNLOAD=true npm ci"]
 [phases.build]
 cmds = [
   "npm run build",
-  "cp -r public .next/standalone/frontend/",
-  "cp -r .next/static .next/standalone/frontend/.next/"
+  "test -d public && cp -r public .next/standalone/frontend/ || echo 'No public directory'",
+  "test -d .next/static && cp -r .next/static .next/standalone/frontend/.next/ || echo 'No static directory'"
 ]
 
 [start]
