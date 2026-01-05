@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Using standard Next.js deployment instead of standalone mode
+  // Enable standalone output for optimized Railway deployment
+  output: 'standalone',
 };
 
 // Only use bundle analyzer if it's available (development environment)
