@@ -126,6 +126,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set up Docker Compose
+        uses: docker/compose-action@v2
+
+      - name: Check Compose availability
+        run: |
+          if command -v docker-compose >/dev/null 2>&1; then docker-compose --version; \
+          elif docker compose version >/dev/null 2>&1; then docker compose version; \
+          else echo "No docker compose available"; exit 1; fi
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -139,11 +148,11 @@ jobs:
 
       - name: Test docker-compose config
         run: |
-          docker-compose config
+          docker compose config
 
       - name: Build with docker-compose
         run: |
-          docker-compose build
+          docker compose build
 
   integration:
     name: Integration Test (Docker)
@@ -155,9 +164,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set up Docker Compose
+        uses: docker/compose-action@v2
+
       - name: Start services with docker-compose
         run: |
-          docker-compose up -d
+          docker compose up -d
           
           # Wait for services to be ready
           echo "Waiting for backend..."
@@ -206,9 +218,9 @@ jobs:
       - name: Show logs on failure
         if: failure()
         run: |
-          docker-compose logs
+          docker compose logs
 
       - name: Stop services
         if: always()
         run: |
-          docker-compose down
+          docker compose down
