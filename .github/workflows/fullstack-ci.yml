@@ -1,0 +1,214 @@
+name: Full-Stack CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    name: Backend Build & Test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest requests
+
+      - name: Start API server
+        run: |
+          nohup python3 api.py > api.log 2>&1 &
+          echo $! > api.pid
+          
+          # Wait for health endpoint (30 second timeout)
+          echo "Waiting for backend to be healthy..."
+          for i in {1..30}; do
+            if curl -sSf http://127.0.0.1:8080/health >/dev/null 2>&1; then
+              echo "✅ Backend API is healthy and ready"
+              break
+            fi
+            if [ $i -eq 30 ]; then
+              echo "❌ API failed to start within 30 seconds"
+              cat api.log
+              exit 1
+            fi
+            sleep 1
+          done
+
+      - name: Run backend tests
+        run: |
+          pytest -v
+
+      - name: Stop API server
+        if: always()
+        run: |
+          if [ -f api.pid ]; then
+            kill $(cat api.pid) || true
+          fi
+
+      - name: Upload API logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-logs
+          path: api.log
+
+  frontend:
+    name: Frontend Build & Typecheck
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: 'frontend/package-lock.json'
+
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm ci
+        env:
+          PUPPETEER_SKIP_DOWNLOAD: 'true'
+
+      - name: Typecheck
+        run: |
+          cd frontend
+          npx tsc --noEmit
+
+      - name: Build (standalone mode)
+        run: |
+          cd frontend
+          npm run build
+        env:
+          NEXT_PUBLIC_API_URL: 'http://localhost:8080'
+
+      - name: Verify standalone output
+        run: |
+          if [ ! -f "frontend/.next/standalone/server.js" ]; then
+            echo "❌ Standalone server.js not found!"
+            exit 1
+          fi
+          echo "✅ Standalone build verified"
+
+      - name: Lint (non-blocking)
+        run: |
+          cd frontend
+          npx eslint --ext .ts,.tsx src || true
+
+  docker:
+    name: Docker Build Test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build backend Docker image
+        run: |
+          docker build -f backend.Dockerfile -t cubit-backend:test .
+
+      - name: Build frontend Docker image
+        run: |
+          docker build -f frontend/Dockerfile -t cubit-frontend:test ./frontend
+
+      - name: Test docker-compose config
+        run: |
+          docker-compose config
+
+      - name: Build with docker-compose
+        run: |
+          docker-compose build
+
+  integration:
+    name: Integration Test (Docker)
+    runs-on: ubuntu-latest
+    needs: [backend, frontend, docker]
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Start services with docker-compose
+        run: |
+          docker-compose up -d
+          
+          # Wait for services to be ready
+          echo "Waiting for backend..."
+          for i in {1..60}; do
+            if curl -sSf http://localhost:8080/health >/dev/null 2>&1; then
+              echo "✅ Backend is healthy"
+              break
+            fi
+            sleep 1
+          done
+          
+          echo "Waiting for frontend..."
+          for i in {1..60}; do
+            if curl -sSf http://localhost:3000 >/dev/null 2>&1; then
+              echo "✅ Frontend is responding"
+              break
+            fi
+            sleep 1
+          done
+
+      - name: Test backend API
+        run: |
+          # Test health endpoint
+          curl -sSf http://localhost:8080/health
+          
+          # Test execute endpoint
+          response=$(curl -sSf -X POST http://localhost:8080/execute \
+            -H "Content-Type: application/json" \
+            -d '{"code": "let x = 10\nprint x * 2"}')
+          echo "Response: $response"
+          
+          # Verify response contains expected output
+          if echo "$response" | grep -q "20"; then
+            echo "✅ Execute endpoint works"
+          else
+            echo "❌ Execute endpoint failed"
+            exit 1
+          fi
+
+      - name: Test frontend
+        run: |
+          # Test that frontend is accessible
+          curl -sSf http://localhost:3000 > /dev/null
+          echo "✅ Frontend is accessible"
+
+      - name: Show logs on failure
+        if: failure()
+        run: |
+          docker-compose logs
+
+      - name: Stop services
+        if: always()
+        run: |
+          docker-compose down

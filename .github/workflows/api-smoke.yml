@@ -1,12 +1,29 @@
-name: API smoke tests
+name: Backend API Tests
 
 on:
   push:
+    branches: [ main ]
   pull_request:
+    branches: [ main ]
+    paths:
+      - '*.py'
+      - 'requirements.txt'
+      - 'pedagogical/**'
+      - '.github/workflows/api-smoke.yml'
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
 
 jobs:
   api-smoke:
+    name: Backend API smoke tests
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -14,7 +31,8 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.11'
+          cache: 'pip'
 
       - name: Install dependencies
         run: |
@@ -24,24 +42,65 @@ jobs:
 
       - name: Start API server
         run: |
-          nohup bash start-api.sh > api.log 2>&1 &
-          # wait for health endpoint (longer timeout and surface logs on failure)
+          nohup python3 api.py > api.log 2>&1 &
+          echo $! > api.pid
+          
+          # Wait for health endpoint with better feedback
+          echo "Waiting for backend to be healthy..."
           for i in {1..60}; do
-            if curl -sSf http://127.0.0.1:8080/health >/dev/null; then
-              echo "API ready"; break
+            if curl -sSf http://127.0.0.1:8080/health >/dev/null 2>&1; then
+              echo "✅ Backend API is healthy and ready"
+              break
+            fi
+            if [ $i -eq 60 ]; then
+              echo "❌ API failed to start within timeout. Dumping api.log:"
+              cat api.log || true
+              exit 1
             fi
             sleep 1
           done
-          # If still not healthy, dump the api.log for debugging and fail
-          if ! curl -sSf http://127.0.0.1:8080/health >/dev/null; then
-            echo "API failed to start within timeout. Dumping api.log:";
-            tail -n +1 api.log || true
+
+      - name: Test health endpoint
+        run: |
+          response=$(curl -sSf http://127.0.0.1:8080/health)
+          echo "Health check response: $response"
+          if echo "$response" | grep -q "healthy"; then
+            echo "✅ Health endpoint returns correct response"
+          else
+            echo "❌ Health endpoint response invalid"
             exit 1
           fi
 
       - name: Run pytest smoke tests
         run: |
-          pytest -q
+          pytest -v
+
+      - name: Test API endpoints manually
+        run: |
+          # Test root endpoint
+          echo "Testing root endpoint..."
+          curl -sSf http://127.0.0.1:8080/ > /dev/null
+          
+          # Test execute endpoint
+          echo "Testing execute endpoint..."
+          response=$(curl -sSf -X POST http://127.0.0.1:8080/execute \
+            -H "Content-Type: application/json" \
+            -d '{"code": "let x = 10\nprint x * 2"}')
+          echo "Execute response: $response"
+          
+          if echo "$response" | grep -q "20"; then
+            echo "✅ Execute endpoint works correctly"
+          else
+            echo "❌ Execute endpoint failed"
+            exit 1
+          fi
+
+      - name: Stop API server
+        if: always()
+        run: |
+          if [ -f api.pid ]; then
+            kill $(cat api.pid) || true
+          fi
 
       - name: Upload api.log artifact
         if: always()
@@ -61,7 +120,7 @@ jobs:
             const prNumber = context.payload.pull_request.number;
             const runUrl = `https://github.com/${repo}/actions/runs/${runId}`;
             const artifactsUrl = `https://github.com/${repo}/suites/${runId}/artifacts`;
-            const body = `⚠️ CI failed — I've uploaded the server logs as an artifact.\n\nRun logs: ${runUrl}\nArtifacts: ${artifactsUrl}`;
+            const body = `⚠️ Backend CI failed — I've uploaded the server logs as an artifact.\n\nRun logs: ${runUrl}\nArtifacts: ${artifactsUrl}`;
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
