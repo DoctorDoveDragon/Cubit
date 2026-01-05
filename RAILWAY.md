@@ -104,22 +104,22 @@ Now add the frontend as a second service in the same project.
 
 **Required Environment Variables:**
 
-⚠️ **CRITICAL**: Set the following environment variables in the frontend service:
+⚠️ **CRITICAL**: Set the following environment variable in the frontend service:
 
 1. In the frontend service settings, go to "Variables" tab
 2. Click "New Variable"
-3. Add the following variables:
+3. Add the following variable:
 
 | Variable Name | Value | Description |
 |--------------|-------|-------------|
 | `NEXT_PUBLIC_API_URL` | `https://your-backend-url.railway.app` | Backend API URL from Step 2 |
-| `PUPPETEER_SKIP_DOWNLOAD` | `true` | Skip Puppeteer Chrome download (optional but recommended) |
 
 **Example:**
 ```
 NEXT_PUBLIC_API_URL=https://cubit-backend-production.up.railway.app
-PUPPETEER_SKIP_DOWNLOAD=true
 ```
+
+**Note:** `PUPPETEER_SKIP_DOWNLOAD=true` is now automatically configured in the build process via `nixpacks.toml`, so you don't need to set it manually.
 
 **Important Notes:**
 - Replace `your-backend-url.railway.app` with your actual backend URL from Step 2
@@ -212,7 +212,8 @@ pydantic>=2.5.0
 3. **Puppeteer installation fails**:
    ```
    Error: Failed to download Chrome binary
-   Solution: Add PUPPETEER_SKIP_DOWNLOAD=true environment variable
+   Solution: This is automatically handled by nixpacks.toml (PUPPETEER_SKIP_DOWNLOAD=true).
+   If you still see this error, verify that frontend/nixpacks.toml contains the correct install command.
    ```
 
 4. **TypeScript errors**:
@@ -421,7 +422,7 @@ Railway offers:
 | Backend | `PORT` | Auto-set by Railway | ✅ (automatic) |
 | Backend | `CORS_ORIGINS` | `https://cubit-frontend-production.up.railway.app` | ⚠️ (optional, defaults to `*`) |
 | Frontend | `NEXT_PUBLIC_API_URL` | `https://cubit-backend-production.up.railway.app` | ✅ (manual) |
-| Frontend | `PUPPETEER_SKIP_DOWNLOAD` | `true` | ⚠️ (recommended) |
+| Frontend | `PUPPETEER_SKIP_DOWNLOAD` | `true` | ✅ (automatic via nixpacks.toml) |
 
 ### Service URLs Template
 
