@@ -157,19 +157,8 @@ The deployed application combines both frontend and backend in a single service:
 
 3. **Proxy configuration issues**:
    ```
-   Solution: After changing NEXT_PUBLIC_API_URL, REDEPLOY the frontend
-   Go to: Deployments → ⋯ → Redeploy
-   ```
-
-4. **CORS issues**:
-   ```
-   Check browser console (F12) for CORS errors
-   Solution 1: Backend CORS defaults to allow all origins (*)
-   Solution 2: For production, set CORS_ORIGINS environment variable in backend:
-               CORS_ORIGINS=https://your-frontend-url.railway.app
-   Solution 3: If using multiple frontends, use comma-separated:
-               CORS_ORIGINS=https://frontend1.app,https://frontend2.app
-   Redeploy backend after changing CORS_ORIGINS
+   Solution: Verify that frontend/next.config.ts includes rewrites configuration
+   The rewrites should proxy /execute, /health, /docs, etc. to BACKEND_URL
    ```
 
 **Changes not reflecting:**

@@ -38,9 +38,11 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
-# Copy and install Python dependencies
+# Create and activate virtual environment, then install Python dependencies
 COPY requirements.txt .
-RUN pip3 install --no-cache-dir -r requirements.txt --break-system-packages
+RUN python3 -m venv /opt/venv && \
+    /opt/venv/bin/pip install --no-cache-dir --upgrade pip && \
+    /opt/venv/bin/pip install --no-cache-dir -r requirements.txt
 
 # Copy backend source code
 COPY api.py .
@@ -56,31 +58,9 @@ COPY --from=frontend-builder /app/frontend/.next/standalone/frontend ./frontend
 COPY --from=frontend-builder /app/frontend/.next/static ./frontend/.next/static
 COPY --from=frontend-builder /app/frontend/public ./frontend/public
 
-# Create startup script that runs both servers
-RUN echo '#!/bin/bash\n\
-set -e\n\
-\n\
-# Start FastAPI backend in background on port 8080\n\
-echo "Starting FastAPI backend on port 8080..."\n\
-python3 api.py &\n\
-BACKEND_PID=$!\n\
-\n\
-# Wait for backend to be ready\n\
-sleep 2\n\
-\n\
-# Check if backend started successfully\n\
-if ! kill -0 $BACKEND_PID 2>/dev/null; then\n\
-  echo "ERROR: Failed to start backend"\n\
-  exit 1\n\
-fi\n\
-\n\
-echo "Backend started successfully (PID: $BACKEND_PID)"\n\
-\n\
-# Start Next.js frontend on the main port\n\
-echo "Starting Next.js frontend on port ${PORT:-3000}..."\n\
-cd frontend\n\
-BACKEND_URL=http://localhost:8080 node server.js\n\
-' > /app/start.sh && chmod +x /app/start.sh
+# Copy startup script
+COPY start-fullstack.sh .
+RUN chmod +x start-fullstack.sh
 
 # Expose the port (Railway will set PORT env variable)
 EXPOSE 3000
@@ -90,5 +70,5 @@ ENV PORT=3000
 ENV BACKEND_URL=http://localhost:8080
 
 # Start both servers
-CMD ["/app/start.sh"]
+CMD ["./start-fullstack.sh"]
 
