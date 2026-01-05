@@ -5,6 +5,9 @@ nixPkgs = ["python311", "python311Packages.pip", "python311Packages.virtualenv",
 cmds = [
   # Install and build frontend
   "cd frontend && PUPPETEER_SKIP_DOWNLOAD=true npm ci && npm run build && cd ..",
+  # Copy standalone output to a location accessible by start script
+  # The standalone output includes a 'frontend' subdirectory with server.js
+  "mkdir -p frontend-standalone && cp -r frontend/.next/standalone/frontend/* frontend-standalone/ && mkdir -p frontend-standalone/.next && cp -r frontend/.next/static frontend-standalone/.next/ && (test -d frontend/public && cp -r frontend/public frontend-standalone/ || echo 'No public directory')",
   # Install backend dependencies
   "python3 -m venv /opt/venv",
   "/opt/venv/bin/pip install --upgrade pip",

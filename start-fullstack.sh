@@ -51,11 +51,14 @@ for i in {1..10}; do
 done
 
 # Determine frontend directory path
-# After Docker build, the standalone output is copied to ./frontend
-if [ -d "frontend" ] && [ -f "frontend/server.js" ]; then
+# After nixpacks build, the standalone output is in ./frontend-standalone
+# The standalone server.js is at the root level of that directory
+if [ -d "frontend-standalone" ] && [ -f "frontend-standalone/server.js" ]; then
+  FRONTEND_DIR="frontend-standalone"
+elif [ -d "frontend" ] && [ -f "frontend/server.js" ]; then
   FRONTEND_DIR="frontend"
 else
-  echo "ERROR: Frontend build not found. Expected: frontend/server.js"
+  echo "ERROR: Frontend build not found. Expected: frontend-standalone/server.js or frontend/server.js"
   kill $BACKEND_PID 2>/dev/null || true
   exit 1
 fi
