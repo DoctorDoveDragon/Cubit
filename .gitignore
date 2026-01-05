@@ -20,6 +20,9 @@ wheels/
 .installed.cfg
 *.egg
 
+# Node.js
+node_modules/
+
 # IDE
 .vscode/
 .idea/
@@ -34,6 +37,5 @@ Thumbs.db
 # Next.js / Frontend
 frontend/.next/
 frontend/out/
-frontend/node_modules/
 frontend/.env.local
 frontend/.env.*.local
