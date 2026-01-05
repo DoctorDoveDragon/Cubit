@@ -49,7 +49,28 @@ Railway will:
 4. Assign a public URL like: `https://cubit-backend-production.up.railway.app`
 
 **Environment Variables:**
-- `PORT` - Automatically set by Railway (no action needed)
+
+⚠️ **Optional but Recommended for Production**: Set the following environment variables in the backend service:
+
+1. In the backend service settings, go to "Variables" tab
+2. Click "New Variable" (if configuring CORS for production)
+
+| Variable Name | Value | Description |
+|--------------|-------|-------------|
+| `PORT` | Auto-set by Railway | Port for the API server (automatic) ✅ |
+| `CORS_ORIGINS` | `https://your-frontend-url.railway.app` | Allowed frontend origins for CORS (optional) |
+
+**CORS Configuration:**
+- **Development/Default**: If not set, CORS allows all origins (`*`)
+- **Production**: Set `CORS_ORIGINS` to your frontend URL for better security
+- **Multiple Origins**: Use comma-separated values: `https://frontend1.app,https://frontend2.app`
+
+**Example:**
+```
+CORS_ORIGINS=https://cubit-frontend-production.up.railway.app
+```
+
+**Note**: The default `CORS_ORIGINS=*` works fine for most use cases. Only set a specific origin if you need stricter CORS control.
 
 **Verify Backend:**
 1. Wait for deployment to complete
@@ -223,7 +244,12 @@ pydantic>=2.5.0
 4. **CORS issues**:
    ```
    Check browser console (F12) for CORS errors
-   Backend CORS is configured to allow all origins in api.py
+   Solution 1: Backend CORS defaults to allow all origins (*)
+   Solution 2: For production, set CORS_ORIGINS environment variable in backend:
+               CORS_ORIGINS=https://your-frontend-url.railway.app
+   Solution 3: If using multiple frontends, use comma-separated:
+               CORS_ORIGINS=https://frontend1.app,https://frontend2.app
+   Redeploy backend after changing CORS_ORIGINS
    ```
 
 **Changes not reflecting:**
@@ -393,6 +419,7 @@ Railway offers:
 | Service | Variable | Example Value | Required |
 |---------|----------|---------------|----------|
 | Backend | `PORT` | Auto-set by Railway | ✅ (automatic) |
+| Backend | `CORS_ORIGINS` | `https://cubit-frontend-production.up.railway.app` | ⚠️ (optional, defaults to `*`) |
 | Frontend | `NEXT_PUBLIC_API_URL` | `https://cubit-backend-production.up.railway.app` | ✅ (manual) |
 | Frontend | `PUPPETEER_SKIP_DOWNLOAD` | `true` | ⚠️ (recommended) |
 

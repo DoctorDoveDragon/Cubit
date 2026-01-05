@@ -4,6 +4,7 @@ FastAPI Web Server for Cubit Programming Language
 Provides REST API endpoints for executing Cubit code
 """
 
+import os
 from io import StringIO
 from typing import Optional, Any, Dict, List
 from contextlib import redirect_stdout
@@ -20,10 +21,19 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Configure CORS
+# Configure CORS with environment-based allowed origins
+# For production, set CORS_ORIGINS to your frontend URL(s)
+# For development, it defaults to allow all origins
+cors_origins_env = os.environ.get("CORS_ORIGINS", "*")
+if cors_origins_env == "*":
+    allowed_origins = ["*"]
+else:
+    # Split by comma to support multiple origins
+    allowed_origins = [origin.strip() for origin in cors_origins_env.split(",")]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins for frontend integration
+    allow_origins=allowed_origins,
     allow_credentials=False,  # Credentials not needed for public API
     allow_methods=["*"],
     allow_headers=["*"],
