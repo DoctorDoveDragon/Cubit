@@ -249,6 +249,43 @@ This repository includes automated workflows in `.github/workflows/`:
 
 Both workflows ensure code quality and prevent regressions.
 
+### Full-Stack Integration (`fullstack-ci.yml`)
+- Comprehensive integration testing workflow
+- Tests backend build and API endpoints
+- Tests frontend build in standalone mode
+- Tests Docker builds for both services
+- Runs integration tests with docker-compose
+- Verifies end-to-end communication between services
+
+## Important Notes
+
+### Standalone Mode Entry Point
+
+This template uses Next.js **standalone output mode** for production deployments. The correct entry point is:
+
+```
+frontend/.next/standalone/frontend/server.js
+```
+
+**Important:** Do NOT use the following for production:
+- ❌ `npm run dev` (development mode only)
+- ❌ `frontend/server.js` (doesn't exist)
+- ❌ `frontend/.next/server/index.js` (incorrect path)
+
+The `start.sh` script and Docker configurations use the correct standalone entry point.
+
+### Deprecated Scripts
+
+The following scripts are maintained for legacy Railway deployment but are **not recommended** for new deployments:
+
+- `start-api.sh` - Use `python3 api.py` directly or the new `start.sh`
+- `start-fullstack.sh` - Use `start.sh` or `docker-compose up` instead
+
+For modern deployments, prefer:
+- **Local development**: `start.sh` (Unix/Linux/Mac)
+- **Docker**: `docker-compose up --build`
+- **Railway**: See [RAILWAY.md](RAILWAY.md)
+
 ## Production Deployment
 
 ### Railway Deployment (Recommended)
