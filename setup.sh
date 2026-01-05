@@ -33,10 +33,20 @@ fi
 echo ""
 echo "📦 Installing frontend dependencies..."
 cd frontend
-if npm install; then
+if PUPPETEER_SKIP_DOWNLOAD=true npm install; then
     echo "✅ Frontend dependencies installed"
 else
     echo "❌ Failed to install frontend dependencies"
+    exit 1
+fi
+
+# Build frontend for production
+echo ""
+echo "🔨 Building frontend for production (standalone mode)..."
+if npm run build; then
+    echo "✅ Frontend built successfully"
+else
+    echo "❌ Failed to build frontend"
     exit 1
 fi
 
@@ -45,18 +55,29 @@ cd ..
 echo ""
 echo "✨ Setup complete! 🎉"
 echo ""
-echo "To start Cubit:"
+echo "===================================================="
+echo "              How to Run Cubit"
+echo "===================================================="
 echo ""
-echo "Option 1 - Automated (Recommended):"
+echo "Option 1 - Production Mode (Standalone, Recommended):"
 echo "  ./start.sh"
+echo "  (Runs both backend and Next.js standalone build)"
 echo ""
-echo "Option 2 - Manual (Two terminals):"
+echo "Option 2 - Development Mode (Two terminals):"
 echo "  Terminal 1 (Backend API):"
 echo "    python3 api.py"
 echo ""
-echo "  Terminal 2 (Frontend):"
+echo "  Terminal 2 (Frontend Dev Server):"
 echo "    cd frontend"
 echo "    npm run dev"
 echo ""
-echo "Then visit: http://localhost:3000"
+echo "Option 3 - Docker (Full-stack):"
+echo "  docker-compose up --build"
+echo ""
+echo "===================================================="
+echo "URLs:"
+echo "  Frontend:       http://localhost:3000"
+echo "  Backend API:    http://localhost:8080"
+echo "  API Docs:       http://localhost:8080/docs"
+echo "===================================================="
 echo ""
