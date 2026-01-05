@@ -10,11 +10,12 @@ This guide provides step-by-step instructions for deploying Cubit (backend + fro
 
 ## Architecture
 
-Cubit on Railway consists of two services:
-- **Backend Service**: Python/FastAPI application serving the Cubit execution API
-- **Frontend Service**: Next.js application providing the interactive playground GUI
+Cubit uses a **monorepo deployment** where both frontend and backend run in a single service:
+- **Backend**: Python/FastAPI application serving the Cubit execution API (port 8080)
+- **Frontend**: Next.js application providing the interactive playground GUI (exposed on main PORT)
+- **Proxy**: Next.js rewrites proxy API requests from the frontend to the backend
 
-Both services are deployed from the same GitHub repository using different root directories.
+Both servers run simultaneously, with the frontend serving as the public-facing application.
 
 ## Deployment Steps
 
@@ -26,194 +27,104 @@ Both services are deployed from the same GitHub repository using different root 
 4. Authorize Railway to access your GitHub account
 5. Select the `DoctorDoveDragon/Cubit` repository
 
-### Step 2: Deploy Backend Service
+### Step 2: Deploy Full-Stack Service
 
-Railway will automatically create the first service for the backend.
+Railway will automatically create a single service that runs both frontend and backend.
 
-**Backend Configuration:**
-- **Name**: `cubit-backend` (or your preferred name)
-- **Root Directory**: `/` (leave default/empty)
+**Service Configuration:**
+- **Name**: `cubit` (or your preferred name)
+- **Root Directory**: `/` (repository root)
 - **Builder**: NIXPACKS (automatically detected)
 - **Start Command**: Automatic (uses `nixpacks.toml`)
 
 **Configuration Files:**
-- `nixpacks.toml` - Defines Python setup and start command
+- `nixpacks.toml` - Defines Node.js + Python setup, builds frontend, and starts both servers
+- `Dockerfile` - Alternative deployment method using Docker
 - `railway.json` - Restart policy configuration
 - `Procfile` - Fallback start command
 
 **Automatic Setup:**
 Railway will:
-1. Detect Python from `nixpacks.toml`
-2. Install dependencies from `requirements.txt`
-3. Start the API with: `uvicorn api:app --host 0.0.0.0 --port $PORT`
-4. Assign a public URL like: `https://cubit-backend-production.up.railway.app`
+1. Detect Node.js and Python from `nixpacks.toml`
+2. Install frontend dependencies and build Next.js app
+3. Install backend Python dependencies from `requirements.txt`
+4. Start both servers:
+   - FastAPI backend on port 8080 (internal)
+   - Next.js frontend on $PORT (public-facing)
+5. Assign a public URL like: `https://cubit-production.up.railway.app`
 
 **Environment Variables:**
 
-⚠️ **Optional but Recommended for Production**: Set the following environment variables in the backend service:
-
-1. In the backend service settings, go to "Variables" tab
-2. Click "New Variable" (if configuring CORS for production)
+The following environment variables are automatically set by Railway:
 
 | Variable Name | Value | Description |
 |--------------|-------|-------------|
-| `PORT` | Auto-set by Railway | Port for the API server (automatic) ✅ |
-| `CORS_ORIGINS` | `https://your-frontend-url.railway.app` | Allowed frontend origins for CORS (optional) |
+| `PORT` | Auto-set by Railway | Port for the frontend server (automatic) ✅ |
+| `BACKEND_URL` | `http://localhost:8080` | URL for Next.js to proxy to backend (automatic) ✅ |
 
-**CORS Configuration:**
-- **Development/Default**: If not set, CORS allows all origins (`*`)
-- **Production**: Set `CORS_ORIGINS` to your frontend URL for better security
-- **Multiple Origins**: Use comma-separated values: `https://frontend1.app,https://frontend2.app`
+**Optional Environment Variables:**
 
-**Example:**
-```
-CORS_ORIGINS=https://cubit-frontend-production.up.railway.app
-```
+For the Next.js API route (`/api/generate-cubit`):
+| Variable Name | Description |
+|--------------|-------------|
+| `DEEPSEEK_API_KEY` | API key for DeepSeek AI code generation feature (optional) |
 
-**Note**: The default `CORS_ORIGINS=*` works fine for most use cases. Only set a specific origin if you need stricter CORS control.
-
-**Verify Backend:**
+**Verify Deployment:**
 1. Wait for deployment to complete
 2. Click on the service to see the public URL
-3. Open `https://your-backend-url.railway.app/health` - should return `{"status":"healthy"}`
-4. Test API docs: `https://your-backend-url.railway.app/docs`
+3. Open `https://your-app-url.railway.app` - should load the Cubit GUI
+4. Test backend health via proxy: `https://your-app-url.railway.app/health` - should return `{"status":"healthy"}`
+5. Try running Cubit code in the playground
 
-### Step 3: Deploy Frontend Service
+### Step 3: Using the Deployed Application
 
-Now add the frontend as a second service in the same project.
+The deployed application combines both frontend and backend in a single service:
 
-**Add Frontend Service:**
-1. In your Railway project dashboard, click "+ New"
-2. Select "GitHub Repo" and choose the same `Cubit` repository
-3. Railway will create a new service
+- **Frontend URL**: `https://your-app-url.railway.app` (main entry point)
+- **API Endpoints** (proxied through frontend):
+  - `/health` - Health check
+  - `/execute` - Code execution
+  - `/docs` - FastAPI documentation
+  - `/concepts` - Programming concepts
+  - `/progress` - Learning progress
 
-**Frontend Configuration:**
-- **Name**: `cubit-frontend` (or your preferred name)
-- **Root Directory**: Set to `frontend` (IMPORTANT!)
-  - Click on the service
-  - Go to Settings → Service
-  - Scroll to "Root Directory"
-  - Enter: `frontend`
-  - Save changes
-- **Builder**: NIXPACKS (automatically detected from `frontend/nixpacks.toml`)
-- **Start Command**: Automatic (uses `frontend/nixpacks.toml`)
-
-**Configuration Files:**
-- `frontend/nixpacks.toml` - Defines Node.js 20, build, and start commands
-- `frontend/railway.json` - Restart policy configuration
-
-**Required Environment Variables:**
-
-⚠️ **CRITICAL**: Set the following environment variable in the frontend service:
-
-1. In the frontend service settings, go to "Variables" tab
-2. Click "New Variable"
-3. Add the following variable:
-
-| Variable Name | Value | Description |
-|--------------|-------|-------------|
-| `NEXT_PUBLIC_API_URL` | `https://your-backend-url.railway.app` | Backend API URL from Step 2 |
-
-**Example:**
-```
-NEXT_PUBLIC_API_URL=https://cubit-backend-production.up.railway.app
-```
-
-**Note:** `PUPPETEER_SKIP_DOWNLOAD=true` is now automatically configured in the build process via `nixpacks.toml`, so you don't need to set it manually.
-
-**Important Notes:**
-- Replace `your-backend-url.railway.app` with your actual backend URL from Step 2
-- The URL must include `https://` protocol
-- Do NOT include a trailing slash
-- After adding/changing environment variables, **redeploy** the service (Railway → Deployments → ⋯ → Redeploy)
-
-**Automatic Setup:**
-Railway will:
-1. Detect Node.js 20 from `frontend/nixpacks.toml`
-2. Run `npm ci` to install exact dependencies
-3. Run `npm run build` with your environment variables
-4. Start the app with: `node .next/standalone/server.js` (standalone mode)
-5. Assign a public URL like: `https://cubit-frontend-production.up.railway.app`
-
-**Verify Frontend:**
-1. Wait for deployment to complete (check build logs)
-2. Open the public URL: `https://your-frontend-url.railway.app`
-3. You should see the Cubit playground interface
-4. Check the API health indicator - it should show "Connected" (green)
-5. Try running sample code to verify backend connectivity
-
-### Step 4: Configure Custom Domains (Optional)
-
-If you want custom domains:
-
-**Backend:**
-1. Go to backend service → Settings → Domains
-2. Click "Custom Domain"
-3. Enter your domain (e.g., `api.cubit.example.com`)
-4. Add the CNAME record to your DNS provider
-5. Update `NEXT_PUBLIC_API_URL` in frontend to use the custom domain
-6. Redeploy frontend
-
-**Frontend:**
-1. Go to frontend service → Settings → Domains
-2. Click "Custom Domain"
-3. Enter your domain (e.g., `cubit.example.com`)
-4. Add the CNAME record to your DNS provider
+**Testing the Deployment:**
+1. Visit the main URL to see the Cubit playground
+2. Try running example code (Hello World, Fibonacci, etc.)
+3. Check the API health indicator (should show connected)
+4. Test the natural language code generation (if DEEPSEEK_API_KEY is set)
 
 ## Deployment Verification Checklist
 
-- [ ] Backend service is running (green status in Railway)
-- [ ] Backend health endpoint returns `{"status":"healthy"}`
-- [ ] Frontend service is running (green status in Railway)
-- [ ] Frontend loads in browser
-- [ ] API health indicator shows "Connected" (green dot)
+- [ ] Service is running (green status in Railway)
+- [ ] Frontend loads in browser at the public URL
+- [ ] Backend health endpoint returns `{"status":"healthy"}` when accessed via `/health`
 - [ ] Code execution works (try running "Hello World" example)
-- [ ] No CORS errors in browser console (F12)
+- [ ] No errors in browser console (F12)
+- [ ] No errors in Railway deployment logs
 
 ## Troubleshooting
 
-### Backend Issues
+### Build Failures
 
-**Backend service fails to start:**
-```bash
-# Check Railway logs for errors
-# Common issues:
-# 1. Missing dependencies in requirements.txt
-# 2. Python version mismatch
-# 3. Port binding issues
+**Frontend build fails during deployment:**
 
-# Solution: Check logs and ensure requirements.txt includes:
-fastapi>=0.109.0
-uvicorn[standard]>=0.27.0
-pydantic>=2.5.0
-```
-
-**Backend returns 404 or 502:**
-- Verify the service is running (check Railway dashboard)
-- Check logs for startup errors
-- Ensure `nixpacks.toml` is in the root directory
-- Verify the start command uses `$PORT` variable
-
-### Frontend Issues
-
-**Frontend build fails:**
-
-1. **Missing Root Directory**:
+1. **Node.js or Python not found**:
    ```
-   Solution: Set Root Directory to "frontend" in service settings
+   Solution: Ensure nixpacks.toml includes both Node.js 20 and Python 3.11
    ```
 
-2. **Environment variable issues**:
+2. **Frontend build timeout**:
    ```
-   Error: NEXT_PUBLIC_API_URL is not set
-   Solution: Add the variable in Railway dashboard and redeploy
+   Error: Build exceeded time limit
+   Solution: This is rare but can happen. Redeploy or contact Railway support.
    ```
 
 3. **Puppeteer installation fails**:
    ```
    Error: Failed to download Chrome binary
    Solution: This is automatically handled by nixpacks.toml (PUPPETEER_SKIP_DOWNLOAD=true).
-   If you still see this error, verify that frontend/nixpacks.toml contains the correct install command.
+   If you still see this error, verify that the install command includes PUPPETEER_SKIP_DOWNLOAD=true.
    ```
 
 4. **TypeScript errors**:
@@ -222,35 +133,32 @@ pydantic>=2.5.0
    Run locally: cd frontend && npm ci && npm run build
    ```
 
-**Frontend shows "API Disconnected":**
+### Runtime Issues
 
-1. **Wrong API URL**:
-   ```
-   Solution: Verify NEXT_PUBLIC_API_URL in frontend service variables
-   Should be: https://your-backend-url.railway.app (no trailing slash)
-   ```
+**Backend not starting:**
+1. Check Railway logs for Python errors
+2. Verify all dependencies are in requirements.txt
+3. Ensure the start script successfully starts both backend and frontend
 
-2. **Backend not accessible**:
-   ```
-   Test: curl https://your-backend-url.railway.app/health
-   Solution: Ensure backend service is running
-   ```
+**Frontend shows "API Disconnected" or execution fails:**
 
-3. **Environment variable not applied**:
+1. **Backend process not running**:
    ```
-   Solution: After changing NEXT_PUBLIC_API_URL, REDEPLOY the frontend
-   Go to: Deployments → ⋯ → Redeploy
+   Solution: Check Railway logs - backend should start on port 8080 before frontend
+   Look for: "Starting FastAPI backend on port 8080..."
    ```
 
-4. **CORS issues**:
+2. **Port conflict or binding issues**:
    ```
-   Check browser console (F12) for CORS errors
-   Solution 1: Backend CORS defaults to allow all origins (*)
-   Solution 2: For production, set CORS_ORIGINS environment variable in backend:
-               CORS_ORIGINS=https://your-frontend-url.railway.app
-   Solution 3: If using multiple frontends, use comma-separated:
-               CORS_ORIGINS=https://frontend1.app,https://frontend2.app
-   Redeploy backend after changing CORS_ORIGINS
+   Solution: Ensure PORT environment variable is being used correctly
+   Backend uses fixed port 8080 (internal)
+   Frontend uses $PORT (Railway-assigned, public-facing)
+   ```
+
+3. **Proxy configuration issues**:
+   ```
+   Solution: Verify that frontend/next.config.ts includes rewrites configuration
+   The rewrites should proxy /execute, /health, /docs, etc. to BACKEND_URL
    ```
 
 **Changes not reflecting:**

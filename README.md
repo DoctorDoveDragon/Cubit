@@ -23,7 +23,30 @@ Cubit is a simple, educational programming language with a clean syntax designed
 
 **📖 Deploy to Railway in minutes! See [RAILWAY.md](RAILWAY.md) for the complete deployment guide.**
 
-Railway is the recommended platform for deploying both backend and frontend from this repository.
+Railway is the recommended platform for deploying the full-stack application (frontend + backend) from this repository as a single unified service.
+
+**Deployment Architecture:**
+- Single service running both Next.js frontend and FastAPI backend
+- Frontend proxies API requests to the backend automatically
+- No separate deployment or CORS configuration needed
+- Simplified environment variable setup
+
+### Docker Deployment (Alternative)
+
+You can also deploy using Docker:
+
+```bash
+# Build the Docker image
+docker build -t cubit:latest .
+
+# Run the container
+docker run -p 3000:3000 cubit:latest
+```
+
+The Dockerfile uses a multi-stage build to:
+1. Build the Next.js frontend
+2. Set up Python environment for the backend
+3. Run both servers in a single container
 
 ### Local Development
 
