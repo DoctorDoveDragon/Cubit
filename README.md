@@ -725,6 +725,34 @@ For detailed frontend deployment instructions including troubleshooting, see `fr
   5. Try `npm install --legacy-peer-deps` if dependency conflicts occur
   6. For CI/CD, ensure cache is cleared between builds if issues persist
 
+**Cleaning build artifacts and dependencies (Best Practice):**
+- **When to clean**: Before reporting issues, after major updates, or when seeing unexplained errors
+- **Steps**:
+  1. Remove old build artifacts:
+     ```bash
+     # From repository root
+     rm -rf frontend/.next frontend/out
+     ```
+  2. Clean dependency caches:
+     ```bash
+     cd frontend
+     npm cache clean --force
+     rm -rf node_modules package-lock.json
+     npm install
+     ```
+  3. Remove any stale compiled config files:
+     ```bash
+     # These files are auto-ignored in .gitignore
+     rm -f next.config.compiled.js frontend/next.config.compiled.js
+     ```
+  4. For Python dependencies:
+     ```bash
+     # From repository root
+     pip install --upgrade pip
+     pip install -r requirements.txt --force-reinstall
+     ```
+- **Note**: The repository includes a placeholder `next.config.js` in the root directory to prevent Next.js from searching for configs in the wrong location. The actual Next.js configuration is in `frontend/next.config.ts`.
+
 ##### Getting Help
 
 If issues persist:
