@@ -10,14 +10,36 @@ export interface ExecuteRequest {
 
 export interface Progress {
   total_calls: number
+  total_methods_used: number
   method_diversity: string[]
   mastered_concepts?: string[]
+  skill_trajectory?: string[]
 }
 
 export interface ExecuteResponse {
   output: string | null
   result: unknown
   error: string | null
+  teaching_moment?: {
+    level?: string
+    focus?: string
+    explanation?: string
+    why_it_exists?: string
+    simple_analogy?: string
+    prerequisites?: string[]
+    related_concepts?: string[]
+    pitfalls?: string[]
+    best_practices?: string[]
+    common_patterns?: string[]
+    when_to_use?: string
+    alternatives?: string[]
+    performance_tips?: string[]
+    advanced_patterns?: string[]
+    theory?: string
+    edge_cases?: string[]
+    implementation_details?: string
+    research_references?: string[]
+  }
   skill_level?: string
   progress?: Progress
   suggestions?: string[]

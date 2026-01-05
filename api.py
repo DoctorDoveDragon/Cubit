@@ -111,7 +111,8 @@ async def execute_code(request: ExecuteRequest):
     if request.teaching_enabled:
         ped_interpreter = PedagogicalAPI(
             interpreter,
-            default_verbosity=request.verbosity or 'normal'
+            default_verbosity=request.verbosity or 'normal',
+            silent_mode=True  # Don't print teaching insights, return as structured data
         )
     
     # Capture stdout using context manager to avoid race conditions
@@ -132,6 +133,7 @@ async def execute_code(request: ExecuteRequest):
         teaching_data = {}
         if request.teaching_enabled:
             teaching_data = {
+                'teaching_moment': ped_interpreter.get_last_teaching_moment(),
                 'skill_level': ped_interpreter._infer_skill_level(),
                 'progress': ped_interpreter.get_learning_progress(),
                 'suggestions': ped_interpreter.suggest_next_concepts()[:5]
