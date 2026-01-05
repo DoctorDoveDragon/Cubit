@@ -104,6 +104,15 @@ jobs:
         env:
           NEXT_PUBLIC_API_URL: 'http://localhost:8080'
 
+      - name: "Debug: list Next.js standalone layout"
+        run: |
+          echo "=== Listing frontend/.next ==="
+          ls -la frontend/.next || true
+          echo "=== Listing frontend/.next/standalone ==="
+          ls -la frontend/.next/standalone || true
+          echo "=== Recursive listing (maxdepth 3) ==="
+          find frontend/.next/standalone -maxdepth 3 -type f -print -exec ls -la {} \; || true
+
       - name: Verify standalone output
         run: |
           if [ ! -f "frontend/.next/standalone/frontend/server.js" ]; then
