@@ -42,6 +42,7 @@ RUN npm run build
 # ------------------------------------------------------------------------------
 # Stage 3: Runner (Production)
 # Create the final production image with minimal size
+# For standalone output mode
 # ------------------------------------------------------------------------------
 FROM node:20-alpine AS runner
 
@@ -54,17 +55,11 @@ ENV NODE_ENV=production
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs
 
-# Copy necessary files for production
-COPY --from=builder /app/next.config.ts ./
-COPY --from=builder /app/package.json ./
-COPY --from=builder /app/package-lock.json ./
-
-# Copy built application
-COPY --from=builder /app/.next ./.next
+# Copy the standalone output from the builder
+# This includes all necessary dependencies automatically bundled by Next.js
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/public ./public
-
-# Install only production dependencies
-RUN npm ci --omit=dev
 
 # Change ownership to non-root user
 RUN chown -R nextjs:nodejs /app
@@ -79,5 +74,5 @@ EXPOSE 3000
 # Set the port environment variable for Railway
 ENV PORT=3000
 
-# Start the Next.js server using standard next start command
-CMD ["npm", "run", "start"]
+# Start the Next.js server using standalone mode command
+CMD ["node", "server.js"]
