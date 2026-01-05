@@ -193,8 +193,8 @@ export default function CodeExecutor() {
                   <div>
                     <div className="text-xs text-yellow-200 font-medium mb-1">⚠️ Common Pitfalls:</div>
                     <ul className="text-yellow-100 space-y-1">
-                      {output.teaching_moment.pitfalls.map((pitfall: string, idx: number) => (
-                        <li key={idx}>• {pitfall}</li>
+                      {output.teaching_moment.pitfalls.map((pitfall: string) => (
+                        <li key={pitfall}>• {pitfall}</li>
                       ))}
                     </ul>
                   </div>
@@ -204,8 +204,8 @@ export default function CodeExecutor() {
                   <div>
                     <div className="text-xs text-cyan-200 font-medium mb-1">✨ Best Practices:</div>
                     <ul className="text-cyan-100 space-y-1">
-                      {output.teaching_moment.best_practices.map((practice: string, idx: number) => (
-                        <li key={idx}>• {practice}</li>
+                      {output.teaching_moment.best_practices.map((practice: string) => (
+                        <li key={practice}>• {practice}</li>
                       ))}
                     </ul>
                   </div>
