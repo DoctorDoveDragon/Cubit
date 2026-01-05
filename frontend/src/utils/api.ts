@@ -42,12 +42,19 @@ export interface ConceptGraph {
  */
 const getApiBaseUrl = (): string => {
   if (typeof window !== 'undefined') {
-    // Client-side - check for environment variable
+    // Client-side - in production, use relative URLs since Next.js proxies to backend
+    // In development, check for environment variable
     const apiUrl = process.env.NEXT_PUBLIC_API_URL
     if (!apiUrl) {
+      // In production deployment (monorepo), use empty string for relative URLs
+      // The Next.js server will proxy these to the backend via rewrites
+      if (process.env.NODE_ENV === 'production') {
+        return ''  // Relative URLs - Next.js will proxy to backend
+      }
       console.warn('NEXT_PUBLIC_API_URL is not set. Using default: http://localhost:8080')
+      return 'http://localhost:8080'
     }
-    return apiUrl || 'http://localhost:8080'
+    return apiUrl
   }
   return 'http://localhost:8080'
 }
