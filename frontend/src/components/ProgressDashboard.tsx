@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import Button from './Button'
 import { getProgress, getConceptGraph, ConceptGraph } from '../utils/api'
+import { safeErrorMessage } from '../utils/safeError'
 
 export default function ProgressDashboard() {
     const [progress, setProgress] = useState<{ message: string; info: string } | null>(null)
@@ -17,8 +18,8 @@ export default function ProgressDashboard() {
         try {
             const progressData = await getProgress()
             setProgress(progressData)
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to load progress')
+        } catch (err: unknown) {
+            setError(safeErrorMessage(err))
         } finally {
             setLoading(false)
         }
@@ -30,8 +31,8 @@ export default function ProgressDashboard() {
         try {
             const conceptData = await getConceptGraph()
             setConcepts(conceptData)
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to load concepts')
+        } catch (err: unknown) {
+            setError(safeErrorMessage(err))
         } finally {
             setLoading(false)
         }

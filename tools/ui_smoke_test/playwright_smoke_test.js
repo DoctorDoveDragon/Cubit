@@ -23,11 +23,11 @@ async function run() {
             const url = base + c.url;
             console.log('Loading', url);
             await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 }).catch(err => {
-                console.warn('Warning: failed to load', url, err && err.message);
+                console.warn('Warning: failed to load', url, err && err.message ? err.message : String(err));
             });
             const out = path.join(outDir, c.name);
             console.log('Saving', out);
-            await page.screenshot({ path: out, fullPage: true }).catch(err => console.warn('screenshot failed', err && err.message));
+            await page.screenshot({ path: out, fullPage: true }).catch(err => console.warn('screenshot failed', err && err.message ? err.message : String(err)));
             await page.waitForTimeout(400);
         }
 
@@ -51,11 +51,11 @@ async function run() {
                         console.log('Tab not found:', t);
                     }
                 } catch (err) {
-                    console.warn('Error interacting with tab', t, err && err.message);
+                    console.warn('Error interacting with tab', t, err && err.message ? err.message : String(err));
                 }
             }
         } catch (err) {
-            console.warn('Game tabs step failed:', err && err.message);
+            console.warn('Game tabs step failed:', err && err.message ? err.message : String(err));
         }
 
         console.log('Smoke test finished. Screenshots saved to', outDir);
@@ -65,6 +65,6 @@ async function run() {
 }
 
 run().catch(err => {
-    console.error('Smoke test failed:', err && err.stack ? err.stack : err);
+    console.error('Smoke test failed:', err && err.stack ? err.stack : String(err));
     process.exit(1);
 });

@@ -27,6 +27,12 @@ Railway is the recommended platform for deploying both backend and frontend from
 
 ### Local Development
 
+> **Note on Package Management:** This repository contains two separate `package-lock.json` files:
+> - Root `package-lock.json`: For the minimal root-level dependency (openai package only, used by some scripts)
+> - `frontend/package-lock.json`: For all Next.js frontend dependencies
+> 
+> This dual-lockfile setup ensures that the root and frontend Node.js environments remain isolated. Always run `npm install` in the appropriate directory (root for scripts, `frontend/` for the web app).
+
 #### Automated Setup (Recommended)
 
 **Unix/Linux/Mac:**

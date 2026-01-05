@@ -5,6 +5,7 @@ import Button from './Button'
 import NaturalLanguageInput from './NaturalLanguageInput'
 import { executeCode, ExecuteResponse } from '../utils/api'
 import { CUBIT_EXAMPLES, getExamplesList } from '../constants/examples'
+import { safeErrorMessage } from '../utils/safeError'
 
 export default function CodeExecutor() {
   const [code, setCode] = useState<string>(CUBIT_EXAMPLES.hello.code)
@@ -25,11 +26,11 @@ export default function CodeExecutor() {
         verbosity: teachingEnabled ? verbosity : undefined
       })
       setOutput(result)
-    } catch (error) {
+    } catch (err: unknown) {
       setOutput({
         output: null,
         result: null,
-        error: error instanceof Error ? error.message : 'Failed to execute code'
+        error: safeErrorMessage(err)
       })
     } finally {
       setLoading(false)

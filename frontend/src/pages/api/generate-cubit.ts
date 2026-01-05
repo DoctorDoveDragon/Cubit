@@ -1,8 +1,14 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import OpenAI from 'openai';
+import { safeErrorMessage } from '../../utils/safeError';
 
 // Defensive: ensure API key is present and log an explicit message if not.
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY ?? '';
+if (!DEEPSEEK_API_KEY && process.env.NODE_ENV !== 'production') {
+  // Only warn in development, not in production where it might be logged
+  console.warn('DEEPSEEK_API_KEY environment variable is not set');
+}
+
 const openai = new OpenAI({
   baseURL: 'https://api.deepseek.com',
   apiKey: DEEPSEEK_API_KEY,
@@ -14,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   if (!DEEPSEEK_API_KEY) {
-    console.error('generate-cubit: missing DEEPSEEK_API_KEY environment variable')
+    // Don't log in production to avoid exposing configuration details
     return res.status(500).json({ error: 'Server misconfiguration: missing API key' })
   }
 
@@ -42,28 +48,21 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const maybe = completion as unknown as MinimalCompletion
     const code = maybe?.choices?.[0]?.message?.content
     if (!code || typeof code !== 'string') {
-      console.error('generate-cubit: unexpected response from OpenAI:', completion);
+      // Log error in development only, avoid logging full response in production
+      if (process.env.NODE_ENV !== 'production') {
+        console.error('generate-cubit: unexpected response structure from upstream API');
+      }
       return res.status(502).json({ error: 'Upstream service returned an unexpected response' });
     }
 
     return res.status(200).json({ code });
-  } catch (error: unknown) {
-    // Log the full error server-side for debugging and return a safe message to client
-    console.error('generate-cubit: error while calling upstream API', error);
-
-    let msg = 'Unknown error';
-    if (error instanceof Error) {
-      msg = error.message || msg;
-    } else if (typeof error === 'string') {
-      msg = error;
-    } else {
-      try {
-        msg = JSON.stringify(error);
-      } catch {
-        // keep default
-      }
+  } catch (err: unknown) {
+    // Log sanitized error server-side for debugging (avoid logging sensitive data)
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('generate-cubit: error while calling upstream API:', safeErrorMessage(err));
     }
 
+    const msg = safeErrorMessage(err);
     return res.status(500).json({ error: `API error: ${msg}` });
   }
 }
