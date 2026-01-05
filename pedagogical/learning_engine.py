@@ -201,9 +201,13 @@ class AdaptiveLearningEngine:
         Returns:
             Progress metrics
         """
+        # Get unique methods used
+        unique_methods = list(set(call['method'] for call in call_history))
+        
         return {
-            'total_methods_used': len(set(call['method'] for call in call_history)),
+            'total_methods_used': len(unique_methods),
             'total_calls': len(call_history),
+            'method_diversity': unique_methods,  # Added for frontend compatibility
             'skill_trajectory': self._calculate_skill_trajectory(call_history),
             'mastered_concepts': self._identify_mastered_concepts(call_history)
         }

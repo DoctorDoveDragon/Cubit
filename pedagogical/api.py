@@ -16,7 +16,7 @@ class PedagogicalAPI:
     Main API that wraps existing APIs and adds pedagogical features
     """
     
-    def __init__(self, wrapped_api: Any, max_history: int = 1000, default_verbosity: str = 'normal'):
+    def __init__(self, wrapped_api: Any, max_history: int = 1000, default_verbosity: str = 'normal', silent_mode: bool = False):
         """
         Initialize the Pedagogical API
         
@@ -24,9 +24,11 @@ class PedagogicalAPI:
             wrapped_api: The API to wrap with pedagogical features
             max_history: Maximum number of calls to keep in history
             default_verbosity: Default verbosity level
+            silent_mode: If True, teaching insights are stored but not printed
         """
         self.wrapped_api = wrapped_api
         self.max_history = max_history
+        self.silent_mode = silent_mode
         
         # Initialize all components
         self.learning_engine = AdaptiveLearningEngine()
@@ -38,6 +40,7 @@ class PedagogicalAPI:
         # Call history for tracking learning progress
         self._call_history: List[Dict[str, Any]] = []
         self._user_profile: Dict[str, Any] = {}
+        self._last_teaching_moment: Optional[Dict[str, Any]] = None
     
     def call(self, method_name: str, *args, **kwargs) -> Any:
         """
@@ -75,10 +78,14 @@ class PedagogicalAPI:
             call_history=self._call_history
         )
         
-        # 6. Deliver the teaching moment
-        self.insight_delivery.deliver(teaching_moment, result)
+        # 6. Store the teaching moment
+        self._last_teaching_moment = teaching_moment
         
-        # 7. Return the result
+        # 7. Deliver the teaching moment (only if not in silent mode)
+        if not self.silent_mode:
+            self.insight_delivery.deliver(teaching_moment, result)
+        
+        # 8. Return the result
         return result
     
     def _record_call(
@@ -125,6 +132,15 @@ class PedagogicalAPI:
             Dictionary containing progress information
         """
         return self.learning_engine.get_progress(self._call_history)
+    
+    def get_last_teaching_moment(self) -> Optional[Dict[str, Any]]:
+        """
+        Get the last teaching moment that was generated
+        
+        Returns:
+            Dictionary containing the teaching moment, or None if no teaching moments yet
+        """
+        return self._last_teaching_moment
     
     def set_verbosity(self, level: str):
         """

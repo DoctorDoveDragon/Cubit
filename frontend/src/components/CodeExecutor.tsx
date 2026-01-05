@@ -156,6 +156,64 @@ export default function CodeExecutor() {
             </div>
           )}
 
+          {/* Teaching Moment */}
+          {output.teaching_moment && (
+            <div className="bg-gradient-to-r from-purple-900/20 to-blue-900/20 border border-purple-500/50 rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-lg">🎓</span>
+                <div className="text-sm font-medium text-purple-300">Learning Moment</div>
+                <span className="text-xs text-[var(--color-muted)] ml-auto">
+                  [{output.teaching_moment.level?.toUpperCase() || 'INFO'}]
+                </span>
+              </div>
+              
+              <div className="space-y-3 text-sm">
+                {output.teaching_moment.explanation && (
+                  <div>
+                    <div className="text-xs text-purple-200 font-medium mb-1">💡 Explanation:</div>
+                    <div className="text-purple-100">{output.teaching_moment.explanation}</div>
+                  </div>
+                )}
+                
+                {output.teaching_moment.why_it_exists && (
+                  <div>
+                    <div className="text-xs text-blue-200 font-medium mb-1">🔍 Why This Matters:</div>
+                    <div className="text-blue-100">{output.teaching_moment.why_it_exists}</div>
+                  </div>
+                )}
+                
+                {output.teaching_moment.simple_analogy && (
+                  <div>
+                    <div className="text-xs text-green-200 font-medium mb-1">🌟 Think of It Like:</div>
+                    <div className="text-green-100 italic">{output.teaching_moment.simple_analogy}</div>
+                  </div>
+                )}
+                
+                {output.teaching_moment.pitfalls && output.teaching_moment.pitfalls.length > 0 && (
+                  <div>
+                    <div className="text-xs text-yellow-200 font-medium mb-1">⚠️ Common Pitfalls:</div>
+                    <ul className="text-yellow-100 space-y-1">
+                      {output.teaching_moment.pitfalls.map((pitfall: string) => (
+                        <li key={pitfall}>• {pitfall}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                
+                {output.teaching_moment.best_practices && output.teaching_moment.best_practices.length > 0 && (
+                  <div>
+                    <div className="text-xs text-cyan-200 font-medium mb-1">✨ Best Practices:</div>
+                    <ul className="text-cyan-100 space-y-1">
+                      {output.teaching_moment.best_practices.map((practice: string) => (
+                        <li key={practice}>• {practice}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Standard Output */}
           {output.output && (
             <div className="bg-[var(--color-surface)] border border-[rgba(255,255,255,0.12)] rounded-lg p-4">
