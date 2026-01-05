@@ -59,9 +59,9 @@ RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs
 
 # Copy the standalone output from the builder
-# Next.js standalone mode preserves the directory name in the output structure
-# Even when building from the frontend directory, it creates .next/standalone/frontend/
-COPY --from=builder /app/.next/standalone/frontend ./
+# Next.js standalone mode creates output at .next/standalone/ directly
+# The standalone build contains the minimal server and dependencies needed to run
+COPY --from=builder /app/.next/standalone ./
 
 # Copy static assets to the correct location
 COPY --from=builder /app/.next/static ./.next/static

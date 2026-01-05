@@ -106,7 +106,7 @@ jobs:
 
       - name: Verify standalone output
         run: |
-          if [ ! -f "frontend/.next/standalone/frontend/server.js" ]; then
+          if [ ! -f "frontend/.next/standalone/server.js" ]; then
             echo "❌ Standalone server.js not found!"
             exit 1
           fi
