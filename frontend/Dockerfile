@@ -57,9 +57,11 @@ RUN addgroup --system --gid 1001 nodejs && \
 
 # Copy the standalone output from the builder
 # This includes all necessary dependencies automatically bundled by Next.js
+# Next.js creates .next/standalone/frontend/ structure for apps in subdirectories
 COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/.next/static ./.next/static
-COPY --from=builder /app/public ./public
+# Copy static assets to the correct location within the standalone structure
+COPY --from=builder /app/.next/static ./frontend/.next/static
+COPY --from=builder /app/public ./frontend/public
 
 # Change ownership to non-root user
 RUN chown -R nextjs:nodejs /app
@@ -75,4 +77,5 @@ EXPOSE 3000
 ENV PORT=3000
 
 # Start the Next.js server using standalone mode command
-CMD ["node", "server.js"]
+# Next.js standalone mode for apps in subdirectories creates .next/standalone/<dirname>/server.js
+CMD ["node", "frontend/server.js"]
