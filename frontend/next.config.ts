@@ -14,8 +14,14 @@ try {
   finalConfig = withBundleAnalyzer(nextConfig);
 } catch (error: unknown) {
   // Bundle analyzer not available (production environment)
-  // Only catch MODULE_NOT_FOUND errors, re-throw others
-  if (error && typeof error === 'object' && 'code' in error && error.code !== 'MODULE_NOT_FOUND') {
+  // Only silently ignore MODULE_NOT_FOUND errors, re-throw all others
+  const isModuleNotFoundError = error && 
+    typeof error === 'object' && 
+    'code' in error && 
+    typeof error.code === 'string' &&
+    error.code === 'MODULE_NOT_FOUND';
+  
+  if (!isModuleNotFoundError) {
     throw error;
   }
   // Use config without analyzer when module is not installed
