@@ -9,9 +9,16 @@ echo "=== Starting Cubit Full-Stack Application ==="
 # Save the frontend port
 FRONTEND_PORT=${PORT:-3000}
 
+# Determine Python executable (use venv if available, otherwise system python3)
+if [ -f "/opt/venv/bin/python3" ]; then
+  PYTHON_BIN="/opt/venv/bin/python3"
+else
+  PYTHON_BIN="python3"
+fi
+
 # Start FastAPI backend in background on fixed port 8080
-echo "Starting FastAPI backend on port 8080..."
-PORT=8080 python3 api.py > /tmp/backend.log 2>&1 &
+echo "Starting FastAPI backend on port 8080 using $PYTHON_BIN..."
+PORT=8080 $PYTHON_BIN api.py > /tmp/backend.log 2>&1 &
 BACKEND_PID=$!
 
 # Wait for backend to initialize
@@ -43,9 +50,20 @@ for i in {1..10}; do
   sleep 1
 done
 
+# Determine frontend directory path
+if [ -d "frontend/.next/standalone/frontend" ]; then
+  FRONTEND_DIR="frontend/.next/standalone/frontend"
+elif [ -d ".next/standalone/frontend" ]; then
+  FRONTEND_DIR=".next/standalone/frontend"
+else
+  echo "ERROR: Frontend build not found. Expected: frontend/.next/standalone/frontend"
+  kill $BACKEND_PID 2>/dev/null || true
+  exit 1
+fi
+
 # Start Next.js frontend on the main port
 echo "Starting Next.js frontend on port ${FRONTEND_PORT}..."
-cd frontend/.next/standalone/frontend
+cd "$FRONTEND_DIR"
 
 # Use exec to replace shell with Node.js process for proper signal handling
 exec env PORT=$FRONTEND_PORT BACKEND_URL=http://localhost:8080 node server.js
