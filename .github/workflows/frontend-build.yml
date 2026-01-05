@@ -5,6 +5,9 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/frontend-build.yml'
 
 jobs:
   build:
@@ -33,14 +36,25 @@ jobs:
           cd frontend
           npx tsc --noEmit
 
-      - name: Build
+      - name: Build (standalone mode)
         run: |
           cd frontend
           npm run build
         env:
           # Placeholder API URL for CI builds (not used at runtime, only embedded during build)
           # In production deployments, set this to your actual backend API URL
-          NEXT_PUBLIC_API_URL: 'https://placeholder-api-for-ci-build.example.com'
+          NEXT_PUBLIC_API_URL: 'http://localhost:8080'
+
+      - name: Verify standalone output
+        run: |
+          if [ ! -f "frontend/.next/standalone/frontend/server.js" ]; then
+            echo "❌ Standalone server.js not found at expected location!"
+            echo "Expected: frontend/.next/standalone/frontend/server.js"
+            ls -la frontend/.next/standalone/ || true
+            exit 1
+          fi
+          echo "✅ Standalone build verified: server.js found"
+          echo "Entry point: frontend/.next/standalone/frontend/server.js"
 
       - name: Lint (non-blocking)
         run: |
