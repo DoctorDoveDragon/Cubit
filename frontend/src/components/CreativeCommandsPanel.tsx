@@ -5,6 +5,7 @@ import Button from './Button'
 import Toast from './Toast'
 import { analyzeBundleSize, generateBundleReport } from '../utils/bundleAnalyzer'
 import { getProgress, getConceptGraph } from '../utils/api'
+import { safeErrorMessage } from '../utils/safeError'
 
 type CommandCategory = 'ai' | 'design' | 'workflow' | 'intelligence'
 
@@ -284,10 +285,10 @@ export default function CreativeCommandsPanel() {
           const analysis = await analyzeBundleSize()
           const report = generateBundleReport(analysis)
           showModalDialog('Bundle Analysis', report)
-        } catch (error) {
+        } catch (err: unknown) {
           showModalDialog(
             'Bundle Analysis Error',
-            `Failed to analyze bundle:\n\n${error instanceof Error ? error.message : 'Unknown error'}\n\nPlease ensure the app is built or running in development mode.`
+            `Failed to analyze bundle:\n\n${safeErrorMessage(err)}\n\nPlease ensure the app is built or running in development mode.`
           )
         }
       }
@@ -303,10 +304,10 @@ export default function CreativeCommandsPanel() {
             'Learning Progress',
             `${progress.message}\n\n${progress.info || 'No detailed progress information available yet. Start coding with Teaching Mode enabled to track your progress!'}`
           )
-        } catch (error) {
+        } catch (err: unknown) {
           showModalDialog(
             'Progress Error',
-            `Failed to fetch progress:\n\n${error instanceof Error ? error.message : 'Unknown error'}\n\nMake sure the backend API is running and Teaching Mode has been used.`
+            `Failed to fetch progress:\n\n${safeErrorMessage(err)}\n\nMake sure the backend API is running and Teaching Mode has been used.`
           )
         }
       }
@@ -333,10 +334,10 @@ export default function CreativeCommandsPanel() {
             `View the Progress Dashboard for detailed concept information!`
 
           showModalDialog('Concept Explorer', report)
-        } catch (error) {
+        } catch (err: unknown) {
           showModalDialog(
             'Concept Error',
-            `Failed to load concepts:\n\n${error instanceof Error ? error.message : 'Unknown error'}`
+            `Failed to load concepts:\n\n${safeErrorMessage(err)}`
           )
         }
       }

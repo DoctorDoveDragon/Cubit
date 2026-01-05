@@ -27,7 +27,7 @@ async function run() {
             console.log('Saved screenshot:', file)
             await new Promise(r => setTimeout(r, 800))
         } catch (err) {
-            console.error('Error capturing', item.url, err && err.message ? err.message : err)
+            console.error('Error capturing', item.url, err && err.message ? err.message : String(err))
         }
     }
 
@@ -56,7 +56,7 @@ async function run() {
         await page.screenshot({ path: file, fullPage: true })
         console.log('Saved screenshot:', file)
     } catch (err) {
-        console.warn('Flowchart canvas not found:', err && err.message ? err.message : err)
+        console.warn('Flowchart canvas not found:', err && err.message ? err.message : String(err))
     }
 
     // Try Solar System
@@ -77,7 +77,7 @@ async function run() {
             console.log('Saved screenshot:', file)
         }
     } catch (err) {
-        console.warn('Solar System canvas not found:', err && err.message ? err.message : err)
+        console.warn('Solar System canvas not found:', err && err.message ? err.message : String(err))
     }
 
     // Try Animated Art
@@ -102,7 +102,7 @@ async function run() {
             console.log('Saved screenshot:', file)
         }
     } catch (err) {
-        console.warn('Animated Art canvas not found:', err && err.message ? err.message : err)
+        console.warn('Animated Art canvas not found:', err && err.message ? err.message : String(err))
     }
 
     await browser.close()
@@ -110,6 +110,6 @@ async function run() {
 }
 
 run().catch(err => {
-    console.error('Smoke test failed:', err)
+    console.error('Smoke test failed:', String(err))
     process.exit(1)
 })

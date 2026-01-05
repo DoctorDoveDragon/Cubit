@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { safeErrorMessage } from '../../utils/safeError';
 
 export default function GraphingCalculator() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -96,8 +97,8 @@ export default function GraphingCalculator() {
             }
 
             ctx.stroke();
-        } catch (error) {
-            console.error('Error plotting function:', error);
+        } catch (err: unknown) {
+            console.error('Error plotting function:', safeErrorMessage(err));
             ctx.fillStyle = '#ef4444';
             ctx.font = '16px monospace';
             ctx.fillText('Invalid equation!', centerX - 60, centerY - 40);

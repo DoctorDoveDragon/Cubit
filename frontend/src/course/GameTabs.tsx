@@ -16,6 +16,7 @@ export default function GameTabs() {
     };
 
     // Placeholder for backend code execution/visualization
+    // See: https://github.com/DoctorDoveDragon/Cubit/issues (create issue for real backend integration)
     const checkSolution = async () => {
         setChecking(true);
         // TODO: Replace with real API call to backend Cubit executor/visualizer
