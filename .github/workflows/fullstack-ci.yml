@@ -111,7 +111,7 @@ jobs:
           echo "=== Listing frontend/.next/standalone ==="
           ls -la frontend/.next/standalone || true
           echo "=== Recursive listing (maxdepth 3) ==="
-          find frontend/.next/standalone -maxdepth 3 -type f -print -exec ls -la {} \; || true
+          find frontend/.next/standalone -maxdepth 3 -ls || true
 
       - name: Verify standalone output
         run: |
