@@ -12,10 +12,10 @@ try {
     enabled: process.env.ANALYZE === 'true',
   });
   finalConfig = withBundleAnalyzer(nextConfig);
-} catch (error: any) {
+} catch (error: unknown) {
   // Bundle analyzer not available (production environment)
   // Only catch MODULE_NOT_FOUND errors, re-throw others
-  if (error?.code !== 'MODULE_NOT_FOUND') {
+  if (error && typeof error === 'object' && 'code' in error && error.code !== 'MODULE_NOT_FOUND') {
     throw error;
   }
   // Use config without analyzer when module is not installed
