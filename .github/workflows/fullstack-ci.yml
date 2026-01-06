@@ -28,13 +28,14 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r backend/requirements.txt
           pip install pytest requests
 
       - name: Start API server
         run: |
-          nohup python3 api.py > api.log 2>&1 &
-          echo $! > api.pid
+          cd backend
+          nohup python3 api.py > ../api.log 2>&1 &
+          echo $! > ../api.pid
           
           # Wait for health endpoint (30 second timeout)
           echo "Waiting for backend to be healthy..."
@@ -150,11 +151,11 @@ jobs:
 
       - name: Build backend Docker image
         run: |
-          docker build -f backend.Dockerfile -t cubit-backend:test .
+          docker build -f backend/Dockerfile -t cubit-backend:test .
 
       - name: Build frontend Docker image
         run: |
-          docker build -f frontend/Dockerfile -t cubit-frontend:test ./frontend
+          docker build -f frontend/Dockerfile -t cubit-frontend:test .
 
       - name: Test docker-compose config
         run: |

@@ -1,37 +1,31 @@
-version: '3.8'
-
+version: "3.8"
 services:
-  # Backend FastAPI service
   backend:
     build:
       context: .
-      dockerfile: backend.Dockerfile
+      dockerfile: backend/Dockerfile
     container_name: cubit-backend
     ports:
       - "8080:8080"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 5s
+      retries: 5
     environment:
       - PORT=8080
-    healthcheck:
-      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/health')"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-    restart: unless-stopped
 
-  # Frontend Next.js service
   frontend:
     build:
-      context: ./frontend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: frontend/Dockerfile
     container_name: cubit-frontend
     ports:
       - "3000:3000"
-    environment:
-      - PORT=3000
-      - BACKEND_URL=http://backend:8080
-      - NODE_ENV=production
+    restart: unless-stopped
     depends_on:
       backend:
         condition: service_healthy
-    restart: unless-stopped
+    environment:
+      - PORT=3000
+      - BACKEND_URL=http://backend:8080
