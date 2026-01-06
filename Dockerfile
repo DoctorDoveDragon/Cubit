@@ -11,7 +11,7 @@ FROM node:20-alpine AS frontend-builder
 WORKDIR /app/frontend
 
 # Copy frontend package files
-COPY frontend/package.json frontend/package-lock. json ./
+COPY frontend/package.json frontend/package-lock.json ./
 
 # Install frontend dependencies (skip chromium download for puppeteer)
 ENV PUPPETEER_SKIP_DOWNLOAD=true
@@ -39,7 +39,7 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # Create and activate virtual environment, then install Python dependencies
-COPY requirements.txt .  
+COPY requirements.txt .
 RUN python3 -m venv /opt/venv && \
     /opt/venv/bin/pip install --no-cache-dir --upgrade pip && \
     /opt/venv/bin/pip install --no-cache-dir -r requirements.txt
@@ -48,8 +48,8 @@ RUN python3 -m venv /opt/venv && \
 COPY api. py . 
 COPY interpreter.py .
 COPY lexer.py .
-COPY parser.py .  
-COPY cubit.py .  
+COPY parser.py .
+COPY cubit.py .
 COPY pedagogical/ ./pedagogical/
 
 # Copy frontend built files
@@ -60,8 +60,8 @@ COPY --from=frontend-builder /app/frontend/.next/static ./frontend/.next/static
 COPY --from=frontend-builder /app/frontend/public ./frontend/public
 
 # Copy startup script
-COPY start-fullstack.sh . 
-RUN chmod +x start-fullstack. sh
+COPY start-fullstack. sh . 
+RUN chmod +x start-fullstack.sh
 
 # Expose the port (Railway will set PORT env variable)
 EXPOSE 3000
