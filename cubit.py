@@ -6,7 +6,33 @@ Interactive shell for the Cubit programming language
 
 import sys
 from interpreter import Interpreter
-from pedagogical.api import PedagogicalAPI
+
+# Guard PedagogicalAPI import with fallback stub
+try:
+    from pedagogical.api import PedagogicalAPI
+except (ImportError, ModuleNotFoundError):
+    print("⚠️ Pedagogical module not found. Running in basic mode.")
+
+    class PedagogicalAPI:
+        def __init__(self, wrapped_api, **kwargs):
+            self.wrapped_api = wrapped_api
+            self.call_history = []
+            self.verbosity = kwargs.get('default_verbosity', 'normal')
+
+        def call(self, method, *args, **kwargs):
+            return getattr(self.wrapped_api, method)(*args, **kwargs)
+
+        def set_verbosity(self, level):
+            self.verbosity = level
+
+        def get_learning_progress(self):
+            return {}
+
+        def suggest_next_concepts(self):
+            return []
+
+        def _infer_skill_level(self):
+            return "beginner"
 
 
 def run_repl():
