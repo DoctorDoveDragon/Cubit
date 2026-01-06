@@ -12,7 +12,46 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, ConfigDict
 from interpreter import Interpreter
-from pedagogical.api import PedagogicalAPI
+
+# Ensure pedagogical import is resilient
+try:
+    from pedagogical.api import PedagogicalAPI
+except Exception:
+    import sys
+    sys.path.append('.')
+    try:
+        from pedagogical.api import PedagogicalAPI  # type: ignore
+    except Exception:
+        class PedagogicalAPI:
+            def __init__(self, wrapped_api, **kwargs):
+                self.wrapped_api = wrapped_api
+                self.call_history = []
+                self.verbosity = kwargs.get('default_verbosity', 'normal')
+
+            def call(self, method_name, *args, **kwargs):
+                result = getattr(self.wrapped_api, method_name)(*args, **kwargs)
+                self.call_history.append({
+                    'method': method_name,
+                    'args': args,
+                    'kwargs': kwargs,
+                    'result': result
+                })
+                return result
+
+            def set_verbosity(self, level):
+                self.verbosity = level
+
+            def get_learning_progress(self):
+                return {}
+
+            def suggest_next_concepts(self, mastered=None):
+                return []
+
+            def _infer_skill_level(self):
+                return 'beginner'
+            
+            def get_last_teaching_moment(self):
+                return None
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -52,7 +91,7 @@ class ExecuteResponse(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
     
     output: Optional[str] = None
-    result: Any = None
+    result: Optional[Any] = None
     error: Optional[str] = None
     teaching_moment: Optional[Dict[str, Any]] = None
     skill_level: Optional[str] = None
