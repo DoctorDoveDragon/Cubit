@@ -48,7 +48,7 @@ RUN python3 -m venv /opt/venv && \
 COPY api. py . 
 COPY interpreter.py .
 COPY lexer.py .
-COPY parser.py .
+COPY parser.py . 
 COPY cubit.py .
 COPY pedagogical/ ./pedagogical/
 
@@ -60,7 +60,7 @@ COPY --from=frontend-builder /app/frontend/.next/static ./frontend/.next/static
 COPY --from=frontend-builder /app/frontend/public ./frontend/public
 
 # Copy startup script
-COPY start-fullstack. sh . 
+COPY start-fullstack.sh . 
 RUN chmod +x start-fullstack.sh
 
 # Expose the port (Railway will set PORT env variable)
