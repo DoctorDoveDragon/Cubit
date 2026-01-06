@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-# (paste the exact frontend Dockerfile contents from above)
-=======
 # Frontend Dockerfile (works with repo-root or frontend-context)
 ARG CONTEXT=frontend
 
@@ -16,10 +13,13 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 # copy app sources from chosen context (./ when building inside frontend/)
 COPY ${CONTEXT}/ ./
-# build Next.js
-RUN npm run build || true
+# build Next.js (fail loudly so CI detects problems)
+RUN npm run build
 # optional standalone step used by the repo's package.json
-RUN npm run build:standalone || true
+RUN npm run build:standalone
+
+# verify build produced standalone artifact
+RUN [ -f .next/standalone/frontend/server.js ] || (echo "Missing Next.js standalone server.js — build failed or wrong context" && exit 1)
 
 FROM node:20-slim AS runner
 WORKDIR /app
@@ -32,4 +32,3 @@ COPY --from=builder /app/package.json /app/package.json
 EXPOSE 3000
 ENV PORT=3000
 CMD ["npm", "run", "start"]
->>>>>>> c432c08 (chore: make Dockerfiles context-agnostic (ARG-based))
