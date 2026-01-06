@@ -1,66 +1,103 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
+# Frontend standalone build script for Cubit
+# Validates and creates Next.js standalone build with proper asset copying
 
-# Build script that produces a Next.js standalone bundle (best-effort)
-# Usage: ./build-frontend.sh
+set -euo pipefail
+shopt -s nullglob
 
-echo "Building frontend (build-frontend.sh)"
+echo "==> Cubit Frontend Build Script"
 
+# Check if frontend directory exists
 if [ ! -d "frontend" ]; then
-  echo "No frontend directory found; nothing to build."
+  echo "❌ Error: frontend directory not found!"
+  echo "   Expected: ./frontend"
   exit 1
 fi
 
-pushd frontend >/dev/null
+cd frontend
 
-# Clean previous build artifacts
+# Remove previous build
+echo "==> Cleaning previous build..."
 rm -rf .next
 
 # Install dependencies
-if [ -f package-lock.json ] || [ -f npm-shrinkwrap.json ]; then
-  PUPPETEER_SKIP_DOWNLOAD=true npm ci
+echo "==> Installing dependencies..."
+if [ -f "package-lock.json" ]; then
+  npm ci || npm install
 else
-  PUPPETEER_SKIP_DOWNLOAD=true npm install
+  npm install
 fi
 
-# Build Next.js
+# Run build
+echo "==> Running npm run build..."
 npm run build
 
-# Ensure standalone directory exists (Next may produce different layouts)
-mkdir -p .next/standalone
-
-# Copy public and .next/static into standalone so assets are available
-if [ -d "public" ]; then
-  cp -r public .next/standalone/ || true
+# Verify standalone directory exists
+if [ ! -d ".next/standalone" ]; then
+  echo "❌ Error: .next/standalone directory not created!"
+  echo "   Make sure next.config has output: 'standalone'"
+  exit 1
 fi
+
+# Copy public directory to standalone (best-effort)
+echo "==> Copying public assets to standalone..."
+if [ -d "public" ]; then
+  mkdir -p .next/standalone
+  cp -r public .next/standalone/ || echo "⚠️  Warning: Failed to copy public directory (non-fatal)"
+else
+  echo "   No public directory found, skipping..."
+fi
+
+# Copy .next/static to standalone/.next/static (best-effort)
+echo "==> Copying static assets to standalone..."
 if [ -d ".next/static" ]; then
   mkdir -p .next/standalone/.next
-  cp -r .next/static .next/standalone/.next/ || true
+  cp -r .next/static .next/standalone/.next/ || echo "⚠️  Warning: Failed to copy static assets (non-fatal)"
+else
+  echo "   No .next/static directory found, skipping..."
 fi
 
-# Detect server.js in candidate locations
-CANDIDATES=(
-  ".next/standalone/server.js"
-  ".next/standalone/*/server.js"
-  ".next/standalone/frontend/server.js"
-)
+cd ..
 
-found=0
-for p in "${CANDIDATES[@]}"; do
-  for m in $p; do
-    if [ -f "$m" ]; then
-      echo "✅ Standalone server found: $m"
-      found=1
+# Function to find server.js in candidate locations
+find_server_js() {
+  # Check explicit paths first
+  local candidates=(
+    "frontend/.next/standalone/server.js"
+    "frontend/.next/standalone/frontend/server.js"
+  )
+  
+  for location in "${candidates[@]}"; do
+    if [ -f "$location" ]; then
+      echo "$location"
+      return 0
     fi
   done
-done
+  
+  # Check glob pattern for wildcard locations
+  for location in frontend/.next/standalone/*/server.js; do
+    if [ -f "$location" ]; then
+      echo "$location"
+      return 0
+    fi
+  done
+  
+  return 1
+}
 
-if [ "$found" -eq 1 ]; then
-  echo "Standalone build ready: .next/standalone"
-  popd >/dev/null
+# Verify server.js exists
+if SERVER_JS=$(find_server_js); then
+  echo "✅ Build successful!"
+  echo "   Standalone server found at: $SERVER_JS"
   exit 0
 else
-  echo "⚠️ Standalone server not found after build. Check Next version and output settings (output: 'standalone' in next.config.js)."
-  popd >/dev/null
+  echo "❌ Error: Standalone server.js not found!"
+  echo "   Checked locations:"
+  for location in "${CANDIDATE_LOCATIONS[@]}"; do
+    echo "     - $location"
+  done
+  echo ""
+  echo "   Contents of .next/standalone:"
+  ls -la frontend/.next/standalone/ || true
   exit 2
 fi

@@ -1,4 +1,4 @@
-name: Build frontend (standalone)
+name: Frontend Build & Upload
 
 on:
   push:
@@ -9,7 +9,8 @@ on:
       - 'frontend/**'
 
 jobs:
-  build-frontend:
+  build:
+    name: Build and Upload Frontend
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -17,21 +18,29 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: 'frontend/package-lock.json'
 
-      - name: Install & build frontend
-        working-directory: frontend
+      - name: Install dependencies
         run: |
+          cd frontend
           npm ci
+
+      - name: Build frontend
+        run: |
+          cd frontend
           npm run build
         env:
-          PUPPETEER_SKIP_DOWNLOAD: 'true'
+          NEXT_PUBLIC_API_URL: 'http://localhost:8080'
 
-      - name: Upload standalone artifact (if present)
+      - name: Upload standalone artifact
         uses: actions/upload-artifact@v4
         with:
           name: frontend-standalone
           path: frontend/.next/standalone
+          if-no-files-found: error
+          retention-days: 7

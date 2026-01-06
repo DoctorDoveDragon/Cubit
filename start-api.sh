@@ -1,78 +1,117 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
+# Resilient deployment script for Cubit API/Frontend Server
+# Detects Next.js standalone server in multiple locations and falls back gracefully
 
-# Resilient start script for Cubit
-# - Detects Next.js standalone server.js in multiple candidate paths
-# - If missing, attempts to build the frontend (if present)
-# - Falls back to running the FastAPI backend via uvicorn
+set -euo pipefail
+shopt -s nullglob
 
-echo "========================================"
-echo "🚀 Starting Cubit (resilient start-api.sh)"
-echo "========================================"
+# Default values
+PORT="${PORT:-8080}"
+NODE_ENV="${NODE_ENV:-production}"
 
-PORT=${PORT:-8080}
-NODE_ENV=${NODE_ENV:-production}
+export PORT
+export NODE_ENV
 
-# Candidate server.js locations (checked in order)
-CANDIDATES=(
-  "frontend/.next/standalone/server.js"
-  "frontend/.next/standalone/*/server.js"
-  "frontend/.next/standalone/frontend/server.js"
-)
+echo "==> Cubit Deployment Script"
+echo "    PORT: $PORT"
+echo "    NODE_ENV: $NODE_ENV"
 
+# Function to find server.js in candidate locations
 find_server_js() {
-  for p in "${CANDIDATES[@]}"; do
-    # Expand glob patterns safely
-    matches=( $p )
-    for m in "${matches[@]}"; do
-      if [ -f "$m" ]; then
-        echo "$m"
-        return 0
-      fi
-    done
+  # Check explicit paths first
+  local candidates=(
+    "frontend/.next/standalone/server.js"
+    "frontend/.next/standalone/frontend/server.js"
+  )
+  
+  for location in "${candidates[@]}"; do
+    if [ -f "$location" ]; then
+      echo "$location"
+      return 0
+    fi
   done
+  
+  # Check glob pattern for wildcard locations
+  for location in frontend/.next/standalone/*/server.js; do
+    if [ -f "$location" ]; then
+      echo "$location"
+      return 0
+    fi
+  done
+  
   return 1
 }
 
-start_frontend_server() {
-  local server_js="$1"
-  echo "Found frontend server: $server_js"
-  echo "Starting frontend server with PORT=$PORT"
-  export NODE_ENV="$NODE_ENV"
-  export PORT="$PORT"
-  # Exec so this process becomes the node process in containers
-  exec node "$server_js"
+# Try to find existing server.js
+if SERVER_JS=$(find_server_js); then
+  echo "==> Found Next.js standalone server at: $SERVER_JS"
+  echo "==> Starting Next.js frontend server..."
+  exec node "$SERVER_JS"
+fi
+
+# Server not found - attempt frontend build if possible
+echo "==> Next.js standalone server not found, checking for frontend..."
+
+if [ ! -f "frontend/package.json" ]; then
+  echo "==> Frontend not available, starting API-only mode..."
+  exec uvicorn api:app --host 0.0.0.0 --port "$PORT" --workers 1
+fi
+
+echo "==> Frontend detected, attempting best-effort build..."
+
+# Check if npm is available
+if ! command -v npm &> /dev/null; then
+  echo "==> npm not available, starting API-only mode..."
+  exec uvicorn api:app --host 0.0.0.0 --port "$PORT" --workers 1
+fi
+
+# Try to install dependencies and build
+cd frontend
+
+echo "==> Installing frontend dependencies..."
+if [ -f "package-lock.json" ]; then
+  npm ci || npm install || {
+    echo "==> Failed to install dependencies, starting API-only mode..."
+    cd ..
+    exec uvicorn api:app --host 0.0.0.0 --port "$PORT" --workers 1
+  }
+else
+  npm install || {
+    echo "==> Failed to install dependencies, starting API-only mode..."
+    cd ..
+    exec uvicorn api:app --host 0.0.0.0 --port "$PORT" --workers 1
+  }
+fi
+
+echo "==> Building frontend..."
+npm run build || {
+  echo "==> Build failed, checking for existing .next directory..."
+  if [ -d ".next" ]; then
+    echo "==> Found .next directory, attempting npm run start..."
+    exec npm run start
+  fi
+  echo "==> No .next directory, starting API-only mode..."
+  cd ..
+  exec uvicorn api:app --host 0.0.0.0 --port "$PORT" --workers 1
 }
 
-if server_path=$(find_server_js); then
-  start_frontend_server "$server_path"
+cd ..
+
+# Re-check for server.js after build
+if SERVER_JS=$(find_server_js); then
+  echo "==> Build successful! Found server at: $SERVER_JS"
+  echo "==> Starting Next.js frontend server..."
+  exec node "$SERVER_JS"
 fi
 
-# If frontend exists, try to build it
-if [ -d "frontend" ] && [ -f "frontend/package.json" ]; then
-  echo "⚠️ Standalone build not found. Attempting to build frontend..."
-  pushd frontend >/dev/null
-  if [ ! -d "node_modules" ]; then
-    echo "Installing frontend dependencies..."
-    PUPPETEER_SKIP_DOWNLOAD=true npm ci || PUPPETEER_SKIP_DOWNLOAD=true npm install
-  fi
-  echo "Building frontend..."
-  npm run build
-  popd >/dev/null
-
-  # Re-check for server.js
-  if server_path=$(find_server_js); then
-    start_frontend_server "$server_path"
-  else
-    echo "⚠️ Build completed but standalone server.js not found. Checking for standard build..."
-    if [ -d "frontend/.next" ]; then
-      echo "Standard build exists. Starting dev server (next start)..."
-      pushd frontend >/dev/null
-      exec npm run start
-    fi
-  fi
+# Build completed but no standalone server found
+echo "==> Build completed but standalone server not found"
+if [ -d "frontend/.next" ]; then
+  echo "==> Found .next directory, attempting npm run start..."
+  cd frontend
+  exec npm run start
 fi
 
-# Fall back to API-only mode
-echo "⚠️ Frontend unavailable or build failed. Starting API-only mode..."
+# Ultimate fallback
+echo "==> Frontend unavailable, starting API-only mode..."
 exec uvicorn api:app --host 0.0.0.0 --port "$PORT" --workers 1
