@@ -78,4 +78,5 @@ fi
 
 # Fallback to API-only mode
 echo "⚠️ Frontend unavailable or build failed. Starting API-only mode..."
+cd backend
 exec uvicorn api:app --host 0.0.0.0 --port "${PORT}" --workers 1

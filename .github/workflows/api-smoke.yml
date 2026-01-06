@@ -6,9 +6,8 @@ on:
   pull_request:
     branches: [ main ]
     paths:
-      - '*.py'
-      - 'requirements.txt'
-      - 'pedagogical/**'
+      - 'backend/**/*.py'
+      - 'backend/requirements.txt'
       - '.github/workflows/api-smoke.yml'
 
 permissions:
@@ -37,13 +36,14 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r backend/requirements.txt
           pip install pytest requests
 
       - name: Start API server
         run: |
-          nohup python3 api.py > api.log 2>&1 &
-          echo $! > api.pid
+          cd backend
+          nohup python3 api.py > ../api.log 2>&1 &
+          echo $! > ../api.pid
           
           # Wait for health endpoint with better feedback
           echo "Waiting for backend to be healthy..."

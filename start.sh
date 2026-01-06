@@ -26,8 +26,10 @@ trap cleanup EXIT INT TERM
 
 # Start backend API in background
 echo "Starting FastAPI backend on http://localhost:8080..."
+cd backend
 python3 api.py &
 BACKEND_PID=$!
+cd ..
 echo "Backend PID: $BACKEND_PID"
 
 # Wait for backend health check

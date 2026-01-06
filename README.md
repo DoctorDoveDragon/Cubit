@@ -76,6 +76,7 @@ You'll need to run both services in separate terminal windows:
 
 Terminal 1 (Backend):
 ```batch
+cd backend
 python api.py
 ```
 
@@ -93,6 +94,7 @@ For active development with hot reloading:
 
 **Terminal 1 (Backend API):**
 ```bash
+cd backend
 python3 api.py
 ```
 
@@ -200,7 +202,7 @@ This template uses Next.js `output: 'standalone'` configuration for optimized pr
 - Base image: `python:3.11-slim`
 - Exposes port 8080
 - Includes health check via `/health` endpoint
-- Runs `python3 api.py`
+- Runs `python3 api.py` from the backend directory
 
 ### Frontend Dockerfile (`frontend/Dockerfile`)
 
@@ -278,7 +280,7 @@ The `start.sh` script and Docker configurations use the correct standalone entry
 
 The following scripts are maintained for legacy Railway deployment but are **not recommended** for new deployments:
 
-- `start-api.sh` - Use `python3 api.py` directly or the new `start.sh`
+- `start-api.sh` - Use `cd backend && python3 api.py` directly or the new `start.sh`
 - `start-fullstack.sh` - Use `start.sh` or `docker-compose up` instead
 
 For modern deployments, prefer:
@@ -591,7 +593,7 @@ Cubit now includes a FastAPI web server that provides REST API endpoints for exe
 Install the required dependencies:
 
 ```bash
-pip install -r requirements.txt
+pip install -r backend/requirements.txt
 ```
 
 Start the server:
@@ -601,9 +603,11 @@ Start the server:
 ./start-api.sh
 
 # Or directly with uvicorn
+cd backend
 uvicorn api:app --host 0.0.0.0 --port 8080
 
 # Or with Python
+cd backend
 python3 api.py
 ```
 
@@ -941,9 +945,9 @@ For detailed frontend deployment instructions including troubleshooting, see `fr
 **Backend API fails to start locally:**
 - **Solutions**:
   1. Ensure Python 3.11+ is installed: `python3 --version`
-  2. Install dependencies: `pip install -r requirements.txt`
+  2. Install dependencies: `pip install -r backend/requirements.txt`
   3. Check port 8080 is not already in use: `lsof -i :8080` (Mac/Linux)
-  4. Try a different port: `PORT=8081 python3 api.py`
+  4. Try a different port: `cd backend && PORT=8081 python3 api.py`
 
 **Frontend cannot connect to local backend:**
 - **Solutions**:
@@ -985,7 +989,7 @@ For detailed frontend deployment instructions including troubleshooting, see `fr
      ```bash
      # From repository root
      pip install --upgrade pip
-     pip install -r requirements.txt --force-reinstall
+     pip install -r backend/requirements.txt --force-reinstall
      ```
 - **Note**: The repository includes a placeholder `next.config.js` in the root directory to prevent Next.js from searching for configs in the wrong location. The actual Next.js configuration is in `frontend/next.config.ts`.
 
