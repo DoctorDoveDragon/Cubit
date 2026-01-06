@@ -59,21 +59,29 @@ fi
 
 cd ..
 
-# Candidate locations for Next.js standalone server.js
-CANDIDATE_LOCATIONS=(
-  "frontend/.next/standalone/server.js"
-  frontend/.next/standalone/*/server.js
-  "frontend/.next/standalone/frontend/server.js"
-)
-
-# Function to find server.js
+# Function to find server.js in candidate locations
 find_server_js() {
-  for location in "${CANDIDATE_LOCATIONS[@]}"; do
+  # Check explicit paths first
+  local candidates=(
+    "frontend/.next/standalone/server.js"
+    "frontend/.next/standalone/frontend/server.js"
+  )
+  
+  for location in "${candidates[@]}"; do
     if [ -f "$location" ]; then
       echo "$location"
       return 0
     fi
   done
+  
+  # Check glob pattern for wildcard locations
+  for location in frontend/.next/standalone/*/server.js; do
+    if [ -f "$location" ]; then
+      echo "$location"
+      return 0
+    fi
+  done
+  
   return 1
 }
 
