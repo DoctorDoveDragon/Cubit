@@ -1,17 +1,4 @@
-# ==============================================================================
-# Multi-stage Dockerfile for Cubit Full-Stack Application
-# Runs both Next.js frontend server and FastAPI backend server
-# ==============================================================================
-
-# ------------------------------------------------------------------------------
-# Stage 1: Build Frontend
-# ------------------------------------------------------------------------------
-FROM node:20-alpine AS frontend-builder
-
-WORKDIR /app/frontend
-
-# Copy frontend package files
-COPY frontend/package.json frontend/package-lock. json ./
+COPY frontend/package.json frontend/package-lock.json ./
 
 # Install frontend dependencies (skip chromium download for puppeteer)
 ENV PUPPETEER_SKIP_DOWNLOAD=true
