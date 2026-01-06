@@ -2,6 +2,7 @@
 ARG CONTEXT=frontend
 
 FROM node:20-alpine AS deps
+ARG CONTEXT
 WORKDIR /app
 # copy package metadata from the chosen context
 COPY ${CONTEXT}/package.json ${CONTEXT}/package-lock.json ./
@@ -9,6 +10,7 @@ ENV PUPPETEER_SKIP_DOWNLOAD=true
 RUN npm ci
 
 FROM node:20-alpine AS builder
+ARG CONTEXT
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 # copy app sources from chosen context (./ when building inside frontend/)

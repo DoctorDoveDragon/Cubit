@@ -2,6 +2,7 @@
 ARG CONTEXT=backend
 
 FROM python:3.11-slim AS base
+ARG CONTEXT
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     build-essential \
     gcc \
