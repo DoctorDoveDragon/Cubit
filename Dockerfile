@@ -1,80 +1,71 @@
-# ==============================================================================
-# Multi-stage Dockerfile for Cubit Full-Stack Application
-# Runs both Next.js frontend server and FastAPI backend server
-# ==============================================================================
-
-# ------------------------------------------------------------------------------
-# Stage 1: Build Frontend
-# ------------------------------------------------------------------------------
-FROM node:20-alpine AS frontend-builder
+# Build stage for frontend
+FROM node:18-alpine AS frontend-builder
 
 WORKDIR /app/frontend
 
 # Copy frontend package files
-COPY frontend/package.json frontend/package-lock.json ./
+COPY frontend/package*.json ./
 
-# Install frontend dependencies (skip chromium download for puppeteer)
-ENV PUPPETEER_SKIP_DOWNLOAD=true
+# Install dependencies
 RUN npm ci
 
-# Copy frontend source code
+# Copy frontend source
 COPY frontend/ ./
 
-# Build the Next.js application
+# Build frontend
 RUN npm run build
 
-
-# ------------------------------------------------------------------------------
-# Stage 2: Production with Both Servers
-# ------------------------------------------------------------------------------
-FROM node:20-slim
-
-# Install Python
-RUN apt-get update && apt-get install -y \
-    python3 \
-    python3-pip \
-    python3-venv \
-    && rm -rf /var/lib/apt/lists/*
+# Build stage for backend
+FROM python:3.11-slim AS backend-builder
 
 WORKDIR /app
 
-# Create and activate virtual environment, then install Python dependencies
-COPY requirements.txt .
-RUN python3 -m venv /opt/venv && \
-    /opt/venv/bin/pip install --no-cache-dir --upgrade pip && \
-    /opt/venv/bin/pip install --no-cache-dir -r requirements.txt
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
 
-# Copy backend source code
-COPY api.py .
-COPY interpreter.py .
-COPY lexer.py .
-COPY parser.py .
-COPY cubit.py .
-COPY pedagogical/ ./pedagogical/
+# Copy backend requirements
+COPY backend/requirements.txt ./
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Final stage
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy Python dependencies from backend-builder
+COPY --from=backend-builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=backend-builder /usr/local/bin /usr/local/bin
+
+# Copy backend source
+COPY backend/ ./backend/
 
 # Copy frontend built files
 # The standalone build includes everything needed to run the frontend
-<<<<<<< copilot/fix-dockerfile-next-standalone
-# Next.js standalone output creates a 'frontend' subdirectory inside .next/standalone/
-RUN mkdir -p ./frontend
-=======
 # Use wildcard to handle variable standalone output structure
->>>>>>> main
+RUN mkdir -p ./frontend
 COPY --from=frontend-builder /app/frontend/.next/standalone/* ./frontend
 COPY --from=frontend-builder /app/frontend/.next/static ./frontend/.next/static
 COPY --from=frontend-builder /app/frontend/public ./frontend/public
 
-# Copy startup script
-COPY start-fullstack.sh .
-RUN chmod +x start-fullstack.sh
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+ENV NODE_ENV=production
 
-# Expose the port (Railway will set PORT env variable)
-EXPOSE 3000
+# Expose ports
+EXPOSE 8000 3000
 
-# Set default environment variables
-ENV PORT=3000
-ENV BACKEND_URL=http://localhost:8080
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
 
-# Start both servers
-CMD ["./start-fullstack.sh"]
-
+# Start command (can be overridden)
+CMD ["python", "backend/main.py"]
