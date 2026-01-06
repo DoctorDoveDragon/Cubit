@@ -16,12 +16,12 @@ from interpreter import Interpreter
 # Ensure pedagogical import is resilient
 try:
     from pedagogical.api import PedagogicalAPI
-except Exception:
+except (ImportError, ModuleNotFoundError):
     import sys
     sys.path.append('.')
     try:
-        from pedagogical.api import PedagogicalAPI  # type: ignore
-    except Exception:
+        from pedagogical.api import PedagogicalAPI
+    except (ImportError, ModuleNotFoundError):
         class PedagogicalAPI:
             def __init__(self, wrapped_api, **kwargs):
                 self.wrapped_api = wrapped_api

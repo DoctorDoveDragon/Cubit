@@ -121,6 +121,8 @@ def create_interpreter_stub():
 
     def _evaluate(self, expr):
         # Very simple evaluation for demonstration
+        # NOTE: This is a minimal stub. The actual interpreter.py uses a proper parser.
+        # Using eval() here is a security risk and should not be used in production.
         if expr.isdigit():
             return int(expr)
         elif expr in self.variables:
@@ -131,6 +133,8 @@ def create_interpreter_stub():
             return expr[1:-1]
         else:
             try:
+                # WARNING: eval() is used here only for demonstration in the stub
+                # The actual interpreter.py uses a proper lexer/parser/AST approach
                 return eval(expr, {}, self.variables)
             except Exception:
                 raise ValueError(f"Cannot evaluate expression: {expr}")

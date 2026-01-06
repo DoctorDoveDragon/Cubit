@@ -10,7 +10,7 @@ from interpreter import Interpreter
 # Guard PedagogicalAPI import with fallback stub
 try:
     from pedagogical.api import PedagogicalAPI
-except Exception:
+except (ImportError, ModuleNotFoundError):
     print("⚠️ Pedagogical module not found. Running in basic mode.")
 
     class PedagogicalAPI:
