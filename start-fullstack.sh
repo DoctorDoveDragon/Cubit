@@ -36,7 +36,7 @@ fi
 # Verify backend is responding to health checks
 echo "Verifying backend health..."
 for i in {1..10}; do
-  if curl -s http://localhost:8080/health > /dev/null 2>&1; then
+  if curl -s http://localhost:127.0.0.1/health > /dev/null 2>&1; then
     echo "✓ Backend started successfully (PID: $BACKEND_PID)"
     break
   fi
