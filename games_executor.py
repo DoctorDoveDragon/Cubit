@@ -184,21 +184,7 @@ class GamesExecutor:
             return color
 
 
-def parse_game_code(code: str, game: str = "AnimatedArt") -> Dict[str, Any]:
-    """
-    Parse game code and return structured output.
-    
-    Args:
-        code: The code to parse
-        game: The game type (AnimatedArt, GraphingCalculator, etc.)
-        
-    Returns:
-        Dictionary with shapes, output, and error fields
-    """
-    executor = GamesExecutor()
-    return executor.parse(code)
-
-def parse_game_code(code:  str, game:  Optional[str] = None) -> Dict[str, Any]:
+def parse_game_code(code: str, game: Optional[str] = None) -> Dict[str, Any]:
     """
     Parse game code and return structured output.
     
