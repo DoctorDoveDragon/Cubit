@@ -16,6 +16,8 @@ Cubit is a simple, educational programming language with a clean syntax designed
 - **Lists/Arrays**: Create and manipulate lists with indexing
 - **Function Calls**: Call built-in functions
 - **Advanced Modules**: Math, String, List, and Random modules
+- **Games & Visualizations**: Interactive visual programming with draw commands
+- **Pedagogical API**: Teaching-enabled code execution with skill tracking
 
 ## Quick Start
 
@@ -458,6 +460,69 @@ Execute Cubit code and return the output.
   "error": "Undefined variable: y"
 }
 ```
+
+#### GET `/games`
+Get the list of available games and visualizations.
+
+**Response:**
+```json
+{
+  "games": [
+    {
+      "title": "Animated Art",
+      "description": "Create generative art with Cubit code",
+      "instructions": "Use draw_circle(), draw_square(), draw_triangle()",
+      "starter": "draw_circle(100, 100, 30)",
+      "solution": "draw_circle(100, 100, 30)"
+    }
+  ]
+}
+```
+
+#### POST `/games/execute`
+Execute game code and return structured visualization data.
+
+**Request:**
+```json
+{
+  "game": "AnimatedArt",
+  "code": "draw_circle(100, 100, 30)\ndraw_square(200, 200, 40, 'red')",
+  "teaching_enabled": false
+}
+```
+
+**Response:**
+```json
+{
+  "output": null,
+  "result": null,
+  "error": null,
+  "shapes": [
+    {
+      "type": "circle",
+      "x": 100,
+      "y": 100,
+      "size": 30,
+      "color": "#7c3aed"
+    },
+    {
+      "type": "square",
+      "x": 200,
+      "y": 200,
+      "size": 40,
+      "color": "#ef4444"
+    }
+  ]
+}
+```
+
+**Supported Draw Commands:**
+- `draw_circle(x, y, radius, color?)` - Draw a circle
+- `draw_square(x, y, size, color?)` - Draw a square
+- `draw_triangle(x, y, size, color?)` - Draw a triangle
+- `set_color(color)` - Set the default color for subsequent shapes
+- `clear()` - Clear all shapes
+- `animate()` - Enable animation (frontend handles this)
 
 ### API Usage Examples
 

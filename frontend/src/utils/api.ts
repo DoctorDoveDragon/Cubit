@@ -8,10 +8,26 @@ export interface ExecuteRequest {
   verbosity?: 'minimal' | 'normal' | 'detailed'
 }
 
+export interface GameExecuteRequest {
+  game: string
+  code: string
+  options?: Record<string, unknown>
+  teaching_enabled?: boolean
+  verbosity?: 'minimal' | 'normal' | 'detailed'
+}
+
 export interface Progress {
   total_calls: number
   method_diversity: string[]
   mastered_concepts?: string[]
+}
+
+export interface Shape {
+  type: 'circle' | 'square' | 'triangle'
+  x: number
+  y: number
+  size: number
+  color: string
 }
 
 export interface ExecuteResponse {
@@ -21,6 +37,20 @@ export interface ExecuteResponse {
   skill_level?: string
   progress?: Progress
   suggestions?: string[]
+  shapes?: Shape[]
+}
+
+export interface Game {
+  title: string
+  description: string
+  instructions: string
+  starter: string
+  solution: string
+}
+
+export interface GamesResponse {
+  games: Game[]
+  error?: string
 }
 
 export interface ConceptGraph {
@@ -182,4 +212,65 @@ export async function getProgress(): Promise<{ message: string; info: string }> 
   }
 
   return response.json()
+}
+
+/**
+ * Get list of available games
+ */
+export async function getGames(): Promise<GamesResponse> {
+  const apiUrl = getApiBaseUrl()
+  
+  try {
+    const response = await fetch(`${apiUrl}/games`)
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    
+    return response.json()
+  } catch (error: unknown) {
+    const errorMessage = safeErrorMessage(error)
+    return {
+      games: [],
+      error: isNetworkError(error)
+        ? `Unable to connect to the backend API at ${apiUrl}. Please ensure the backend is running.`
+        : errorMessage
+    }
+  }
+}
+
+/**
+ * Execute game code via the backend API
+ * @param request - The game execution request
+ * @returns Promise with execution results including shapes for visualization
+ */
+export async function executeGameCode(request: GameExecuteRequest): Promise<ExecuteResponse> {
+  const apiUrl = getApiBaseUrl()
+  
+  try {
+    const response = await fetch(`${apiUrl}/games/execute`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(request)
+    })
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    
+    const data: ExecuteResponse = await response.json()
+    return data
+  } catch (error: unknown) {
+    const errorMessage = safeErrorMessage(error)
+    return {
+      output: null,
+      result: null,
+      shapes: [],
+      error: isNetworkError(error)
+        ? `Unable to connect to the backend API at ${apiUrl}. Please ensure the backend is running.`
+        : errorMessage
+    }
+  }
 }

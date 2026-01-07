@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import gamesData from './games.json';
+import { executeGameCode } from '../utils/api';
 
 export default function GameTabs() {
     const [active, setActive] = useState(0);
@@ -15,14 +16,28 @@ export default function GameTabs() {
         setResult(null);
     };
 
-    // Placeholder for backend code execution/visualization
-    // See: https://github.com/DoctorDoveDragon/Cubit/issues (create issue for real backend integration)
     const checkSolution = async () => {
         setChecking(true);
-        // TODO: Replace with real API call to backend Cubit executor/visualizer
-        const isCorrect = userCode.trim() === game.solution.trim();
-        setResult(isCorrect ? 'Success! 🎉' : 'Try again or run to see output.');
-        setChecking(false);
+        try {
+            // Use backend to execute the code
+            const response = await executeGameCode({
+                game: game.title,
+                code: userCode,
+                teaching_enabled: false
+            });
+            
+            if (response.error) {
+                setResult(`Error: ${response.error}`);
+            } else {
+                // For now, simple check - you could enhance this to compare shapes, etc.
+                const isCorrect = userCode.trim() === game.solution.trim();
+                setResult(isCorrect ? 'Success! 🎉' : 'Code executed. Try to match the solution!');
+            }
+        } catch (error) {
+            setResult(`Error: ${error instanceof Error ? error.message : String(error)}`);
+        } finally {
+            setChecking(false);
+        }
     };
 
     return (
