@@ -16,9 +16,9 @@ else
   PYTHON_BIN="python3"
 fi
 
-# Start FastAPI backend in background on fixed port 8080
-echo "Starting FastAPI backend on port 8080 using $PYTHON_BIN..."
-PORT=8080 $PYTHON_BIN api.py > /tmp/backend.log 2>&1 &
+# Start FastAPI backend in background on internal port 8000
+echo "Starting FastAPI backend on port 8000 using $PYTHON_BIN..."
+PORT=8000 $PYTHON_BIN api.py > /tmp/backend.log 2>&1 &
 BACKEND_PID=$!
 
 # Wait for backend to initialize
@@ -65,4 +65,4 @@ echo "Starting Next.js frontend on port ${FRONTEND_PORT}..."
 cd "$FRONTEND_DIR"
 
 # Use exec to replace shell with Node.js process for proper signal handling
-exec env PORT=$FRONTEND_PORT BACKEND_URL=http://localhost:8080 node server.js
+exec env PORT=$FRONTEND_PORT BACKEND_URL=http://localhost:8000 node server.js
