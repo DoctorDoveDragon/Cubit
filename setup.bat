@@ -38,7 +38,6 @@ REM Install frontend dependencies
 echo.
 echo 📦 Installing frontend dependencies...
 cd frontend
-set PUPPETEER_SKIP_DOWNLOAD=true
 call npm install
 
 if %errorlevel% neq 0 (
@@ -46,56 +45,22 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-echo ✅ Frontend dependencies installed
-
-REM Build frontend for production
-echo.
-echo 🔨 Building frontend for production (standalone mode)...
-call npm run build
-
-if %errorlevel% neq 0 (
-    echo ❌ Failed to build frontend
-    exit /b 1
-)
-
-echo ✅ Frontend built successfully
-
 cd ..
 
 echo.
 echo ✨ Setup complete! 🎉
 echo.
-echo ====================================================
-echo               How to Run Cubit
-echo ====================================================
+echo To start Cubit:
 echo.
-echo Option 1 - Production Mode (Manual, Two terminals):
+echo Option 1 - Manual (Two terminals):
 echo   Terminal 1 (Backend API):
 echo     python api.py
 echo.
-echo   Terminal 2 (Frontend Standalone):
-echo     cd frontend\.next\standalone\frontend
-echo     set BACKEND_URL=http://localhost:8080
-echo     set PORT=3000
-echo     node server.js
-echo.
-echo Option 2 - Development Mode (Two terminals):
-echo   Terminal 1 (Backend API):
-echo     python api.py
-echo.
-echo   Terminal 2 (Frontend Dev Server):
+echo   Terminal 2 (Frontend):
 echo     cd frontend
 echo     npm run dev
 echo.
-echo Option 3 - Docker (Full-stack):
-echo   docker-compose up --build
-echo.
-echo ====================================================
-echo URLs:
-echo   Frontend:       http://localhost:3000
-echo   Backend API:    http://localhost:8080
-echo   API Docs:       http://localhost:8080/docs
-echo ====================================================
+echo Then visit: http://localhost:3000
 echo.
 echo Note: For automated startup on Unix/Linux/Mac, use ./start.sh
 echo.

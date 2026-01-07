@@ -1,6 +1,6 @@
 # Cubit Programming Language
 
-Cubit is a simple, educational programming language with a clean syntax designed for learning programming concepts. This repository provides a complete full-stack template with a Next.js frontend and FastAPI backend, optimized for both local development and containerized deployment.
+Cubit is a simple, educational programming language with a clean syntax designed for learning programming concepts.
 
 ## Features
 
@@ -17,24 +17,46 @@ Cubit is a simple, educational programming language with a clean syntax designed
 - **Function Calls**: Call built-in functions
 - **Advanced Modules**: Math, String, List, and Random modules
 
-## Architecture
-
-This template provides a complete full-stack application:
-
-- **Frontend**: Next.js (standalone output mode) in `frontend/` directory
-- **Backend**: FastAPI server in `api.py` with `/health` endpoint
-- **Containerization**: Docker and Docker Compose support
-- **CI/CD**: GitHub Actions workflows for automated testing
-
 ## Quick Start
 
-### Prerequisites
+### Railway Deployment (Production)
 
-- Python 3.8+
-- Node.js 18+
-- Docker and Docker Compose (for containerized deployment)
+**📖 Deploy to Railway in minutes! See [RAILWAY.md](RAILWAY.md) for the complete deployment guide.**
 
-### Automated Setup (Recommended)
+Railway is the recommended platform for deploying the full-stack application (frontend + backend) from this repository as a single unified service.
+
+**Deployment Architecture:**
+- Single service running both Next.js frontend and FastAPI backend
+- Frontend proxies API requests to the backend automatically
+- No separate deployment or CORS configuration needed
+- Simplified environment variable setup
+
+### Docker Deployment (Alternative)
+
+You can also deploy using Docker:
+
+```bash
+# Build the Docker image
+docker build -t cubit:latest .
+
+# Run the container
+docker run -p 3000:3000 cubit:latest
+```
+
+The Dockerfile uses a multi-stage build to:
+1. Build the Next.js frontend
+2. Set up Python environment for the backend
+3. Run both servers in a single container
+
+### Local Development
+
+> **Note on Package Management:** This repository contains two separate `package-lock.json` files:
+> - Root `package-lock.json`: For the minimal root-level dependency (openai package only, used by some scripts)
+> - `frontend/package-lock.json`: For all Next.js frontend dependencies
+> 
+> This dual-lockfile setup ensures that the root and frontend Node.js environments remain isolated. Always run `npm install` in the appropriate directory (root for scripts, `frontend/` for the web app).
+
+#### Automated Setup (Recommended)
 
 **Unix/Linux/Mac:**
 ```bash
@@ -47,92 +69,7 @@ chmod +x setup.sh
 setup.bat
 ```
 
-This will:
-1. Install Python dependencies
-2. Install frontend dependencies
-3. Build the Next.js frontend in standalone mode
-4. Display instructions for running the application
-
-## Running the Application
-
-### Option 1: Production Mode (Standalone Build)
-
-After running the setup script, start both services:
-
-**Unix/Linux/Mac:**
-```bash
-./start.sh
-```
-
-This automated script will:
-- Start the FastAPI backend on port 8080
-- Wait for the backend health check to pass
-- Start the Next.js standalone server on port 3000
-- Gracefully shut down both services on Ctrl+C
-
-**Windows:**
-
-You'll need to run both services in separate terminal windows:
-
-Terminal 1 (Backend):
-```batch
-cd backend
-python api.py
-```
-
-Terminal 2 (Frontend):
-```batch
-cd frontend\.next\standalone\frontend
-set BACKEND_URL=http://localhost:8080
-set PORT=3000
-node server.js
-```
-
-### Option 2: Development Mode
-
-For active development with hot reloading:
-
-**Terminal 1 (Backend API):**
-```bash
-cd backend
-python3 api.py
-```
-
-**Terminal 2 (Frontend Dev Server):**
-```bash
-cd frontend
-npm run dev
-```
-
-The dev server supports hot module replacement for rapid iteration.
-
-### Option 3: Docker Compose (Full-Stack)
-
-Build and run both services in containers:
-
-```bash
-docker-compose up --build
-```
-
-This will:
-- Build the backend container from `backend.Dockerfile`
-- Build the frontend container from `frontend/Dockerfile`
-- Start both services with proper health checks and dependencies
-- Frontend waits for backend to be healthy before starting
-
-To run in detached mode:
-```bash
-docker-compose up -d --build
-```
-
-To stop:
-```bash
-docker-compose down
-```
-
-## Manual Setup
-
-If you prefer manual setup:
+### Manual Setup
 
 **1. Install Python dependencies:**
 ```bash
@@ -142,187 +79,24 @@ pip3 install -r requirements.txt
 **2. Install frontend dependencies:**
 ```bash
 cd frontend
-PUPPETEER_SKIP_DOWNLOAD=true npm install
+npm install
 ```
 
-**3. Build the frontend:**
+**3. Start the backend API (Terminal 1):**
 ```bash
-npm run build
-cd ..
+python3 api.py
 ```
 
-**4. Start services** (see Running the Application above)
-
-## Accessing the Application
-
-Once running, access the following endpoints:
-
-- **Frontend UI**: http://localhost:3000
-- **Backend API**: http://localhost:8080
-- **API Documentation**: http://localhost:8080/docs
-- **Health Check**: http://localhost:8080/health
-
-## Configuration & Environment
-
-### Backend Configuration
-
-The backend runs on port 8080 by default. Configure via environment variables:
-
-- `PORT`: Server port (default: 8080)
-- `CORS_ORIGINS`: Allowed CORS origins (default: `*`)
-
-### Frontend Configuration
-
-The frontend uses Next.js standalone output mode. Key configurations:
-
-- `PORT`: Server port (default: 3000)
-- `BACKEND_URL`: Backend API URL (default: http://localhost:8080)
-- `NEXT_PUBLIC_API_URL`: API URL embedded at build time
-
-For local development, create `frontend/.env.local`:
-```env
-NEXT_PUBLIC_API_URL=http://localhost:8080
+**4. Start the frontend (Terminal 2):**
+```bash
+cd frontend
+npm run dev
 ```
 
-### Next.js Standalone Mode
+**5. Open your browser:**
+Visit http://localhost:3000
 
-This template uses Next.js `output: 'standalone'` configuration for optimized production builds. The standalone build:
-
-- Bundles all dependencies into `.next/standalone/frontend/`
-- Entry point: `frontend/.next/standalone/frontend/server.js`
-- Includes minimal dependencies for production
-- Reduces Docker image size significantly
-
-**Important**: Always use the standalone server.js entry point for production, NOT the development server.
-
-## Docker Deployment Details
-
-### Backend Dockerfile (`backend.Dockerfile`)
-
-- Base image: `python:3.11-slim`
-- Exposes port 8080
-- Includes health check via `/health` endpoint
-- Runs `python3 api.py` from the backend directory
-
-### Frontend Dockerfile (`frontend/Dockerfile`)
-
-- Multi-stage build with Node 20 Alpine
-- Builds Next.js in standalone mode
-- Minimal production image with non-root user
-- Exposes port 3000
-- Entry point: `node server.js`
-
-### Docker Compose Configuration
-
-The `docker-compose.yml` orchestrates both services:
-
-```yaml
-services:
-  backend:
-    - Builds from backend.Dockerfile
-    - Exposes port 8080
-    - Health check enabled
-  
-  frontend:
-    - Builds from frontend/Dockerfile  
-    - Exposes port 3000
-    - Depends on backend health check
-    - Environment: BACKEND_URL=http://backend:8080
-```
-
-## CI/CD with GitHub Actions
-
-This repository includes automated workflows in `.github/workflows/`:
-
-### Backend CI (`api-smoke.yml`)
-- Runs on every push and pull request
-- Tests Python dependencies installation
-- Starts backend server
-- Validates `/health` endpoint
-- Runs pytest smoke tests
-- Uploads logs as artifacts on failure
-
-### Frontend CI (`frontend-build.yml`)
-- Runs on main branch and pull requests
-- Installs Node.js dependencies
-- Runs TypeScript type checking
-- Builds Next.js in standalone mode
-- Runs ESLint (non-blocking)
-
-Both workflows ensure code quality and prevent regressions.
-
-### Full-Stack Integration (`fullstack-ci.yml`)
-- Comprehensive integration testing workflow
-- Tests backend build and API endpoints
-- Tests frontend build in standalone mode
-- Tests Docker builds for both services
-- Runs integration tests with docker-compose
-- Verifies end-to-end communication between services
-
-## Important Notes
-
-### Standalone Mode Entry Point
-
-This template uses Next.js **standalone output mode** for production deployments. The correct entry point is:
-
-```
-frontend/.next/standalone/frontend/server.js
-```
-
-**Important:** Do NOT use the following for production:
-- ❌ `npm run dev` (development mode only)
-- ❌ `frontend/server.js` (doesn't exist)
-- ❌ `frontend/.next/server/index.js` (incorrect path)
-
-The `start.sh` script and Docker configurations use the correct standalone entry point.
-
-### Deprecated Scripts
-
-The following scripts are maintained for legacy Railway deployment but are **not recommended** for new deployments:
-
-- `start-api.sh` - Use `cd backend && python3 api.py` directly or the new `start.sh`
-- `start-fullstack.sh` - Use `start.sh` or `docker-compose up` instead
-
-For modern deployments, prefer:
-- **Local development**: `start.sh` (Unix/Linux/Mac)
-- **Docker**: `docker-compose up --build`
-- **Railway**: See [RAILWAY.md](RAILWAY.md)
-
-## Production Deployment
-
-### Railway Deployment (Recommended)
-
-**📖 For detailed Railway deployment instructions, see [RAILWAY.md](RAILWAY.md)**
-
-Railway is the recommended platform for deploying the full-stack application. Key features:
-
-- Single service running both frontend and backend
-- Automatic HTTPS and domain management
-- Simple environment variable configuration
-- Built-in monitoring and logs
-
-Quick deployment steps:
-1. Connect your GitHub repository to Railway
-2. Set root directory to `/` for backend service
-3. Add frontend service with root directory `/frontend`
-4. Set `NEXT_PUBLIC_API_URL` environment variable
-5. Deploy!
-
-### Alternative Cloud Platforms
-
-This template can be deployed to other platforms:
-
-- **Vercel** (frontend only, backend needs separate hosting)
-- **Heroku** (both services separately)
-- **AWS ECS/Fargate** (using Docker containers)
-- **Google Cloud Run** (using Docker containers)
-- **Azure Container Instances** (using Docker containers)
-
-For containerized deployments, use the provided Dockerfiles and docker-compose.yml as a starting point.
-
-## Using the Cubit Language
-
-### Interactive REPL (Command Line)
+### Using the REPL (Command Line)
 
 ```bash
 # Interactive REPL
@@ -332,56 +106,19 @@ python3 cubit.py
 python3 cubit.py examples/basic.cubit
 ```
 
-The REPL (Read-Eval-Print Loop) provides an interactive environment:
+## Installation
+
+No installation required! Just Python 3.6+ needed.
 
 ```bash
-$ python3 cubit.py
-Cubit Programming Language v1.0
-Type 'exit' or 'quit' to exit, 'help' for help
+# Make the script executable (Unix/Linux/Mac)
+chmod +x cubit.py
 
-cubit> let x = 5
-=> 5
-cubit> let y = 10
-=> 10
-cubit> print x + y
-15
-cubit> help
-[shows help text]
-cubit> vars
-Variables: {'x': 5, 'y': 10}
-cubit> exit
-Goodbye!
-```
+# Run the REPL
+python3 cubit.py
 
-#### REPL Commands
-
-- `help` - Display help information
-- `vars` - Show all defined variables
-- `exit` or `quit` - Exit the REPL
-
-### Running Example Programs
-
-The `examples/` directory contains sample programs:
-
-```bash
-# Basic arithmetic and variables
+# Or run a file
 python3 cubit.py examples/basic.cubit
-
-# Fibonacci sequence
-python3 cubit.py examples/fibonacci.cubit
-
-# Conditional logic
-python3 cubit.py examples/conditionals.cubit
-
-# Countdown
-python3 cubit.py examples/countdown.cubit
-
-# Advanced modules
-python3 cubit.py examples/math_module.cubit      # Math functions
-python3 cubit.py examples/string_module.cubit    # String operations
-python3 cubit.py examples/list_module.cubit      # List/array operations
-python3 cubit.py examples/random_module.cubit    # Random number generation
-python3 cubit.py examples/advanced_demo.cubit    # Comprehensive demo
 ```
 
 ## Language Syntax
@@ -576,7 +313,61 @@ while count > 0 {
 print "Liftoff!"
 ```
 
-## Implementation Architecture
+## REPL Usage
+
+The REPL (Read-Eval-Print Loop) provides an interactive environment:
+
+```bash
+$ python3 cubit.py
+Cubit Programming Language v1.0
+Type 'exit' or 'quit' to exit, 'help' for help
+
+cubit> let x = 5
+=> 5
+cubit> let y = 10
+=> 10
+cubit> print x + y
+15
+cubit> help
+[shows help text]
+cubit> vars
+Variables: {'x': 5, 'y': 10}
+cubit> exit
+Goodbye!
+```
+
+### REPL Commands
+
+- `help` - Display help information
+- `vars` - Show all defined variables
+- `exit` or `quit` - Exit the REPL
+
+## Running Examples
+
+The `examples/` directory contains sample programs:
+
+```bash
+# Basic arithmetic and variables
+python3 cubit.py examples/basic.cubit
+
+# Fibonacci sequence
+python3 cubit.py examples/fibonacci.cubit
+
+# Conditional logic
+python3 cubit.py examples/conditionals.cubit
+
+# Countdown
+python3 cubit.py examples/countdown.cubit
+
+# Advanced modules
+python3 cubit.py examples/math_module.cubit      # Math functions
+python3 cubit.py examples/string_module.cubit    # String operations
+python3 cubit.py examples/list_module.cubit      # List/array operations
+python3 cubit.py examples/random_module.cubit    # Random number generation
+python3 cubit.py examples/advanced_demo.cubit    # Comprehensive demo
+```
+
+## Architecture
 
 Cubit is implemented in Python with three main components:
 
@@ -593,7 +384,7 @@ Cubit now includes a FastAPI web server that provides REST API endpoints for exe
 Install the required dependencies:
 
 ```bash
-pip install -r backend/requirements.txt
+pip install -r requirements.txt
 ```
 
 Start the server:
@@ -603,11 +394,9 @@ Start the server:
 ./start-api.sh
 
 # Or directly with uvicorn
-cd backend
 uvicorn api:app --host 0.0.0.0 --port 8080
 
 # Or with Python
-cd backend
 python3 api.py
 ```
 
@@ -945,9 +734,9 @@ For detailed frontend deployment instructions including troubleshooting, see `fr
 **Backend API fails to start locally:**
 - **Solutions**:
   1. Ensure Python 3.11+ is installed: `python3 --version`
-  2. Install dependencies: `pip install -r backend/requirements.txt`
+  2. Install dependencies: `pip install -r requirements.txt`
   3. Check port 8080 is not already in use: `lsof -i :8080` (Mac/Linux)
-  4. Try a different port: `cd backend && PORT=8081 python3 api.py`
+  4. Try a different port: `PORT=8081 python3 api.py`
 
 **Frontend cannot connect to local backend:**
 - **Solutions**:
@@ -989,7 +778,7 @@ For detailed frontend deployment instructions including troubleshooting, see `fr
      ```bash
      # From repository root
      pip install --upgrade pip
-     pip install -r backend/requirements.txt --force-reinstall
+     pip install -r requirements.txt --force-reinstall
      ```
 - **Note**: The repository includes a placeholder `next.config.js` in the root directory to prevent Next.js from searching for configs in the wrong location. The actual Next.js configuration is in `frontend/next.config.ts`.
 
