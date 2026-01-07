@@ -197,3 +197,17 @@ def parse_game_code(code: str, game: str = "AnimatedArt") -> Dict[str, Any]:
     """
     executor = GamesExecutor()
     return executor.parse(code)
+
+def parse_game_code(code:  str, game:  Optional[str] = None) -> Dict[str, Any]:
+    """
+    Parse game code and return structured output.
+    
+    Args:
+        code: The code to parse
+        game: Optional game name (for future game-specific parsing)
+        
+    Returns:
+        Dictionary with shapes, output, and error fields
+    """
+    executor = GamesExecutor()
+    return executor.parse(code)
