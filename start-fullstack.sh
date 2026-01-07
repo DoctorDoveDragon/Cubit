@@ -65,4 +65,4 @@ echo "Starting Next.js frontend on port ${FRONTEND_PORT}..."
 cd "$FRONTEND_DIR"
 
 # Use exec to replace shell with Node.js process for proper signal handling
-exec env PORT=$FRONTEND_PORT BACKEND_URL=http://localhost:8000 node server.js
+exec env PORT=$FRONTEND_PORT HOSTNAME=0.0.0.0 BACKEND_URL=http://localhost:8000 node server.js
