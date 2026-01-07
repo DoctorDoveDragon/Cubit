@@ -12,46 +12,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, ConfigDict
 from interpreter import Interpreter
-
-# Ensure pedagogical import is resilient
-try:
-    from pedagogical.api import PedagogicalAPI
-except (ImportError, ModuleNotFoundError):
-    import sys
-    sys.path.append('.')
-    try:
-        from pedagogical.api import PedagogicalAPI
-    except (ImportError, ModuleNotFoundError):
-        class PedagogicalAPI:
-            def __init__(self, wrapped_api, **kwargs):
-                self.wrapped_api = wrapped_api
-                self.call_history = []
-                self.verbosity = kwargs.get('default_verbosity', 'normal')
-
-            def call(self, method_name, *args, **kwargs):
-                result = getattr(self.wrapped_api, method_name)(*args, **kwargs)
-                self.call_history.append({
-                    'method': method_name,
-                    'args': args,
-                    'kwargs': kwargs,
-                    'result': result
-                })
-                return result
-
-            def set_verbosity(self, level):
-                self.verbosity = level
-
-            def get_learning_progress(self):
-                return {}
-
-            def suggest_next_concepts(self, mastered=None):
-                return []
-
-            def _infer_skill_level(self):
-                return 'beginner'
-            
-            def get_last_teaching_moment(self):
-                return None
+from pedagogical.api import PedagogicalAPI
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -91,7 +52,7 @@ class ExecuteResponse(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
     
     output: Optional[str] = None
-    result: Optional[Any] = None
+    result: Any = None
     error: Optional[str] = None
     teaching_moment: Optional[Dict[str, Any]] = None
     skill_level: Optional[str] = None
@@ -150,8 +111,7 @@ async def execute_code(request: ExecuteRequest):
     if request.teaching_enabled:
         ped_interpreter = PedagogicalAPI(
             interpreter,
-            default_verbosity=request.verbosity or 'normal',
-            silent_mode=True  # Don't print teaching insights, return as structured data
+            default_verbosity=request.verbosity or 'normal'
         )
     
     # Capture stdout using context manager to avoid race conditions
@@ -172,7 +132,6 @@ async def execute_code(request: ExecuteRequest):
         teaching_data = {}
         if request.teaching_enabled:
             teaching_data = {
-                'teaching_moment': ped_interpreter.get_last_teaching_moment(),
                 'skill_level': ped_interpreter._infer_skill_level(),
                 'progress': ped_interpreter.get_learning_progress(),
                 'suggestions': ped_interpreter.suggest_next_concepts()[:5]
