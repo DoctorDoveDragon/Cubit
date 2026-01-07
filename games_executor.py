@@ -140,16 +140,19 @@ class GamesExecutor:
             # Try direct conversion first
             return float(value)
         except ValueError:
-            # Try evaluating simple expressions like "100 + 50"
-            # Use a restricted eval for safety
+            # Try evaluating simple arithmetic expressions
+            # Use a safe approach: only allow basic math operations
             try:
-                # Only allow numbers, operators, and parentheses
-                if re.match(r'^[\d\s\+\-\*/\(\)\.]+$', value):
-                    return float(eval(value))
-                else:
-                    raise ValueError(f"Invalid {field_name}: {value}")
-            except:
-                raise ValueError(f"Invalid {field_name}: {value}")
+                # Only allow numbers, basic operators, whitespace, and parentheses
+                if not re.match(r'^[\d\s\+\-\*/\(\)\.]+$', value):
+                    raise ValueError(f"Invalid {field_name}: {value} - contains invalid characters")
+                
+                # Use a restricted evaluation for safety
+                # Create a safe eval environment with no builtins
+                result = eval(value, {"__builtins__": {}}, {})
+                return float(result)
+            except (ValueError, SyntaxError, NameError, TypeError) as e:
+                raise ValueError(f"Invalid {field_name}: {value} - {str(e)}")
     
     def _normalize_color(self, color: str) -> str:
         """Normalize color names to CSS-compatible format"""

@@ -308,7 +308,7 @@ async def execute_game_code(request: GameExecuteRequest):
                     'progress': ped_interpreter.get_learning_progress(),
                     'suggestions': ped_interpreter.suggest_next_concepts()[:5]
                 }
-            except:
+            except Exception:
                 # If teaching analysis fails, continue without it
                 pass
         
