@@ -4,6 +4,8 @@ services:
     build:
       context: .
       dockerfile: backend/Dockerfile
+      args:
+        CONTEXT: backend
     container_name: cubit-backend
     ports:
       - "8080:8080"
@@ -19,6 +21,8 @@ services:
     build:
       context: .
       dockerfile: frontend/Dockerfile
+      args:
+        CONTEXT: frontend
     container_name: cubit-frontend
     ports:
       - "3000:3000"

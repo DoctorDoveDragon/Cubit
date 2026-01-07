@@ -1,4 +1,4 @@
-# Frontend Dockerfile (works with repo-root or frontend-context)
+# Frontend Dockerfile: use CONTEXT=frontend for repo-root builds, CONTEXT=. when building from ./frontend
 ARG CONTEXT=frontend
 
 FROM node:20-alpine AS deps
