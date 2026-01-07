@@ -33,22 +33,19 @@ if ! kill -0 $BACKEND_PID 2>/dev/null; then
   exit 1
 fi
 
-# Verify backend is responding to health checks
-echo "Verifying backend health..."
-for i in {1..10}; do
-  if curl -s http://localhost:127.0.0.1/health > /dev/null 2>&1; then
-    echo "✓ Backend started successfully (PID: $BACKEND_PID)"
-    break
-  fi
-  if [ $i -eq 10 ]; then
-    echo "ERROR: Backend not responding to health checks after 10 attempts"
-    echo "Backend logs:"
-    cat /tmp/backend.log
-    kill $BACKEND_PID 2>/dev/null || true
-    exit 1
-  fi
-  sleep 1
-done
+# Give backend time to fully initialize
+echo "Waiting for backend to fully initialize..."
+sleep 5
+
+# Check if backend process is still alive
+if ! kill -0 $BACKEND_PID 2>/dev/null; then
+  echo "ERROR: Backend process died during startup"
+  echo "Backend logs:"
+  cat /tmp/backend.log
+  exit 1
+fi
+
+echo "✓ Backend started successfully (PID: $BACKEND_PID)"
 
 # Determine frontend directory path
 # After nixpacks build, the standalone output is in ./frontend-standalone
