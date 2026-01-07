@@ -50,6 +50,7 @@ COPY interpreter.py .
 COPY lexer.py .
 COPY parser.py .
 COPY cubit.py .
+COPY games_executor.py .
 COPY pedagogical/ ./pedagogical/
 
 # Copy frontend built files
