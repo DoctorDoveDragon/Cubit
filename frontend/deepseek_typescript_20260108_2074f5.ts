@@ -8,7 +8,6 @@ const nextConfig: NextConfig = {
   output: 'standalone',
   
   // Performance optimizations
-  swcMinify: true,
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
   },
@@ -43,14 +42,7 @@ const nextConfig: NextConfig = {
     optimizeCss: true,
     
     // Partial prerendering (when available)
-    ppr: 'incremental',
-    
-    // Turbopack improvements
-    turbo: {
-      resolveAlias: {
-        // Add alias mappings if needed
-      }
-    }
+    ppr: 'incremental'
   },
   
   // Security headers

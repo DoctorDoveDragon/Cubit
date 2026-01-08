@@ -17,6 +17,9 @@
 /.next/
 /out/
 
+# compiled config files (prevent stale build artifacts)
+next.config.compiled.js
+
 # production
 /build
 

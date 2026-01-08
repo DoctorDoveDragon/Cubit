@@ -5,6 +5,7 @@ import Button from './Button'
 import Toast from './Toast'
 import { analyzeBundleSize, generateBundleReport } from '../utils/bundleAnalyzer'
 import { getProgress, getConceptGraph } from '../utils/api'
+import { safeErrorMessage } from '../utils/safeError'
 
 type CommandCategory = 'ai' | 'design' | 'workflow' | 'intelligence'
 
@@ -14,6 +15,18 @@ interface Command {
   action: () => void
   icon?: string
 }
+
+// Constants for deployment simulation
+const DEPLOYMENT_SIMULATION_MESSAGE = `1. ✓ Building application...
+2. ✓ Running tests...
+3. ✓ Optimizing assets...
+4. ✓ Uploading to CDN...
+5. ✓ Deployment complete!
+
+Preview URL: https://cubit-preview.app
+
+⚠️ This is a SIMULATED deployment for demonstration purposes.
+For real deployment, see README.md for instructions on deploying to Railway, Vercel, or Netlify.`
 
 export default function CreativeCommandsPanel() {
   const [toast, setToast] = useState<string | null>(null)
@@ -175,14 +188,14 @@ export default function CreativeCommandsPanel() {
   // Workflow & Productivity Commands
   const workflowCommands: Command[] = [
     {
-      name: 'Deploy Preview',
-      description: 'Simulate deployment',
+      name: 'Deployment Demo',
+      description: 'Simulate deployment workflow',
       action: () => {
-        showToast('Starting deployment...')
+        showToast('Starting simulated deployment...')
         setTimeout(() => {
           showModalDialog(
-            'Deployment Steps',
-            '1. ✓ Building application...\n2. ✓ Running tests...\n3. ✓ Optimizing assets...\n4. ✓ Uploading to CDN...\n5. ✓ Deployment complete!\n\nPreview URL: https://cubit-preview.app\n\n[Simulated deployment]'
+            'Deployment Preview (Simulation)',
+            DEPLOYMENT_SIMULATION_MESSAGE
           )
         }, 2000)
       }
@@ -272,10 +285,10 @@ export default function CreativeCommandsPanel() {
           const analysis = await analyzeBundleSize()
           const report = generateBundleReport(analysis)
           showModalDialog('Bundle Analysis', report)
-        } catch (error) {
+        } catch (err: unknown) {
           showModalDialog(
             'Bundle Analysis Error',
-            `Failed to analyze bundle:\n\n${error instanceof Error ? error.message : 'Unknown error'}\n\nPlease ensure the app is built or running in development mode.`
+            `Failed to analyze bundle:\n\n${safeErrorMessage(err)}\n\nPlease ensure the app is built or running in development mode.`
           )
         }
       }
@@ -291,10 +304,10 @@ export default function CreativeCommandsPanel() {
             'Learning Progress',
             `${progress.message}\n\n${progress.info || 'No detailed progress information available yet. Start coding with Teaching Mode enabled to track your progress!'}`
           )
-        } catch (error) {
+        } catch (err: unknown) {
           showModalDialog(
             'Progress Error',
-            `Failed to fetch progress:\n\n${error instanceof Error ? error.message : 'Unknown error'}\n\nMake sure the backend API is running and Teaching Mode has been used.`
+            `Failed to fetch progress:\n\n${safeErrorMessage(err)}\n\nMake sure the backend API is running and Teaching Mode has been used.`
           )
         }
       }
@@ -321,10 +334,10 @@ export default function CreativeCommandsPanel() {
             `View the Progress Dashboard for detailed concept information!`
 
           showModalDialog('Concept Explorer', report)
-        } catch (error) {
+        } catch (err: unknown) {
           showModalDialog(
             'Concept Error',
-            `Failed to load concepts:\n\n${error instanceof Error ? error.message : 'Unknown error'}`
+            `Failed to load concepts:\n\n${safeErrorMessage(err)}`
           )
         }
       }

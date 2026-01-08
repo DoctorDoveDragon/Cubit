@@ -16,10 +16,49 @@ Cubit is a simple, educational programming language with a clean syntax designed
 - **Lists/Arrays**: Create and manipulate lists with indexing
 - **Function Calls**: Call built-in functions
 - **Advanced Modules**: Math, String, List, and Random modules
+- **Games & Visualizations**: Interactive visual programming with draw commands
+- **Pedagogical API**: Teaching-enabled code execution with skill tracking
 
 ## Quick Start
 
-### Automated Setup (Recommended)
+### Railway Deployment (Production)
+
+**📖 Deploy to Railway in minutes! See [RAILWAY.md](RAILWAY.md) for the complete deployment guide.**
+
+Railway is the recommended platform for deploying the full-stack application (frontend + backend) from this repository as a single unified service.
+
+**Deployment Architecture:**
+- Single service running both Next.js frontend and FastAPI backend
+- Frontend proxies API requests to the backend automatically
+- No separate deployment or CORS configuration needed
+- Simplified environment variable setup
+
+### Docker Deployment (Alternative)
+
+You can also deploy using Docker:
+
+```bash
+# Build the Docker image
+docker build -t cubit:latest .
+
+# Run the container
+docker run -p 3000:3000 cubit:latest
+```
+
+The Dockerfile uses a multi-stage build to:
+1. Build the Next.js frontend
+2. Set up Python environment for the backend
+3. Run both servers in a single container
+
+### Local Development
+
+> **Note on Package Management:** This repository contains two separate `package-lock.json` files:
+> - Root `package-lock.json`: For the minimal root-level dependency (openai package only, used by some scripts)
+> - `frontend/package-lock.json`: For all Next.js frontend dependencies
+> 
+> This dual-lockfile setup ensures that the root and frontend Node.js environments remain isolated. Always run `npm install` in the appropriate directory (root for scripts, `frontend/` for the web app).
+
+#### Automated Setup (Recommended)
 
 **Unix/Linux/Mac:**
 ```bash
@@ -422,6 +461,69 @@ Execute Cubit code and return the output.
 }
 ```
 
+#### GET `/games`
+Get the list of available games and visualizations.
+
+**Response:**
+```json
+{
+  "games": [
+    {
+      "title": "Animated Art",
+      "description": "Create generative art with Cubit code",
+      "instructions": "Use draw_circle(), draw_square(), draw_triangle()",
+      "starter": "draw_circle(100, 100, 30)",
+      "solution": "draw_circle(100, 100, 30)"
+    }
+  ]
+}
+```
+
+#### POST `/games/execute`
+Execute game code and return structured visualization data.
+
+**Request:**
+```json
+{
+  "game": "AnimatedArt",
+  "code": "draw_circle(100, 100, 30)\ndraw_square(200, 200, 40, 'red')",
+  "teaching_enabled": false
+}
+```
+
+**Response:**
+```json
+{
+  "output": null,
+  "result": null,
+  "error": null,
+  "shapes": [
+    {
+      "type": "circle",
+      "x": 100,
+      "y": 100,
+      "size": 30,
+      "color": "#7c3aed"
+    },
+    {
+      "type": "square",
+      "x": 200,
+      "y": 200,
+      "size": 40,
+      "color": "#ef4444"
+    }
+  ]
+}
+```
+
+**Supported Draw Commands:**
+- `draw_circle(x, y, radius, color?)` - Draw a circle
+- `draw_square(x, y, size, color?)` - Draw a square
+- `draw_triangle(x, y, size, color?)` - Draw a triangle
+- `set_color(color)` - Set the default color for subsequent shapes
+- `clear()` - Clear all shapes
+- `animate()` - Enable animation (frontend handles this)
+
 ### API Usage Examples
 
 #### Using curl
@@ -479,9 +581,21 @@ console.log(result);
 // Output: { output: "20\n", result: 20, error: null }
 ```
 
-### Deployment to Railway (Full Stack)
+### Deployment to Railway (Primary Platform)
 
-Cubit supports deployment of both the backend API and frontend GUI as separate Railway services from the same repository.
+**📖 See [RAILWAY.md](RAILWAY.md) for the complete, step-by-step Railway deployment guide.**
+
+Cubit is designed for Railway deployment with both backend and frontend services running from the same repository.
+
+#### Quick Start
+
+1. Create Railway project from GitHub repository
+2. Deploy backend (automatic, uses root directory)
+3. Add frontend service (set root directory to `frontend`)
+4. Set `NEXT_PUBLIC_API_URL` environment variable in frontend
+5. Deploy!
+
+For detailed instructions, troubleshooting, and best practices, see **[RAILWAY.md](RAILWAY.md)**.
 
 #### Architecture Overview
 
@@ -489,7 +603,7 @@ Cubit supports deployment of both the backend API and frontend GUI as separate R
 - **Frontend Service**: Next.js application providing the interactive playground GUI
 - **Communication**: Frontend calls backend API via `NEXT_PUBLIC_API_URL`
 
-#### Deployment Steps
+#### Deployment Steps (Summary)
 
 ##### 1. Deploy Backend Service
 
@@ -498,6 +612,7 @@ Cubit supports deployment of both the backend API and frontend GUI as separate R
    - **Root Directory**: `/` (project root)
    - **Build Command**: Automatic (uses `nixpacks.toml` or `Procfile`)
    - **Start Command**: `uvicorn api:app --host 0.0.0.0 --port $PORT`
+   - **Node Version**: Not applicable (Python service)
 3. **Railway will automatically:**
    - Detect Python and install dependencies from `requirements.txt`
    - Use the `Procfile` or `nixpacks.toml` configuration
@@ -510,14 +625,17 @@ Cubit supports deployment of both the backend API and frontend GUI as separate R
 2. **Configure the frontend service:**
    - **Root Directory**: `/frontend`
    - **Build Command**: `npm run build`
-   - **Start Command**: `npm run start`
+   - **Start Command**: `npm run start` (runs `node .next/standalone/server.js` for standalone mode)
+   - **Node Version**: 18+ (configured in `frontend/nixpacks.toml`)
 3. **Set environment variables** (critical):
    - `NEXT_PUBLIC_API_URL`: Your backend service URL from step 1
    - Example: `https://your-backend-service.railway.app`
+   - **Note**: For Puppeteer installation issues, add `PUPPETEER_SKIP_DOWNLOAD=true`
 4. **Railway will automatically:**
    - Detect Node.js and install dependencies from `package.json`
-   - Build the Next.js application
+   - Build the Next.js application using the configuration in `frontend/nixpacks.toml`
    - Start the production server on the Railway-provided port
+5. **Important**: After setting environment variables, **redeploy** the frontend service to apply changes
 
 ##### 3. Access Your Deployment
 
@@ -575,6 +693,43 @@ app.add_middleware(
 )
 ```
 
+#### Alternative Deployment Platforms
+
+While Railway is recommended for full-stack deployment from a single repository, you can also deploy to other platforms:
+
+##### Vercel (Frontend Only)
+
+**Frontend Deployment:**
+1. Import your GitHub repository to Vercel
+2. Set **Root Directory** to `frontend`
+3. Add environment variable: `NEXT_PUBLIC_API_URL=https://your-backend-api.example.com`
+4. Vercel auto-detects Next.js and configures build settings
+5. Deploy
+
+**Note:** You'll need to deploy your backend separately (Railway, Heroku, etc.)
+
+##### Netlify (Frontend Only)
+
+**Frontend Deployment:**
+1. Create new site from Git in Netlify
+2. Set **Base directory** to `frontend`
+3. Set **Build command** to `npm run build`
+4. Set **Publish directory** to `frontend/.next`
+5. Add environment variable: `NEXT_PUBLIC_API_URL=https://your-backend-api.example.com`
+6. Add `PUPPETEER_SKIP_DOWNLOAD=true` to environment variables
+7. Deploy
+
+**Note:** You'll need to deploy your backend separately.
+
+##### Important Notes for All Platforms
+
+- **Required Environment Variable**: `NEXT_PUBLIC_API_URL` must be set for the frontend to connect to the backend
+- **Build-time Variables**: Variables starting with `NEXT_PUBLIC_` are embedded during build, so you must redeploy after changing them
+- **Node Version**: Ensure Node.js 18+ is used (check platform settings)
+- **Backend URL Format**: Use full URL with protocol (e.g., `https://api.example.com`, not `api.example.com`)
+
+For detailed frontend deployment instructions including troubleshooting, see `frontend/README.md`.
+
 #### Troubleshooting
 
 ##### Common Deployment Issues
@@ -604,11 +759,13 @@ app.add_middleware(
 **Frontend build fails:**
 - **Issue**: Next.js build process fails during deployment
 - **Solutions**:
-  1. Check Railway build logs for specific error messages
-  2. Verify all dependencies are in `package.json`
-  3. Ensure Node.js version is compatible (configured in `nixpacks.toml`)
+  1. Check deployment platform build logs for specific error messages
+  2. Verify all dependencies are in `frontend/package.json`
+  3. Ensure Node.js version 18+ is configured
   4. Check for TypeScript errors in your components
-  5. Try building locally: `cd frontend && npm install && npm run build`
+  5. If Puppeteer installation fails, add environment variable: `PUPPETEER_SKIP_DOWNLOAD=true`
+  6. Try building locally to reproduce: `cd frontend && npm ci && npm run build`
+  7. Verify `NEXT_PUBLIC_API_URL` is set (missing env vars can cause build issues in some cases)
 
 **Changes not reflecting after deployment:**
 - **Issue**: New code or configuration changes not visible
@@ -656,19 +813,51 @@ app.add_middleware(
 **npm install fails in frontend:**
 - **Solutions**:
   1. Use Node.js 18+ (check with `node --version`)
-  2. Clear npm cache: `npm cache clean --force`
-  3. Delete `node_modules` and `package-lock.json`, then reinstall
-  4. Try `npm install --legacy-peer-deps` if dependency conflicts occur
+  2. If Puppeteer fails to download Chrome: set `PUPPETEER_SKIP_DOWNLOAD=true` environment variable
+  3. Clear npm cache: `npm cache clean --force`
+  4. Delete `node_modules` and `package-lock.json`, then reinstall
+  5. Try `npm install --legacy-peer-deps` if dependency conflicts occur
+  6. For CI/CD, ensure cache is cleared between builds if issues persist
+
+**Cleaning build artifacts and dependencies (Best Practice):**
+- **When to clean**: Before reporting issues, after major updates, or when seeing unexplained errors
+- **Steps**:
+  1. Remove old build artifacts:
+     ```bash
+     # From repository root
+     rm -rf frontend/.next frontend/out
+     ```
+  2. Clean dependency caches:
+     ```bash
+     cd frontend
+     npm cache clean --force
+     rm -rf node_modules package-lock.json
+     npm install
+     ```
+  3. Remove any stale compiled config files:
+     ```bash
+     # These files are auto-ignored in .gitignore
+     rm -f next.config.compiled.js frontend/next.config.compiled.js
+     ```
+  4. For Python dependencies:
+     ```bash
+     # From repository root
+     pip install --upgrade pip
+     pip install -r requirements.txt --force-reinstall
+     ```
+- **Note**: The repository includes a placeholder `next.config.js` in the root directory to prevent Next.js from searching for configs in the wrong location. The actual Next.js configuration is in `frontend/next.config.ts`.
 
 ##### Getting Help
 
 If issues persist:
-1. Check Railway deployment logs for detailed error messages
-2. Review browser console for frontend errors
+1. Check deployment platform logs for detailed error messages
+2. Review browser console for frontend errors (F12 Developer Tools)
 3. Test individual components in isolation
-4. Ensure environment variables are correctly set in Railway dashboard
-5. Verify your GitHub repository is properly connected to Railway
+4. Ensure environment variables are correctly set in your platform's dashboard
+5. Verify your GitHub repository is properly connected to your deployment platform
 6. Try redeploying from scratch if configuration changes aren't taking effect
+7. For Railway-specific issues, check the Railway documentation at https://docs.railway.app
+8. See detailed troubleshooting in `frontend/README.md` for frontend-specific issues
 
 ### Interactive Documentation
 

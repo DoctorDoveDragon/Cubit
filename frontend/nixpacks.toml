@@ -1,11 +1,15 @@
 [phases.setup]
-nixPkgs = ["nodejs-20_x", "npm"]
+nixPkgs = ["nodejs_20", "npm-9_x"]
 
 [phases.install]
-cmds = ["npm install"]
+cmds = ["PUPPETEER_SKIP_DOWNLOAD=true npm ci"]
 
 [phases.build]
-cmds = ["npm run build"]
+cmds = [
+  "npm run build",
+  "test -d public && cp -r public .next/standalone/frontend/ || echo 'No public directory'",
+  "test -d .next/static && cp -r .next/static .next/standalone/frontend/.next/ || echo 'No static directory'"
+]
 
 [start]
-cmd = "npm run start -- -p ${PORT:-3000}"
+cmd = "node .next/standalone/frontend/server.js"

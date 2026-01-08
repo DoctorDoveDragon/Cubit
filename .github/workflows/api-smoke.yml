@@ -1,0 +1,70 @@
+name: API smoke tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  api-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest requests
+
+      - name: Start API server
+        run: |
+          nohup bash start-api.sh > api.log 2>&1 &
+          # wait for health endpoint (longer timeout and surface logs on failure)
+          for i in {1..60}; do
+            if curl -sSf http://127.0.0.1:8080/health >/dev/null; then
+              echo "API ready"; break
+            fi
+            sleep 1
+          done
+          # If still not healthy, dump the api.log for debugging and fail
+          if ! curl -sSf http://127.0.0.1:8080/health >/dev/null; then
+            echo "API failed to start within timeout. Dumping api.log:";
+            tail -n +1 api.log || true
+            exit 1
+          fi
+
+      - name: Run pytest smoke tests
+        run: |
+          pytest -q
+
+      - name: Upload api.log artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-log
+          path: api.log
+
+      - name: Comment on PR with run + artifact links
+        if: ${{ github.event_name == 'pull_request' && failure() }}
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const runId = process.env.GITHUB_RUN_ID;
+            const repo = process.env.GITHUB_REPOSITORY;
+            const prNumber = context.payload.pull_request.number;
+            const runUrl = `https://github.com/${repo}/actions/runs/${runId}`;
+            const artifactsUrl = `https://github.com/${repo}/suites/${runId}/artifacts`;
+            const body = `⚠️ CI failed — I've uploaded the server logs as an artifact.\n\nRun logs: ${runUrl}\nArtifacts: ${artifactsUrl}`;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              body,
+            });

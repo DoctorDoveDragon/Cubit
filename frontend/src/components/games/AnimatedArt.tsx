@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useRef, useEffect } from 'react';
+import { executeGameCode } from '../../utils/api';
 
 interface Shape {
     type: 'circle' | 'square' | 'triangle';
@@ -27,9 +28,7 @@ export default function AnimatedArt() {
     const [sequenceRunning, setSequenceRunning] = useState(false);
     const seqRunningRef = useRef<boolean>(false);
 
-    /* eslint-disable @typescript-eslint/no-unused-vars */
-    const [_mode, _setMode] = useState<'manual' | 'code'>('manual');
-    const [cubitCode, _setCubitCode] = useState(`# Draw shapes with Cubit code!
+    const [cubitCode, setCubitCode] = useState(`# Draw shapes with Cubit code!
 # Available commands:
 # draw_circle(x, y, size, color)
 # draw_square(x, y, size, color)
@@ -41,9 +40,8 @@ export default function AnimatedArt() {
 draw_circle(300, 200, 50, "purple")
 draw_square(150, 150, 40, "blue")
 draw_triangle(450, 300, 60, "red")`);
-    const [_executing, _setExecuting] = useState(false);
-    const [_output, _setOutput] = useState<string>('');
-    /* eslint-enable @typescript-eslint/no-unused-vars */
+    const [executing, setExecuting] = useState(false);
+    const [output, setOutput] = useState<string>('');
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -283,8 +281,46 @@ draw_triangle(450, 300, 60, "red")`);
                     {selectMode ? 'Selection: ON' : 'Selection: OFF'}
                 </button>
                 <button
+                    onClick={async () => {
+                        setExecuting(true);
+                        setOutput('');
+                        try {
+                            // Call backend to execute the code
+                            const result = await executeGameCode({
+                                game: 'AnimatedArt',
+                                code: cubitCode,
+                                teaching_enabled: false
+                            });
+                            
+                            if (result.error) {
+                                setOutput(`Error: ${result.error}`);
+                            } else if (result.shapes) {
+                                // Convert backend shapes to our format with IDs
+                                const shapesWithIds = result.shapes.map((s, idx) => ({
+                                    ...s,
+                                    id: idx
+                                }));
+                                setShapes(shapesWithIds);
+                                setOutput('Code executed successfully!');
+                            } else {
+                                setOutput('No shapes generated');
+                            }
+                        } catch (err) {
+                            setOutput(`Error: ${err instanceof Error ? err.message : String(err)}`);
+                        } finally {
+                            setExecuting(false);
+                        }
+                        setSelectedId(null);
+                        setMappings({});
+                    }}
+                    className="px-4 py-2 rounded bg-[var(--color-accent)] text-white font-semibold disabled:opacity-50"
+                    disabled={executing}
+                >
+                    {executing ? 'Running...' : 'Run Code (Backend)'}
+                </button>
+                <button
                     onClick={() => {
-                        // simple local parser for Cubit draw commands
+                        // simple local parser for Cubit draw commands (fallback)
                         const lines = cubitCode.split('\n').map(l => l.trim()).filter(Boolean);
                         const parsed: Shape[] = [];
                         let idCounter = 0;
@@ -322,7 +358,7 @@ draw_triangle(450, 300, 60, "red")`);
                     }}
                     className="px-4 py-2 rounded bg-[var(--color-surface)] text-[var(--color-muted)] font-semibold"
                 >
-                    Run Code
+                    Run Code (Local)
                 </button>
                 <button
                     onClick={() => {
@@ -355,6 +391,22 @@ draw_triangle(450, 300, 60, "red")`);
                 >
                     {sequenceRunning ? 'Stop Sequence' : 'Run Sequence'}
                 </button>
+            </div>
+
+            {output && (
+                <div className={`w-full max-w-2xl p-3 rounded ${output.includes('Error') ? 'bg-red-900/30 border border-red-500' : 'bg-green-900/30 border border-green-500'}`}>
+                    <div className="text-sm font-mono">{output}</div>
+                </div>
+            )}
+
+            <div className="w-full max-w-2xl">
+                <label className="text-sm font-semibold mb-2 block">Cubit Code Editor:</label>
+                <textarea
+                    value={cubitCode}
+                    onChange={(e) => setCubitCode(e.target.value)}
+                    className="w-full h-48 p-3 rounded bg-[var(--color-surface)] border-2 border-[var(--color-accent)] font-mono text-sm"
+                    spellCheck={false}
+                />
             </div>
 
             <p className="text-sm text-[var(--color-muted)] text-center max-w-md">
