@@ -9,42 +9,7 @@ This is a modern, designer-friendly UI for the Cubit programming language with a
 - Tailwind CSS with CSS variables (design tokens)
 - Framer Motion for smooth micro-interactions
 - Component library (Header, Sidebar, Card, Button, Toast)
-- Storybook for component previews and development
-
-### Intelligent GUI System
-
-The frontend now includes comprehensive pages and components for visualizing and interacting with the Cubit system:
-
-#### 🏗️ Architecture Page (`/architecture`)
-- **SystemFlowchart**: Interactive ReactFlow visualization of all system modules
-- **ModuleNode**: Custom node component showing module status, type, and metrics
-- **ModuleInspector**: Detailed metrics panel for selected modules
-- Live module status updates every 10 seconds
-- Click modules to view detailed information
-
-#### ▶️ Execution Page (`/execution`)
-- **ExecutionTimeline**: Step-by-step visualization of code execution through Lexer → Parser → Interpreter
-- **VariableInspector**: Real-time variable state viewer
-- **CallStackView**: Call stack visualization during execution
-- Debug mode with detailed timing metrics for each processing step
-
-#### 🎓 Learning Page (`/learning`)
-- **SkillMap**: Visual progress tracker showing beginner → intermediate → advanced → expert journey
-- **ConceptExplorer**: Interactive concept dependency graph with prerequisites
-- **TeachingMoments**: Timeline of personalized learning insights and tips
-- Skill trajectory visualization
-
-#### ⚙️ System Page (`/system`)
-- **ApiHealthDashboard**: Real-time API health monitoring with uptime tracking
-- **ModuleStatusGrid**: Comprehensive grid view of all modules with metrics
-- **LogViewer**: System logs with filtering by level (info, warn, error, debug)
-- Auto-refresh every 5-10 seconds
-
-#### 🎨 Customize Page (`/customize`)
-- **LayoutBuilder**: Drag-and-drop dashboard customization using react-grid-layout
-- **ThemeEditor**: Live theme customization with color pickers
-- Layout and theme preferences saved to localStorage
-- Preview mode for theme changes
+- Storybook 10.x for component previews (Next.js 16 compatible)
 
 ### Code Execution
 - **CodeExecutor Component**: Interactive code editor with syntax highlighting
@@ -115,6 +80,10 @@ Organized into 4 categories with 20+ commands:
    npm run storybook
    ```
    Open http://localhost:6006
+   
+   **Note:** This project uses Storybook 10.x for Next.js 16 compatibility. 
+   Older Storybook versions (8.x and earlier) have peer dependency conflicts with Next.js 16.
+   Storybook is configured to use the nextjs-vite framework with the Vite builder.
 
 ### Backend API Setup
 
