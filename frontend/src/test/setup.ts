@@ -3,6 +3,13 @@ import { beforeAll, afterEach, afterAll } from 'vitest'
 import { setupServer } from 'msw/node'
 import { http, HttpResponse } from 'msw'
 
+// Mock ResizeObserver for ReactFlow
+global.ResizeObserver = class ResizeObserver {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+
 // Mock module status data
 const mockModuleStatus = {
   modules: [
