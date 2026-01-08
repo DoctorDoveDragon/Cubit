@@ -194,7 +194,7 @@ def test_execute_teaching_moment():
     response = client.post(
         "/execute",
         json={
-            "code": "print 'hello'",
+            "code": "print \"hello\"",
             "teaching_enabled": True,
             "verbosity": "normal"
         }
