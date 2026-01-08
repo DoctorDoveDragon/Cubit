@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Full-stack service (frontend + backend)
   cubit:
