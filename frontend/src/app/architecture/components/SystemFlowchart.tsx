@@ -19,8 +19,8 @@ export default function SystemFlowchart({ onModuleSelect }: SystemFlowchartProps
   const [modules, setModules] = useState<Module[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [nodes, setNodes, onNodesChange] = useNodesState([])
-  const [edges, setEdges, onEdgesChange] = useEdgesState([])
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node>([] as Node[])
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([] as Edge[])
 
   useEffect(() => {
     async function fetchModules() {
