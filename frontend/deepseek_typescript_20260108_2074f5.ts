@@ -37,7 +37,7 @@ const nextConfig: NextConfig = {
     ],
     
     // View Transitions API for smooth page transitions
-    viewTransitions: true,
+    viewTransition: true,
     
     // Optimize CSS loading
     optimizeCss: true,
