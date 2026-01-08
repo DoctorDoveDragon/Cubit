@@ -274,3 +274,144 @@ export async function executeGameCode(request: GameExecuteRequest): Promise<Exec
     }
   }
 }
+
+/**
+ * Get modules status from the backend
+ * @returns Promise with modules and system status
+ */
+export async function getModuleStatus(): Promise<{
+  modules: Array<{
+    id: string;
+    name: string;
+    type: string;
+    status: string;
+    version: string;
+    metrics: Record<string, unknown>;
+  }>;
+  system: {
+    total_modules: number;
+    active_modules: number;
+    error_modules: number;
+    uptime_seconds: number;
+  };
+}> {
+  const apiUrl = getApiBaseUrl()
+  
+  try {
+    const response = await fetch(`${apiUrl}/api/modules/status`)
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    
+    return response.json()
+  } catch (error: unknown) {
+    console.error('Failed to fetch module status:', error)
+    return {
+      modules: [],
+      system: {
+        total_modules: 0,
+        active_modules: 0,
+        error_modules: 0,
+        uptime_seconds: 0
+      }
+    }
+  }
+}
+
+/**
+ * Execute code with debug instrumentation
+ * @param request - The execution request
+ * @returns Promise with debug steps and execution result
+ */
+export async function executeDebug(request: ExecuteRequest): Promise<{
+  steps: Array<{
+    id: string;
+    module: string;
+    timestamp: string;
+    duration_ms: number;
+    input: string | Record<string, unknown>;
+    output: Record<string, unknown>;
+    status: string;
+    error?: string;
+  }>;
+  result: {
+    output: string | null;
+    result: unknown;
+    error: string | null;
+    skill_level: string;
+    progress: Record<string, unknown>;
+    suggestions: string[];
+  };
+}> {
+  const apiUrl = getApiBaseUrl()
+  
+  try {
+    const response = await fetch(`${apiUrl}/api/execute/debug`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(request)
+    })
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    
+    return response.json()
+  } catch (error: unknown) {
+    const errorMessage = safeErrorMessage(error)
+    return {
+      steps: [],
+      result: {
+        output: null,
+        result: null,
+        error: isNetworkError(error)
+          ? `Unable to connect to the backend API at ${apiUrl}. Please ensure the backend is running.`
+          : errorMessage,
+        skill_level: 'beginner',
+        progress: {},
+        suggestions: []
+      }
+    }
+  }
+}
+
+/**
+ * Get concept suggestions and graph
+ * @returns Promise with concept information
+ */
+export async function getConcepts(): Promise<{
+  concepts: {
+    beginner: string[];
+    intermediate: string[];
+    advanced: string[];
+  };
+  graph: Record<string, {
+    prerequisites: string[];
+    difficulty: string;
+  }>;
+}> {
+  const apiUrl = getApiBaseUrl()
+  
+  try {
+    const response = await fetch(`${apiUrl}/concepts`)
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    
+    return response.json()
+  } catch (error: unknown) {
+    console.error('Failed to fetch concepts:', error)
+    return {
+      concepts: {
+        beginner: [],
+        intermediate: [],
+        advanced: []
+      },
+      graph: {}
+    }
+  }
+}
