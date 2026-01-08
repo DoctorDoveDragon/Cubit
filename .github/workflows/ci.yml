@@ -6,11 +6,16 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: read
+
 jobs:
   # Backend testing
   backend-test:
     name: Backend Tests
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -57,6 +62,8 @@ jobs:
   frontend-test:
     name: Frontend Tests (Node ${{ matrix.node-version }})
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     strategy:
       matrix:
         node-version: [18.x, 20.x]
@@ -103,6 +110,8 @@ jobs:
   docker-build:
     name: Docker Build Verification
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -123,6 +132,8 @@ jobs:
   code-quality:
     name: Code Quality
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
