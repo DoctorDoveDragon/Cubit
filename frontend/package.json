@@ -11,7 +11,9 @@
     "start:prod": "NODE_ENV=production next start",
     "lint": "next lint",
     "lint:fix": "eslint . --fix",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "classnames": "^2.3.2",
@@ -29,6 +31,10 @@
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^16.1.1",
+    "@storybook/addon-essentials": "10.0.0-beta.5",
+    "@storybook/addon-links": "10.0.0-beta.5",
+    "@storybook/nextjs-vite": "10.0.0-beta.5",
+    "@storybook/react": "10.0.0-beta.5",
     "@tailwindcss/postcss": "^4",
     "@types/classnames": "^2.2.11",
     "@types/node": "^20",
@@ -37,6 +43,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.1",
     "playwright": "^1.40.0",
+    "storybook": "10.0.0-beta.5",
     "tailwindcss": "^4",
     "typescript": "^5",
     "@tailwindcss/typography": "^0.5.16",

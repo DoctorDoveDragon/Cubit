@@ -9,7 +9,7 @@ This is a modern, designer-friendly UI for the Cubit programming language with a
 - Tailwind CSS with CSS variables (design tokens)
 - Framer Motion for smooth micro-interactions
 - Component library (Header, Sidebar, Card, Button, Toast)
-- Storybook skeleton for component previews
+- Storybook 10.0.0-beta.5 for component previews (Next.js 16 compatible)
 
 ### Code Execution
 - **CodeExecutor Component**: Interactive code editor with syntax highlighting
@@ -79,6 +79,10 @@ Organized into 4 categories with 20+ commands:
    npm run storybook
    ```
    Open http://localhost:6006
+   
+   **Note:** This project uses Storybook 10.0.0-beta.5 (prerelease) for Next.js 16 compatibility. 
+   The stable Storybook 8.x versions have peer dependency conflicts with Next.js 16.
+   Storybook is configured to use the nextjs-vite framework with the Vite builder.
 
 ### Backend API Setup
 
