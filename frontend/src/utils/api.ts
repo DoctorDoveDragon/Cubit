@@ -274,3 +274,100 @@ export async function executeGameCode(request: GameExecuteRequest): Promise<Exec
     }
   }
 }
+
+/**
+ * Get module status from backend
+ */
+export async function getModuleStatus(): Promise<import('../types/api').ModuleStatusResponse> {
+  const apiUrl = getApiBaseUrl()
+  
+  try {
+    const response = await fetch(`${apiUrl}/api/modules/status`)
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    
+    return response.json()
+  } catch (error: unknown) {
+    const errorMessage = safeErrorMessage(error)
+    // Return fallback response with error state
+    return {
+      modules: [],
+      system: {
+        total_modules: 0,
+        active_modules: 0,
+        error_modules: 0,
+        uptime_seconds: 0
+      }
+    }
+  }
+}
+
+/**
+ * Execute code with debug instrumentation
+ */
+export async function executeDebug(request: ExecuteRequest): Promise<import('../types/api').DebugExecutionResponse> {
+  const apiUrl = getApiBaseUrl()
+  
+  try {
+    const response = await fetch(`${apiUrl}/api/execute/debug`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(request)
+    })
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    
+    return response.json()
+  } catch (error: unknown) {
+    const errorMessage = safeErrorMessage(error)
+    // Return fallback response with error
+    return {
+      steps: [],
+      final_result: {
+        output: null,
+        result: null,
+        error: isNetworkError(error)
+          ? `Unable to connect to the backend API at ${apiUrl}. Please ensure the backend is running.`
+          : errorMessage,
+        skill_level: 'beginner',
+        progress: {},
+        suggestions: []
+      },
+      total_duration_ms: 0
+    }
+  }
+}
+
+/**
+ * Get concepts from backend
+ */
+export async function getConcepts(): Promise<import('../types/api').ConceptsResponse> {
+  const apiUrl = getApiBaseUrl()
+  
+  try {
+    const response = await fetch(`${apiUrl}/concepts`)
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    
+    return response.json()
+  } catch (error: unknown) {
+    // Return fallback empty concepts
+    return {
+      concepts: {
+        beginner: [],
+        intermediate: [],
+        advanced: []
+      },
+      graph: {}
+    }
+  }
+}
+
