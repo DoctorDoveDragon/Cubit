@@ -173,6 +173,28 @@ class PedagogicalAPI:
         
         return self.concept_mapper.suggest_next_concepts(mastered)
     
+    def get_skill_level(self) -> str:
+        """
+        Get the current inferred skill level
+        
+        Returns:
+            Skill level: 'beginner', 'intermediate', 'advanced', or 'expert'
+        """
+        return self._infer_skill_level()
+    
+    def get_concept_difficulty(self, concept: str) -> str:
+        """
+        Get the difficulty level of a specific concept
+        
+        Args:
+            concept: Name of the concept
+            
+        Returns:
+            Difficulty level: 'beginner', 'intermediate', or 'advanced'
+        """
+        # Delegate to concept mapper
+        return self.concept_mapper.get_concept_difficulty(concept)
+    
     def reset_history(self):
         """Reset the call history"""
         self._call_history = []
