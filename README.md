@@ -123,6 +123,89 @@ python3 cubit.py
 python3 cubit.py examples/basic.cubit
 ```
 
+## Docker Compose Quick Start
+
+Docker Compose provides an easy way to run the full Cubit stack (backend + frontend) with a single command. See [DOCKER.md](DOCKER.md) for detailed documentation.
+
+### Prerequisites
+
+- Docker (20.10+)
+- Docker Compose (2.0+)
+
+### Production Mode
+
+Run the optimized production build:
+
+```bash
+# Start all services
+docker compose up
+
+# Or run in background
+docker compose up -d
+```
+
+**Access the application:**
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:8080
+- API Documentation: http://localhost:8080/docs
+
+### Development Mode
+
+Run with hot-reload for active development:
+
+```bash
+# Start with development profile (enables hot-reload)
+docker compose --profile dev up
+
+# Changes to Python files auto-reload the backend
+# Changes to frontend files trigger hot module replacement
+```
+
+### Managing Services
+
+```bash
+# Start only the backend
+docker compose up backend
+
+# View logs
+docker compose logs -f
+
+# Stop all services
+docker compose down
+
+# Rebuild after changes to Dockerfile
+docker compose up --build
+```
+
+### Troubleshooting
+
+**Port conflicts:**
+```bash
+# Check if ports 3000 or 8080 are in use
+lsof -i :3000  # macOS/Linux
+lsof -i :8080
+```
+
+**View container logs:**
+```bash
+# All services
+docker compose logs
+
+# Specific service
+docker compose logs backend
+docker compose logs frontend
+```
+
+**Rebuild from scratch:**
+```bash
+# Remove containers and rebuild
+docker compose down
+docker compose build --no-cache
+docker compose up
+```
+
+For more details, see [DOCKER.md](DOCKER.md).
+
 ## Language Syntax
 
 ### Variables

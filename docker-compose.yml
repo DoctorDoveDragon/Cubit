@@ -1,0 +1,100 @@
+# ==============================================================================
+# Docker Compose Configuration for Cubit
+# Python Backend (FastAPI) + Next.js Frontend
+# ==============================================================================
+
+services:
+  # ----------------------------------------------------------------------------
+  # Backend Service: Python FastAPI Server
+  # ----------------------------------------------------------------------------
+  backend:
+    image: python:3.11-slim
+    container_name: cubit-backend
+    working_dir: /app
+    command: >
+      sh -c "pip install --no-cache-dir -r requirements.txt &&
+             uvicorn api:app --host 0.0.0.0 --port 8080 --reload"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./api.py:/app/api.py
+      - ./lexer.py:/app/lexer.py
+      - ./parser.py:/app/parser.py
+      - ./interpreter.py:/app/interpreter.py
+      - ./cubit.py:/app/cubit.py
+      - ./games_executor.py:/app/games_executor.py
+      - ./module_metrics.py:/app/module_metrics.py
+      - ./pedagogical:/app/pedagogical
+      - ./requirements.txt:/app/requirements.txt
+      - ./examples:/app/examples
+    environment:
+      - PORT=8080
+      - PYTHONUNBUFFERED=1
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - cubit-network
+
+  # ----------------------------------------------------------------------------
+  # Frontend Service: Next.js Production Build
+  # ----------------------------------------------------------------------------
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      target: runner
+    container_name: cubit-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - NEXT_PUBLIC_API_URL=http://localhost:8080
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - cubit-network
+
+  # ----------------------------------------------------------------------------
+  # Frontend Development Service: Next.js with Hot Reload
+  # Only runs with: docker compose --profile dev up
+  # ----------------------------------------------------------------------------
+  frontend-dev:
+    image: node:20-alpine
+    container_name: cubit-frontend-dev
+    working_dir: /app
+    command: sh -c "npm install && npm run dev"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://backend:8080
+      - WATCHPACK_POLLING=true
+    depends_on:
+      - backend
+    profiles:
+      - dev
+    networks:
+      - cubit-network
+
+# ==============================================================================
+# Networks
+# ==============================================================================
+networks:
+  cubit-network:
+    driver: bridge
