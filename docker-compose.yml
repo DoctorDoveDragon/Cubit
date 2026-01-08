@@ -6,6 +6,9 @@
 services:
   # ----------------------------------------------------------------------------
   # Backend Service: Python FastAPI Server
+  # Note: Dependencies are installed on startup for simplicity and to ensure
+  # they're always up-to-date with requirements.txt changes. For faster startup
+  # in production, consider creating a custom Dockerfile with pre-installed deps.
   # ----------------------------------------------------------------------------
   backend:
     image: python:3.11-slim
@@ -84,7 +87,8 @@ services:
       - /app/.next
     environment:
       - NODE_ENV=development
-      - NEXT_PUBLIC_API_URL=http://backend:8080
+      - NEXT_PUBLIC_API_URL=http://localhost:8080
+      - BACKEND_URL=http://backend:8080
       - WATCHPACK_POLLING=true
     depends_on:
       - backend
