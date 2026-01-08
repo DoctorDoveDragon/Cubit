@@ -1,8 +1,8 @@
 name: Docker Build
 
 on:
-  push:
   pull_request:
+  workflow_dispatch:
 
 jobs:
   docker-build:
@@ -22,7 +22,7 @@ jobs:
       - name: Collect Docker diagnostics
         if: always()
         run: |
-          set -euxo pipefail || true
+          set -uxo pipefail || true
           mkdir -p ci-logs/docker
           docker version > ci-logs/docker/docker-version.txt 2>&1 || true
           docker info > ci-logs/docker/docker-info.txt 2>&1 || true
