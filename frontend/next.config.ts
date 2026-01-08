@@ -25,7 +25,6 @@ const nextConfig: NextConfig = {
       '@radix-ui/react-icons',
       'framer-motion'
     ],
-    optimizeCss: true,
   },
   
   // Security headers
