@@ -1,6 +1,6 @@
 # Cubit — Frontend Interactive Playground
 
-This is a modern, designer-friendly UI for the Cubit programming language with a fully functional code executor and creative command panel.
+This is a modern, designer-friendly UI for the Cubit programming language with a fully functional code executor, creative command panel, and intelligent GUI integration with backend APIs.
 
 ## Features
 
@@ -9,7 +9,13 @@ This is a modern, designer-friendly UI for the Cubit programming language with a
 - Tailwind CSS with CSS variables (design tokens)
 - Framer Motion for smooth micro-interactions
 - Component library (Header, Sidebar, Card, Button, Toast)
-- Storybook skeleton for component previews
+- Storybook for component development and documentation
+
+### Intelligent GUI Integration (New)
+- **Architecture Visualization**: Interactive ReactFlow-based system flowchart showing module relationships
+- **Execution Debugger**: Step-by-step code execution timeline with variable inspection
+- **System Health Dashboard**: Real-time API health monitoring and module status grid
+- **Backend API Integration**: Full integration with Cubit backend endpoints
 
 ### Code Execution
 - **CodeExecutor Component**: Interactive code editor with syntax highlighting
@@ -74,11 +80,21 @@ Organized into 4 categories with 20+ commands:
 
 4. Open http://localhost:3000 in your browser
 
-5. (Optional) Run Storybook for component previews:
+### Storybook
+
+Storybook provides an interactive component explorer for developing and testing components in isolation.
+
+1. Start Storybook:
    ```bash
    npm run storybook
    ```
-   Open http://localhost:6006
+
+2. Open http://localhost:6006 in your browser
+
+3. Browse and interact with component stories:
+   - **Architecture Components**: ModuleNode, SystemFlowchart
+   - **Execution Components**: ExecutionTimeline, VariableInspector, CallStackView
+   - More components coming in future releases
 
 ### Backend API Setup
 
