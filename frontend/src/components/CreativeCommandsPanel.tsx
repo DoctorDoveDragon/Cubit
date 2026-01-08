@@ -67,29 +67,25 @@ export default function CreativeCommandsPanel() {
       }
     },
     {
-      name: 'Refactor Code',
-      description: 'Analyzes and suggests improvements',
+      name: 'Code Analysis',
+      description: 'Real-time code complexity and metrics',
       action: () => {
-        showToast('Analyzing code for refactoring suggestions...')
-        setTimeout(() => {
-          showModalDialog(
-            'Refactoring Suggestions',
-            '✓ Extract repeated code into functions\n✓ Use more descriptive variable names\n✓ Add error handling\n✓ Optimize loop performance\n\n[Simulated suggestions]'
-          )
-        }, 1000)
+        showModalDialog(
+          'Code Analysis',
+          '✓ Real code complexity calculation\n✓ Variable tracking and counting\n✓ Control structure detection\n✓ Actionable suggestions\n\n📊 Click "Show Analysis" in the Code Executor to view detailed metrics!\n\nThis is a REAL feature - try it now in the main code editor.'
+        )
+        showToast('Code Analysis available in Code Executor!')
       }
     },
     {
-      name: 'Write Tests',
-      description: 'Generates unit test examples',
+      name: 'Visual Flowchart Editor',
+      description: 'Create code visually with flowcharts',
       action: () => {
-        showToast('Generating test examples...')
-        setTimeout(() => {
-          showModalDialog(
-            'Generated Tests',
-            'Example test cases:\n\ntest "fibonacci(5) returns 5"\ntest "fibonacci(0) returns 0"\ntest "sum(10, 20) returns 30"\n\n[Simulated test generation]'
-          )
-        }, 800)
+        showModalDialog(
+          'Visual Flowchart Editor',
+          '🎯 Powerful Simplicity!\n\n✓ Create flowcharts visually\n✓ Automatic code generation\n✓ Node-to-code mapping:\n  • Circle → Loops\n  • Square → Conditionals\n  • Triangle → Functions\n  • Diamond → Assignments\n  • Parallelogram → I/O\n\n📊 Click "Show Visual Editor" button at the top to start!\n\nThis is a REAL feature - fully functional visual programming.'
+        )
+        showToast('Visual Editor available - click button at top!')
       }
     },
     {
