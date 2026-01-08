@@ -4,10 +4,56 @@ const nextConfig: NextConfig = {
   // Enable standalone output for optimized Railway deployment
   output: 'standalone',
   
-  // Proxy API requests to the backend FastAPI server
+  // Performance optimizations
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production' ? {
+      exclude: ['error', 'warn']
+    } : false,
+  },
+  
+  // Image optimizations
+  images: {
+    formats: ['image/avif', 'image/webp'],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+  },
+  
+  // Experimental features for better performance
+  experimental: {
+    optimizePackageImports: [
+      'lucide-react',
+      '@radix-ui/react-icons',
+      'framer-motion'
+    ],
+    optimizeCss: true,
+  },
+  
+  // Security headers
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'X-DNS-Prefetch-Control',
+            value: 'on'
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'SAMEORIGIN'
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff'
+          }
+        ],
+      },
+    ];
+  },
+  
+  // CRITICAL: Proxy API requests to the backend FastAPI server
+  // DO NOT REMOVE - Required for backend communication
   async rewrites() {
-    // In production, the backend runs on localhost:8080
-    // In development, users might have it on a different port
     const backendUrl = process.env.BACKEND_URL || 'http://localhost:8080';
     
     return [
