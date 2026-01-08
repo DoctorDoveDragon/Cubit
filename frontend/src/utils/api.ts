@@ -18,6 +18,7 @@ export type {
   DebugExecuteResponse
 } from '../types/api'
 
+// Import types for internal use in this module
 import type {
   ExecuteRequest,
   ExecuteResponse,
@@ -153,7 +154,7 @@ export async function checkApiHealth(): Promise<boolean> {
       throw new Error(`API health check timeout after 5 seconds for ${apiUrl}/health`)
     }
     if (isNetworkError(error)) {
-      throw new Error(`Network error connecting to API at ${apiUrl}/health: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      throw new Error(`Network error connecting to API at ${apiUrl}/health: ${error instanceof Error ? error.message : 'Unknown network error'}`)
     }
     throw error
   }
