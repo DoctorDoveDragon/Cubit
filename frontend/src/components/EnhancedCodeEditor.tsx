@@ -67,48 +67,6 @@ export default function EnhancedCodeEditor({
     }
   }
 
-  // Apply basic syntax highlighting (simplified for Cubit)
-  const highlightSyntax = (code: string): string => {
-    if (language !== 'cubit') return code
-
-    // Cubit keywords
-    const keywords = ['let', 'if', 'else', 'while', 'print', 'return', 'function', 'true', 'false']
-    const builtins = ['sqrt', 'pow', 'abs', 'min', 'max', 'floor', 'ceil', 'round', 'sin', 'cos', 'tan',
-                      'len', 'upper', 'lower', 'split', 'join', 'append', 'pop', 'random', 'randint']
-
-    let highlighted = code
-      // Escape HTML
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-
-    // Highlight comments
-    highlighted = highlighted.replace(/(#.*$)/gm, '<span class="text-gray-400 italic">$1</span>')
-
-    // Highlight strings
-    highlighted = highlighted.replace(/(".*?"|'.*?')/g, '<span class="text-green-400">$1</span>')
-
-    // Highlight numbers
-    highlighted = highlighted.replace(/\b(\d+\.?\d*)\b/g, '<span class="text-orange-400">$1</span>')
-
-    // Highlight keywords
-    keywords.forEach(keyword => {
-      const regex = new RegExp(`\\b(${keyword})\\b`, 'g')
-      highlighted = highlighted.replace(regex, '<span class="text-purple-400 font-semibold">$1</span>')
-    })
-
-    // Highlight built-in functions
-    builtins.forEach(builtin => {
-      const regex = new RegExp(`\\b(${builtin})\\b`, 'g')
-      highlighted = highlighted.replace(regex, '<span class="text-blue-400">$1</span>')
-    })
-
-    // Highlight operators
-    highlighted = highlighted.replace(/([+\-*/%=<>!&|]+)/g, '<span class="text-yellow-400">$1</span>')
-
-    return highlighted
-  }
-
   return (
     <div className={`relative ${className}`}>
       <div className="flex items-center justify-between mb-2 text-xs text-[var(--color-muted)]">
