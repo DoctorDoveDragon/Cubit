@@ -5,13 +5,30 @@
 // Derive API base from environment, making tests portable across local/CI
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'
 
-// MSW handlers for API mocking
-// Note: MSW should be installed as a dev dependency (npm install -D msw@latest)
-// Handlers are defined here but MSW setup would typically happen in a jest/vitest config
-
 /**
- * Mock API handlers for testing
- * Usage: Configure these with MSW's setupServer() in your test framework config
+ * Mock API handler configurations for testing
+ * 
+ * These are configuration objects that should be converted to actual MSW handlers
+ * using MSW's http.get() and http.post() functions.
+ * 
+ * Example usage with MSW:
+ * ```typescript
+ * import { http, HttpResponse } from 'msw'
+ * import { setupServer } from 'msw/node'
+ * import { handlers } from './test/setup'
+ * 
+ * // Convert handler configs to MSW handlers
+ * const mswHandlers = handlers.map(h => {
+ *   const handler = h.method === 'GET' ? http.get : http.post
+ *   return handler(h.url, () => HttpResponse.json(h.response))
+ * })
+ * 
+ * const server = setupServer(...mswHandlers)
+ * 
+ * beforeAll(() => server.listen())
+ * afterEach(() => server.resetHandlers())
+ * afterAll(() => server.close())
+ * ```
  */
 export const handlers = [
   // Health check endpoint
@@ -155,27 +172,8 @@ export class ResizeObserverMock {
 }
 
 /**
- * Setup function to be called in test configuration
- * Example usage with Vitest:
- * 
- * ```ts
- * import { beforeAll, afterEach, afterAll } from 'vitest'
- * import { setupServer } from 'msw/node'
- * import { http, HttpResponse } from 'msw'
- * import { handlers } from './test/setup'
- * 
- * // Convert handler configs to MSW handlers
- * const mswHandlers = handlers.map(h => {
- *   const handler = h.method === 'GET' ? http.get : http.post
- *   return handler(h.url, () => HttpResponse.json(h.response))
- * })
- * 
- * const server = setupServer(...mswHandlers)
- * 
- * beforeAll(() => server.listen())
- * afterEach(() => server.resetHandlers())
- * afterAll(() => server.close())
- * ```
+ * Setup function to initialize test environment
+ * Sets up ResizeObserver mock for components that use it
  */
 export function setupTests() {
   // Setup ResizeObserver mock

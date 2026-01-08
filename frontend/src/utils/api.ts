@@ -2,7 +2,9 @@
  * API client for the Cubit backend with pedagogical features
  */
 
-// Re-export types from types/api for convenience
+import { safeErrorMessage } from './safeError'
+
+// Re-export all types from types/api for convenience
 export type {
   ExecuteRequest,
   GameExecuteRequest,
@@ -79,8 +81,6 @@ const isNetworkError = (error: unknown): boolean => {
  * @param retries - Number of retries (default: 2)
  * @returns Promise with execution results
  */
-import { safeErrorMessage } from './safeError'
-
 export async function executeCode(request: ExecuteRequest, retries: number = 2): Promise<ExecuteResponse> {
   const apiUrl = getApiBaseUrl()
   let lastError: unknown = null
