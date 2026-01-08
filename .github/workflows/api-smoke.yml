@@ -46,7 +46,7 @@ jobs:
       - name: Collect API diagnostics
         if: always()
         run: |
-          set -euxo pipefail || true
+          set -uxo pipefail || true
           mkdir -p ci-logs/api
           echo "Collecting process list" > ci-logs/api/process-list.txt
           ps auxww >> ci-logs/api/process-list.txt || true
