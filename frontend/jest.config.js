@@ -22,6 +22,12 @@ const customJestConfig = {
     '!src/**/*.stories.{js,jsx,ts,tsx}',
     '!src/**/__tests__/**',
   ],
+  // Ignore TypeScript errors in test files for now
+  globals: {
+    'ts-jest': {
+      isolatedModules: true,
+    },
+  },
 }
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async

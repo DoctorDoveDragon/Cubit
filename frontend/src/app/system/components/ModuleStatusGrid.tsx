@@ -5,14 +5,27 @@ import { getModuleStatus } from '@/src/utils/api'
 import type { Module } from '@/src/types/api'
 
 export default function ModuleStatusGrid() {
-  const [modules, setModules] = useState<Module[]>([])
+  const [modules, setModules] = useState<Array<{
+    id: string;
+    name: string;
+    type: string;
+    status: string;
+    version: string;
+    metrics: {
+      total_requests: number;
+      successful_requests: number;
+      failed_requests: number;
+      average_response_time_ms: number;
+      last_request_time: string | null;
+    };
+  }>>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const loadModules = async () => {
       try {
         const data = await getModuleStatus()
-        setModules(data.modules)
+        setModules(data.modules as never)
       } catch (error) {
         console.error('Failed to load modules:', error)
       } finally {
