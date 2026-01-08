@@ -67,6 +67,57 @@ export interface ConceptGraph {
   }
 }
 
+export interface ModuleMetrics {
+  total_requests: number
+  successful_requests: number
+  failed_requests: number
+  avg_response_time_ms: number
+  last_request_time?: string
+}
+
+export interface Module {
+  id: string
+  name: string
+  type: 'core' | 'pedagogical' | 'game' | 'api'
+  status: 'active' | 'error' | 'inactive'
+  version: string
+  metrics: ModuleMetrics
+}
+
+export interface ModuleStatusResponse {
+  modules: Module[]
+  system: {
+    total_modules: number
+    active_modules: number
+    error_modules: number
+    uptime_seconds: number
+  }
+}
+
+export interface ExecutionStep {
+  id: string
+  module: string
+  timestamp: string
+  duration_ms: number
+  input: string | object
+  output: object
+  status: 'completed' | 'error'
+  error?: string
+}
+
+export interface DebugExecuteResponse {
+  steps: ExecutionStep[]
+  final_result: {
+    output: string | null
+    result: unknown
+    error: string | null
+    skill_level: string
+    progress: Record<string, unknown>
+    suggestions: string[]
+  }
+  total_duration_ms: number
+}
+
 /**
  * Get API base URL from environment or default to localhost
  */
@@ -201,6 +252,13 @@ export async function getConceptGraph(): Promise<ConceptGraph> {
 }
 
 /**
+ * Alias for getConceptGraph for consistency
+ */
+export async function getConcepts(): Promise<ConceptGraph> {
+  return getConceptGraph()
+}
+
+/**
  * Get learning progress information
  */
 export async function getProgress(): Promise<{ message: string; info: string }> {
@@ -271,6 +329,76 @@ export async function executeGameCode(request: GameExecuteRequest): Promise<Exec
       error: isNetworkError(error)
         ? `Unable to connect to the backend API at ${apiUrl}. Please ensure the backend is running.`
         : errorMessage
+    }
+  }
+}
+
+/**
+ * Get module status information
+ */
+export async function getModuleStatus(): Promise<ModuleStatusResponse> {
+  const apiUrl = getApiBaseUrl()
+  
+  try {
+    const response = await fetch(`${apiUrl}/api/modules/status`)
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    
+    return response.json()
+  } catch (error: unknown) {
+    const errorMessage = safeErrorMessage(error)
+    // Return fallback data structure
+    return {
+      modules: [],
+      system: {
+        total_modules: 0,
+        active_modules: 0,
+        error_modules: 0,
+        uptime_seconds: 0
+      }
+    }
+  }
+}
+
+/**
+ * Execute code with step-by-step debugging information
+ * @param request - The execution request
+ * @returns Promise with debug execution results including steps
+ */
+export async function executeDebug(request: ExecuteRequest): Promise<DebugExecuteResponse> {
+  const apiUrl = getApiBaseUrl()
+  
+  try {
+    const response = await fetch(`${apiUrl}/api/execute/debug`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(request)
+    })
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`)
+    }
+    
+    return response.json()
+  } catch (error: unknown) {
+    const errorMessage = safeErrorMessage(error)
+    return {
+      steps: [],
+      final_result: {
+        output: null,
+        result: null,
+        error: isNetworkError(error)
+          ? `Unable to connect to the backend API at ${apiUrl}. Please ensure the backend is running.`
+          : errorMessage,
+        skill_level: 'beginner',
+        progress: {},
+        suggestions: []
+      },
+      total_duration_ms: 0
     }
   }
 }
