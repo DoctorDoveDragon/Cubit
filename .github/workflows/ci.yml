@@ -140,12 +140,6 @@ jobs:
         env:
           PUPPETEER_SKIP_DOWNLOAD: 'true'
 
-      - name: Check code formatting (if prettier exists)
+      - name: Check code formatting
         working-directory: frontend
-        run: |
-          if [ -f "../prettier.config.js" ]; then
-            npx prettier --check "src/**/*.{ts,tsx,js,jsx,json,css,md}"
-          else
-            echo "Prettier config not found, skipping format check"
-          fi
-        continue-on-error: true
+        run: npx prettier --check "src/**/*.{ts,tsx,js,jsx,json,css,md}"
