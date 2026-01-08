@@ -2,75 +2,35 @@
  * API client for the Cubit backend with pedagogical features
  */
 
-export interface ExecuteRequest {
-  code: string
-  teaching_enabled?: boolean
-  verbosity?: 'minimal' | 'normal' | 'detailed'
-}
+// Re-export types from types/api for convenience
+export type {
+  ExecuteRequest,
+  GameExecuteRequest,
+  Progress,
+  Shape,
+  ExecuteResponse,
+  Game,
+  GamesResponse,
+  ConceptGraph,
+  ModuleStatus,
+  DebugExecuteResponse
+} from '../types/api'
 
-export interface GameExecuteRequest {
-  game: string
-  code: string
-  options?: Record<string, unknown>
-  teaching_enabled?: boolean
-  verbosity?: 'minimal' | 'normal' | 'detailed'
-}
-
-export interface Progress {
-  total_calls: number
-  method_diversity: string[]
-  mastered_concepts?: string[]
-}
-
-export interface Shape {
-  type: 'circle' | 'square' | 'triangle'
-  x: number
-  y: number
-  size: number
-  color: string
-}
-
-export interface ExecuteResponse {
-  output: string | null
-  result: unknown
-  error: string | null
-  skill_level?: string
-  progress?: Progress
-  suggestions?: string[]
-  shapes?: Shape[]
-}
-
-export interface Game {
-  title: string
-  description: string
-  instructions: string
-  starter: string
-  solution: string
-}
-
-export interface GamesResponse {
-  games: Game[]
-  error?: string
-}
-
-export interface ConceptGraph {
-  concepts: {
-    beginner: string[]
-    intermediate: string[]
-    advanced: string[]
-  }
-  graph: {
-    [key: string]: {
-      prerequisites: string[]
-      difficulty: string
-    }
-  }
-}
+import type {
+  ExecuteRequest,
+  ExecuteResponse,
+  GameExecuteRequest,
+  GamesResponse,
+  ConceptGraph,
+  ModuleStatus,
+  DebugExecuteResponse
+} from '../types/api'
 
 /**
  * Get API base URL from environment or default to localhost
+ * Exported for use in tests and components
  */
-const getApiBaseUrl = (): string => {
+export function getApiBaseUrl(): string {
   if (typeof window !== 'undefined') {
     // Client-side - in production, use relative URLs since Next.js proxies to backend
     // In development, check for environment variable
@@ -167,6 +127,8 @@ export async function executeCode(request: ExecuteRequest, retries: number = 2):
 
 /**
  * Check if the API server is healthy
+ * Throws on failure with helpful error message
+ * Returns true on success
  */
 export async function checkApiHealth(): Promise<boolean> {
   const apiUrl = getApiBaseUrl()
@@ -180,9 +142,20 @@ export async function checkApiHealth(): Promise<boolean> {
     })
 
     clearTimeout(timeoutId)
-    return response.ok
-  } catch {
-    return false
+    
+    if (!response.ok) {
+      throw new Error(`API health check failed with status ${response.status}`)
+    }
+    
+    return true
+  } catch (error: unknown) {
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error(`API health check timeout after 5 seconds for ${apiUrl}/health`)
+    }
+    if (isNetworkError(error)) {
+      throw new Error(`Network error connecting to API at ${apiUrl}/health: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    }
+    throw error
   }
 }
 
@@ -212,6 +185,62 @@ export async function getProgress(): Promise<{ message: string; info: string }> 
   }
 
   return response.json()
+}
+
+/**
+ * Get module status information from the API
+ * Throws on network or non-OK HTTP responses with helpful error messages
+ * Returns array of module status on success
+ */
+export async function getModuleStatus(): Promise<ModuleStatus[]> {
+  const apiUrl = getApiBaseUrl()
+
+  try {
+    const response = await fetch(`${apiUrl}/modules/status`)
+
+    if (!response.ok) {
+      throw new Error(`Failed to get module status: HTTP ${response.status}`)
+    }
+
+    const data = await response.json()
+    return data.modules || []
+  } catch (error: unknown) {
+    if (isNetworkError(error)) {
+      throw new Error(`Network error fetching module status from ${apiUrl}/modules/status: ${error instanceof Error ? error.message : 'Unknown network error'}`)
+    }
+    throw error
+  }
+}
+
+/**
+ * Execute debug command via the API
+ * Throws on network or non-OK HTTP responses with helpful error messages
+ * Returns typed DebugExecuteResponse on success
+ */
+export async function executeDebug(code: string): Promise<DebugExecuteResponse> {
+  const apiUrl = getApiBaseUrl()
+
+  try {
+    const response = await fetch(`${apiUrl}/debug/execute`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ code })
+    })
+
+    if (!response.ok) {
+      throw new Error(`Debug execution failed: HTTP ${response.status}`)
+    }
+
+    const data: DebugExecuteResponse = await response.json()
+    return data
+  } catch (error: unknown) {
+    if (isNetworkError(error)) {
+      throw new Error(`Network error executing debug command at ${apiUrl}/debug/execute: ${error instanceof Error ? error.message : 'Unknown network error'}`)
+    }
+    throw error
+  }
 }
 
 /**

@@ -37,12 +37,7 @@ export default function ApiHealthIndicator() {
     try {
       const healthy = await checkApiHealth()
       setIsHealthy(healthy)
-
-      if (healthy) {
-        handleHealthCheckSuccess()
-      } else {
-        handleHealthCheckFailure()
-      }
+      handleHealthCheckSuccess()
     } catch {
       setIsHealthy(false)
       handleHealthCheckFailure()
