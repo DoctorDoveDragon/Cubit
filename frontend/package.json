@@ -11,7 +11,12 @@
     "start:prod": "NODE_ENV=production next start",
     "lint": "next lint",
     "lint:fix": "eslint . --fix",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css,md}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json,css,md}\"",
+    "test": "echo \"No tests configured yet\" && exit 0",
+    "docker:build": "docker build -t cubit-frontend:latest -f Dockerfile .",
+    "docker:dev": "docker-compose --profile dev up frontend-dev backend-dev"
   },
   "dependencies": {
     "classnames": "^2.3.2",
@@ -37,6 +42,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.1",
     "playwright": "^1.40.0",
+    "prettier": "^3.2.4",
     "tailwindcss": "^4",
     "typescript": "^5",
     "@tailwindcss/typography": "^0.5.16",

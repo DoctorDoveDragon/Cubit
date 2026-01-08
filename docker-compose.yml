@@ -1,0 +1,87 @@
+version: '3.8'
+
+services:
+  # Full-stack service (frontend + backend)
+  cubit:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"  # Frontend port
+      - "8080:8080"  # Backend port (if running separately)
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - BACKEND_URL=http://localhost:8080
+      # Add your custom environment variables here
+      # - OPENAI_API_KEY=${OPENAI_API_KEY}
+    volumes:
+      # Mount source code for development hot-reload
+      # Comment out for production usage
+      - ./frontend/src:/app/frontend/src:ro
+      - ./api.py:/app/api.py:ro
+      - ./interpreter.py:/app/interpreter.py:ro
+      - ./lexer.py:/app/lexer.py:ro
+      - ./parser.py:/app/parser.py:ro
+      - ./cubit.py:/app/cubit.py:ro
+      - ./games_executor.py:/app/games_executor.py:ro
+      - ./pedagogical:/app/pedagogical:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Development mode - frontend only with hot reload
+  frontend-dev:
+    image: node:20-alpine
+    working_dir: /app/frontend
+    command: npm run dev
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://localhost:8080
+      - PUPPETEER_SKIP_DOWNLOAD=true
+    volumes:
+      - ./frontend:/app/frontend
+      - /app/frontend/node_modules  # Preserve node_modules
+      - /app/frontend/.next  # Preserve build cache
+    profiles:
+      - dev
+    restart: unless-stopped
+
+  # Development mode - backend only
+  backend-dev:
+    image: python:3.11-slim
+    working_dir: /app
+    command: bash -c "pip install -r requirements.txt && uvicorn api:app --host 0.0.0.0 --port 8080 --reload"
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - .:/app
+      - /app/__pycache__  # Exclude cache
+    profiles:
+      - dev
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+# Volumes for persistent data (if needed in the future)
+volumes:
+  node_modules:
+  python_cache:
+
+# Networks (default bridge network is sufficient for now)
+networks:
+  default:
+    name: cubit-network

@@ -1,5 +1,11 @@
 # Cubit Programming Language
 
+[![CI](https://github.com/DoctorDoveDragon/Cubit/actions/workflows/ci.yml/badge.svg)](https://github.com/DoctorDoveDragon/Cubit/actions/workflows/ci.yml)
+[![Deploy](https://github.com/DoctorDoveDragon/Cubit/actions/workflows/deploy.yml/badge.svg)](https://github.com/DoctorDoveDragon/Cubit/actions/workflows/deploy.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node.js Version](https://img.shields.io/badge/node-20.x-brightgreen.svg)](https://nodejs.org)
+[![Python Version](https://img.shields.io/badge/python-3.11+-blue.svg)](https://python.org)
+
 Cubit is a simple, educational programming language with a clean syntax designed for learning programming concepts.
 
 ## Features
@@ -35,18 +41,59 @@ Railway is the recommended platform for deploying the full-stack application (fr
 
 ### Docker Deployment (Alternative)
 
-You can also deploy using Docker:
+You can deploy and run Cubit using Docker and Docker Compose:
 
+#### Using Docker Compose (Recommended)
+
+**Production mode (both frontend and backend):**
 ```bash
-# Build the Docker image
-docker build -t cubit:latest .
+# Build and start the application
+docker-compose up -d
 
-# Run the container
-docker run -p 3000:3000 cubit:latest
+# View logs
+docker-compose logs -f
+
+# Stop the application
+docker-compose down
 ```
 
+**Development mode (with hot reload):**
+```bash
+# Start frontend and backend in development mode
+docker-compose --profile dev up
+
+# Or use the npm script from the frontend directory
+cd frontend
+npm run docker:dev
+```
+
+The application will be available at:
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:8080
+
+#### Using Docker Directly
+
+**Build the Docker image:**
+```bash
+docker build -t cubit:latest .
+```
+
+**Run the container:**
+```bash
+# Run with default settings
+docker run -p 3000:3000 cubit:latest
+
+# Run with custom environment variables
+docker run -p 3000:3000 \
+  -e PORT=3000 \
+  -e BACKEND_URL=http://localhost:8080 \
+  cubit:latest
+```
+
+#### Docker Features
+
 The Dockerfile uses a multi-stage build to:
-1. Build the Next.js frontend
+1. Build the Next.js frontend with optimizations
 2. Set up Python environment for the backend
 3. Run both servers in a single container
 
@@ -107,6 +154,94 @@ python3 cubit.py
 # Run a file
 python3 cubit.py examples/basic.cubit
 ```
+
+## Development Workflow
+
+### Code Quality Tools
+
+The project includes several tools to maintain code quality:
+
+**Type Checking:**
+```bash
+cd frontend
+npm run type-check
+```
+
+**Linting:**
+```bash
+cd frontend
+npm run lint          # Check for issues
+npm run lint:fix      # Auto-fix issues
+```
+
+**Code Formatting:**
+```bash
+cd frontend
+npm run format        # Format code with Prettier
+npm run format:check  # Check formatting without changes
+```
+
+**Build Verification:**
+```bash
+cd frontend
+npm run build         # Production build
+npm run build:analyze # Analyze bundle size
+```
+
+### Running Tests
+
+**Backend tests:**
+```bash
+pytest -q
+```
+
+**Frontend tests:**
+```bash
+cd frontend
+npm test
+```
+
+### Contributing
+
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for:
+- Development setup instructions
+- Coding standards and best practices
+- Pull request process
+- Issue reporting guidelines
+
+### CI/CD Pipeline
+
+The project uses GitHub Actions for continuous integration and deployment:
+
+- **CI Workflow** (`.github/workflows/ci.yml`):
+  - Runs on every push and pull request
+  - Tests backend API with Python 3.11
+  - Tests frontend with Node.js 18.x and 20.x
+  - Performs type checking and linting
+  - Verifies Docker builds
+  - Checks code formatting
+
+- **Deploy Workflow** (`.github/workflows/deploy.yml`):
+  - Triggers on pushes to `main` branch
+  - Builds and pushes Docker images to GitHub Container Registry
+  - Supports environment-based deployments (staging/production)
+
+### Node.js Version Management
+
+This project uses Node.js 20.x. We recommend using `nvm` for version management:
+
+```bash
+# Install nvm (if not already installed)
+# See: https://github.com/nvm-sh/nvm
+
+# Use the project's Node.js version
+nvm use
+
+# Or install it if you don't have it
+nvm install
+```
+
+The `.nvmrc` file ensures everyone uses the same Node.js version.
 
 ## Installation
 
