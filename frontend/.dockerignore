@@ -51,7 +51,3 @@ next-env.d.ts
 # Railway/Nixpacks configs (not needed in Docker)
 nixpacks.toml
 railway.json
-
-# Dockerfile itself
-Dockerfile
-.dockerignore
