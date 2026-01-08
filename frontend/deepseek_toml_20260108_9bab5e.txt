@@ -1,0 +1,28 @@
+[phases.setup]
+nixPkgs = [
+  "nodejs-20_x", 
+  "npm",
+  "git"  # Needed for some dependencies
+]
+cacheDirectories = [
+  "/root/.npm",
+  "/app/node_modules"
+]
+
+[phases.install]
+cmds = [
+  "npm ci --only=production --prefer-offline --no-audit",
+  "npm cache clean --force"
+]
+cacheDirectories = ["/app/node_modules"]
+
+[phases.build]
+cmds = [
+  "npm run build",
+  "npm prune --production"  # Remove dev dependencies
+]
+cacheDirectories = ["/.next/cache"]
+
+[start]
+cmd = "npm run start:prod -- -p ${PORT:-3000}"
+replicas = 1
