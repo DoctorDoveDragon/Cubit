@@ -46,18 +46,18 @@ jobs:
       - name: Collect API diagnostics
         if: always()
         run: |
-          set -euxo pipefail || true
+          set -uxo pipefail || true
           mkdir -p ci-logs/api
           echo "Collecting process list" > ci-logs/api/process-list.txt
-          ps auxww > ci-logs/api/process-list.txt || true
+          ps auxww >> ci-logs/api/process-list.txt || true
 
           if [ -f api.log ]; then
-            echo "Found api.log; copying" > ci-logs/api/notes.txt || true
+            echo "Found api.log; copying" >> ci-logs/api/notes.txt || true
             cp api.log ci-logs/api/api.log || true
           fi
 
           if command -v docker >/dev/null 2>&1; then
-            echo "Collecting docker information" > ci-logs/api/notes.txt || true
+            echo "Collecting docker information" >> ci-logs/api/notes.txt || true
             docker ps -a --no-trunc > ci-logs/api/docker-ps.txt || true
             for cname in $(docker ps -a --format '{{.Names}}'); do
               docker logs --tail 5000 "$cname" > "ci-logs/api/docker-${cname}.log" 2>&1 || true
