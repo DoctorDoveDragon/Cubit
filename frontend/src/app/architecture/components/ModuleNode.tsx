@@ -1,24 +1,28 @@
 'use client'
 
 import { memo } from 'react'
-import { Handle, Position, NodeProps } from '@xyflow/react'
+import { Handle, Position } from '@xyflow/react'
 import type { Module } from '@/types/api'
 
 interface ModuleNodeData {
   module: Module
 }
 
-function ModuleNode({ data }: NodeProps<ModuleNodeData>) {
+interface ModuleNodeProps {
+  data: ModuleNodeData
+}
+
+function ModuleNode({ data }: ModuleNodeProps) {
   const { module } = data
   
-  const typeColors = {
+  const typeColors: Record<Module['type'], string> = {
     core: 'bg-blue-600 border-blue-500',
     pedagogical: 'bg-purple-600 border-purple-500',
     game: 'bg-green-600 border-green-500',
     api: 'bg-orange-600 border-orange-500',
   }
   
-  const statusColors = {
+  const statusColors: Record<Module['status'], string> = {
     active: 'bg-green-500',
     error: 'bg-red-500',
     inactive: 'bg-gray-500',

@@ -29,7 +29,7 @@ export default function SystemFlowchart({ onModuleSelect }: SystemFlowchartProps
         setModules(data.modules)
         
         // Create nodes from modules
-        const moduleNodes: Node[] = data.modules.map((module, index) => {
+        const moduleNodes: Node[] = data.modules.map((module: Module, index: number) => {
           const column = Math.floor(index / 3)
           const row = index % 3
           

@@ -16,14 +16,14 @@ export default function ModuleInspector({ module }: ModuleInspectorProps) {
     )
   }
 
-  const typeColors = {
+  const typeColors: Record<Module['type'], string> = {
     core: 'text-blue-400',
     pedagogical: 'text-purple-400',
     game: 'text-green-400',
     api: 'text-orange-400',
   }
 
-  const statusColors = {
+  const statusColors: Record<Module['status'], string> = {
     active: 'text-green-400',
     error: 'text-red-400',
     inactive: 'text-gray-400',

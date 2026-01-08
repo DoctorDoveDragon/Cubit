@@ -74,11 +74,27 @@ Organized into 4 categories with 20+ commands:
 
 4. Open http://localhost:3000 in your browser
 
-5. (Optional) Run Storybook for component previews:
+5. (Optional) Run Storybook for component development and preview:
    ```bash
    npm run storybook
    ```
    Open http://localhost:6006
+
+   Storybook provides:
+   - Isolated component development
+   - Interactive component documentation
+   - Visual testing with example data
+   - Stories for ModuleNode, SystemFlowchart, ExecutionTimeline with mock data fallbacks
+
+6. (Optional) Run tests:
+   ```bash
+   npm run test
+   ```
+   
+   For watch mode during development:
+   ```bash
+   npm run test:watch
+   ```
 
 ### Backend API Setup
 
@@ -163,8 +179,11 @@ NEXT_PUBLIC_API_URL=https://your-backend-api.railway.app
 - `npm run build` - Build for production
 - `npm run start` - Start production server (uses standalone mode: `node .next/standalone/frontend/server.js`)
 - `npm run lint` - Run ESLint
+- `npm run type-check` - Run TypeScript type checking
 - `npm run storybook` - Start Storybook (http://localhost:6006)
 - `npm run build-storybook` - Build Storybook for deployment
+- `npm run test` - Run tests once
+- `npm run test:watch` - Run tests in watch mode
 
 ## Project Structure
 
@@ -172,24 +191,53 @@ NEXT_PUBLIC_API_URL=https://your-backend-api.railway.app
 frontend/
 ├── src/
 │   ├── app/
-│   │   ├── page.tsx          # Main application page
-│   │   ├── layout.tsx        # Root layout
-│   │   └── globals.css       # Global styles
-│   ├── components/
-│   │   ├── CodeExecutor.tsx          # Code execution component
-│   │   ├── CreativeCommandsPanel.tsx # Creative commands panel
-│   │   ├── CommandsPanel.tsx         # Original commands
+│   │   ├── architecture/            # System architecture visualization
+│   │   │   ├── page.tsx
+│   │   │   └── components/
+│   │   │       ├── SystemFlowchart.tsx
+│   │   │       ├── ModuleNode.tsx
+│   │   │       └── ModuleInspector.tsx
+│   │   ├── execution/               # Code execution debugger
+│   │   │   ├── page.tsx
+│   │   │   └── components/
+│   │   │       ├── ExecutionTimeline.tsx
+│   │   │       ├── VariableInspector.tsx
+│   │   │       └── CallStackView.tsx
+│   │   ├── system/                  # System monitoring
+│   │   │   ├── page.tsx
+│   │   │   └── components/
+│   │   │       ├── ApiHealthDashboard.tsx
+│   │   │       └── ModuleStatusGrid.tsx
+│   │   ├── customize/               # Customization options (placeholder)
+│   │   │   └── page.tsx
+│   │   ├── page.tsx                 # Main application page
+│   │   ├── layout.tsx               # Root layout with navigation
+│   │   └── globals.css              # Global styles
+│   ├── components/                  # Shared components
+│   │   ├── CodeExecutor.tsx         # Code execution component
+│   │   ├── CreativeCommandsPanel.tsx
+│   │   ├── CommandsPanel.tsx
 │   │   ├── Button.tsx
 │   │   ├── Card.tsx
 │   │   ├── Header.tsx
 │   │   ├── Sidebar.tsx
 │   │   └── Toast.tsx
 │   ├── constants/
-│   │   └── examples.ts       # Cubit code examples
-│   └── utils/
-│       └── api.ts            # API client functions
-├── public/                   # Static assets
+│   │   └── examples.ts              # Cubit code examples
+│   ├── types/
+│   │   └── api.d.ts                 # API type definitions
+│   ├── utils/
+│   │   ├── api.ts                   # API client functions
+│   │   ├── bundleAnalyzer.ts
+│   │   └── safeError.ts
+│   └── test/
+│       └── setup.ts                 # Test setup with MSW
+├── .storybook/                      # Storybook configuration
+│   ├── main.ts
+│   └── preview.ts
+├── public/                          # Static assets
 ├── package.json
+├── vitest.config.ts                 # Vitest configuration
 └── README.md
 ```
 

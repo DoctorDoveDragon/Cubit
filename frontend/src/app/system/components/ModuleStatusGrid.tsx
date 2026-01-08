@@ -47,14 +47,14 @@ export default function ModuleStatusGrid() {
     )
   }
 
-  const typeColors = {
+  const typeColors: Record<Module['type'], string> = {
     core: 'border-blue-500',
     pedagogical: 'border-purple-500',
     game: 'border-green-500',
     api: 'border-orange-500',
   }
 
-  const statusColors = {
+  const statusColors: Record<Module['status'], string> = {
     active: 'bg-green-500',
     error: 'bg-red-500',
     inactive: 'bg-gray-500',
@@ -84,7 +84,7 @@ export default function ModuleStatusGrid() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {data.modules.map((module) => (
+        {data.modules.map((module: Module) => (
           <div 
             key={module.id} 
             className={`bg-gray-800 rounded-lg p-4 border-l-4 ${typeColors[module.type]}`}
