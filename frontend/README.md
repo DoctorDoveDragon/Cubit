@@ -9,7 +9,42 @@ This is a modern, designer-friendly UI for the Cubit programming language with a
 - Tailwind CSS with CSS variables (design tokens)
 - Framer Motion for smooth micro-interactions
 - Component library (Header, Sidebar, Card, Button, Toast)
-- Storybook skeleton for component previews
+- Storybook for component previews and development
+
+### Intelligent GUI System
+
+The frontend now includes comprehensive pages and components for visualizing and interacting with the Cubit system:
+
+#### 🏗️ Architecture Page (`/architecture`)
+- **SystemFlowchart**: Interactive ReactFlow visualization of all system modules
+- **ModuleNode**: Custom node component showing module status, type, and metrics
+- **ModuleInspector**: Detailed metrics panel for selected modules
+- Live module status updates every 10 seconds
+- Click modules to view detailed information
+
+#### ▶️ Execution Page (`/execution`)
+- **ExecutionTimeline**: Step-by-step visualization of code execution through Lexer → Parser → Interpreter
+- **VariableInspector**: Real-time variable state viewer
+- **CallStackView**: Call stack visualization during execution
+- Debug mode with detailed timing metrics for each processing step
+
+#### 🎓 Learning Page (`/learning`)
+- **SkillMap**: Visual progress tracker showing beginner → intermediate → advanced → expert journey
+- **ConceptExplorer**: Interactive concept dependency graph with prerequisites
+- **TeachingMoments**: Timeline of personalized learning insights and tips
+- Skill trajectory visualization
+
+#### ⚙️ System Page (`/system`)
+- **ApiHealthDashboard**: Real-time API health monitoring with uptime tracking
+- **ModuleStatusGrid**: Comprehensive grid view of all modules with metrics
+- **LogViewer**: System logs with filtering by level (info, warn, error, debug)
+- Auto-refresh every 5-10 seconds
+
+#### 🎨 Customize Page (`/customize`)
+- **LayoutBuilder**: Drag-and-drop dashboard customization using react-grid-layout
+- **ThemeEditor**: Live theme customization with color pickers
+- Layout and theme preferences saved to localStorage
+- Preview mode for theme changes
 
 ### Code Execution
 - **CodeExecutor Component**: Interactive code editor with syntax highlighting
@@ -17,6 +52,7 @@ This is a modern, designer-friendly UI for the Cubit programming language with a
 - **Example Snippets**: Quick-load examples (Hello World, Fibonacci, Variables, Conditionals, Loops)
 - **Real-time Output**: Display standard output, result values, and error messages
 - **Loading States**: Visual feedback during code execution
+- **Debug Mode**: Step-by-step execution visualization
 
 ### Creative Commands Panel
 Organized into 4 categories with 20+ commands:
@@ -163,6 +199,9 @@ NEXT_PUBLIC_API_URL=https://your-backend-api.railway.app
 - `npm run build` - Build for production
 - `npm run start` - Start production server (uses standalone mode: `node .next/standalone/frontend/server.js`)
 - `npm run lint` - Run ESLint
+- `npm run type-check` - Run TypeScript type checking
+- `npm test` - Run Jest tests
+- `npm run test:watch` - Run tests in watch mode
 - `npm run storybook` - Start Storybook (http://localhost:6006)
 - `npm run build-storybook` - Build Storybook for deployment
 
@@ -170,25 +209,66 @@ NEXT_PUBLIC_API_URL=https://your-backend-api.railway.app
 
 ```
 frontend/
+├── .storybook/                # Storybook configuration
+│   ├── main.ts
+│   └── preview.tsx
 ├── src/
 │   ├── app/
-│   │   ├── page.tsx          # Main application page
-│   │   ├── layout.tsx        # Root layout
-│   │   └── globals.css       # Global styles
+│   │   ├── architecture/      # Architecture visualization page
+│   │   │   ├── components/
+│   │   │   │   ├── SystemFlowchart.tsx
+│   │   │   │   ├── ModuleNode.tsx
+│   │   │   │   └── ModuleInspector.tsx
+│   │   │   └── page.tsx
+│   │   ├── execution/         # Execution debug page
+│   │   │   ├── components/
+│   │   │   │   ├── ExecutionTimeline.tsx
+│   │   │   │   ├── VariableInspector.tsx
+│   │   │   │   └── CallStackView.tsx
+│   │   │   └── page.tsx
+│   │   ├── learning/          # Learning dashboard page
+│   │   │   ├── components/
+│   │   │   │   ├── SkillMap.tsx
+│   │   │   │   ├── ConceptExplorer.tsx
+│   │   │   │   └── TeachingMoments.tsx
+│   │   │   └── page.tsx
+│   │   ├── system/            # System monitoring page
+│   │   │   ├── components/
+│   │   │   │   ├── ApiHealthDashboard.tsx
+│   │   │   │   ├── ModuleStatusGrid.tsx
+│   │   │   │   └── LogViewer.tsx
+│   │   │   └── page.tsx
+│   │   ├── customize/         # Customization page
+│   │   │   ├── components/
+│   │   │   │   ├── LayoutBuilder.tsx
+│   │   │   │   └── ThemeEditor.tsx
+│   │   │   └── page.tsx
+│   │   ├── page.tsx           # Main application page
+│   │   ├── layout.tsx         # Root layout with navigation
+│   │   └── globals.css        # Global styles
 │   ├── components/
-│   │   ├── CodeExecutor.tsx          # Code execution component
-│   │   ├── CreativeCommandsPanel.tsx # Creative commands panel
-│   │   ├── CommandsPanel.tsx         # Original commands
+│   │   ├── Navigation.tsx             # Top navigation bar
+│   │   ├── CodeExecutor.tsx           # Code execution component
+│   │   ├── CreativeCommandsPanel.tsx  # Creative commands panel
+│   │   ├── CommandsPanel.tsx          # Original commands
 │   │   ├── Button.tsx
 │   │   ├── Card.tsx
 │   │   ├── Header.tsx
 │   │   ├── Sidebar.tsx
 │   │   └── Toast.tsx
+│   ├── types/
+│   │   └── api.d.ts           # TypeScript type definitions for API
 │   ├── constants/
-│   │   └── examples.ts       # Cubit code examples
-│   └── utils/
-│       └── api.ts            # API client functions
-├── public/                   # Static assets
+│   │   └── examples.ts        # Cubit code examples
+│   ├── utils/
+│   │   └── api.ts             # API client functions
+│   └── stories/               # Storybook stories
+│       ├── ModuleNode.stories.tsx
+│       ├── SystemFlowchart.stories.tsx
+│       └── ExecutionTimeline.stories.tsx
+├── public/                    # Static assets
+├── jest.config.js             # Jest configuration
+├── jest.setup.js              # Jest setup file
 ├── package.json
 └── README.md
 ```

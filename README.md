@@ -19,6 +19,18 @@ Cubit is a simple, educational programming language with a clean syntax designed
 - **Games & Visualizations**: Interactive visual programming with draw commands
 - **Pedagogical API**: Teaching-enabled code execution with skill tracking
 
+### Intelligent GUI System (New!)
+
+The frontend now includes comprehensive visualization and monitoring pages:
+
+- **Architecture Page** (`/architecture`): Interactive ReactFlow visualization of system modules with real-time metrics
+- **Execution Page** (`/execution`): Step-by-step debug visualization through Lexer → Parser → Interpreter
+- **Learning Page** (`/learning`): Skill progression tracking, concept explorer, and personalized teaching moments
+- **System Page** (`/system`): API health monitoring, module status grid, and system logs
+- **Customize Page** (`/customize`): Drag-and-drop layout builder and theme customization
+
+All pages consume real backend APIs with proper TypeScript types and error handling. See [frontend/README.md](frontend/README.md) for details.
+
 ## Quick Start
 
 ### Railway Deployment (Production)
