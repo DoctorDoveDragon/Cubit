@@ -12,12 +12,8 @@
     "lint": "next lint",
     "lint:fix": "eslint . --fix",
     "type-check": "tsc --noEmit",
-    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css,md}\"",
-    "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json,css,md}\"",
-    "test": "echo \"No tests configured yet\" && exit 0",
-    "test:e2e": "playwright test",
-    "docker:build": "docker build -t cubit-frontend:latest -f Dockerfile .",
-    "docker:dev": "docker-compose --profile dev up frontend-dev backend-dev"
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "classnames": "^2.3.2",
@@ -34,7 +30,7 @@
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^16.1.1",
-    "@playwright/test": "^1.40.1",
+    "@storybook/nextjs-vite": "^10.1.11",
     "@tailwindcss/postcss": "^4",
     "@types/classnames": "^2.2.11",
     "@types/node": "^20",
@@ -42,7 +38,8 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.1.1",
-    "prettier": "^3.2.4",
+    "playwright": "^1.40.0",
+    "storybook": "^10.1.11",
     "tailwindcss": "^4",
     "typescript": "^5",
     "@tailwindcss/typography": "^0.5.16",

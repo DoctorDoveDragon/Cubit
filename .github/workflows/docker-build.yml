@@ -1,0 +1,43 @@
+name: Docker Build
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  docker-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Docker image (capture build log)
+        id: build-image
+        run: |
+          set -euxo pipefail
+          mkdir -p ci-logs/docker
+          export DOCKER_BUILDKIT=1
+          docker build --progress=plain -t my-image:ci . 2>&1 | tee ci-logs/docker/build.log
+
+      - name: Collect Docker diagnostics
+        if: always()
+        run: |
+          set -uxo pipefail || true
+          mkdir -p ci-logs/docker
+          docker version > ci-logs/docker/docker-version.txt 2>&1 || true
+          docker info > ci-logs/docker/docker-info.txt 2>&1 || true
+          docker ps -a --no-trunc > ci-logs/docker/docker-ps.txt 2>&1 || true
+          docker images --no-trunc > ci-logs/docker/docker-images.txt 2>&1 || true
+          for cname in $(docker ps -a --format '{{.Names}}'); do
+            docker logs --tail 5000 "$cname" > "ci-logs/docker/docker-${cname}.log" 2>&1 || true
+          done
+          if docker image inspect my-image:ci >/dev/null 2>&1; then
+            docker image inspect my-image:ci > ci-logs/docker/image-inspect-my-image-ci.json 2>&1 || true
+          fi
+
+      - name: Upload Docker build logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-build-logs-${{ github.run_id }}-${{ github.job }}
+          path: ci-logs/docker
