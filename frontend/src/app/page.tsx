@@ -13,6 +13,7 @@ import CommandsPanel from '../components/CommandsPanel'
 import CodeExecutor from '../components/CodeExecutor'
 import CreativeCommandsPanel from '../components/CreativeCommandsPanel'
 import ProgressDashboard from '../components/ProgressDashboard'
+import VisualFlowchartEditor from '../components/VisualFlowchartEditor'
 import ErrorBoundary from '../components/ErrorBoundary'
 import { motion } from 'framer-motion'
 const ChallengeTabs = dynamic(() => import('../course/ChallengeTabs'), { ssr: false })
@@ -25,6 +26,7 @@ export default function MainPage() {
   const [showCreativePanel, setShowCreativePanel] = useState<boolean>(false);
   const [showProgressDashboard, setShowProgressDashboard] = useState<boolean>(false);
   const [showSettings, setShowSettings] = useState<boolean>(false);
+  const [showVisualEditor, setShowVisualEditor] = useState<boolean>(false);
 
   return (
     <div className="flex h-screen">
@@ -34,6 +36,13 @@ export default function MainPage() {
         <div className="flex justify-end mb-2 gap-2">
           <Button variant="secondary" onClick={() => setShowSettings(!showSettings)} className="text-xs">
             {showSettings ? 'Hide' : 'Show'} Settings
+          </Button>
+          <Button 
+            variant="primary" 
+            onClick={() => setShowVisualEditor(!showVisualEditor)} 
+            className="text-xs bg-gradient-to-r from-purple-600 to-blue-600"
+          >
+            {showVisualEditor ? 'Hide' : 'Show'} Visual Editor
           </Button>
           <Button variant="primary" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="text-xs">
             Cubit Full Course
@@ -51,6 +60,21 @@ export default function MainPage() {
               <h3 className="text-lg font-semibold mb-4">Settings</h3>
               <SettingsPanel />
             </Card>
+          </motion.div>
+        )}
+
+        {/* Visual Flowchart Editor (Collapsible) */}
+        {showVisualEditor && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.4 }}
+            className="mb-6"
+          >
+            <ErrorBoundary>
+              <VisualFlowchartEditor />
+            </ErrorBoundary>
           </motion.div>
         )}
 

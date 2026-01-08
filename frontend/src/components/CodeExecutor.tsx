@@ -3,6 +3,8 @@
 import React, { useState } from 'react'
 import Button from './Button'
 import NaturalLanguageInput from './NaturalLanguageInput'
+import EnhancedCodeEditor from './EnhancedCodeEditor'
+import CodeAnalysis from './CodeAnalysis'
 import { executeCode, ExecuteResponse } from '../utils/api'
 import { CUBIT_EXAMPLES, getExamplesList } from '../constants/examples'
 import { safeErrorMessage } from '../utils/safeError'
@@ -14,6 +16,7 @@ export default function CodeExecutor() {
   const [selectedExample, setSelectedExample] = useState<string>('hello')
   const [teachingEnabled, setTeachingEnabled] = useState<boolean>(false)
   const [verbosity, setVerbosity] = useState<'minimal' | 'normal' | 'detailed'>('normal')
+  const [showAnalysis, setShowAnalysis] = useState<boolean>(false)
 
   const handleRunCode = async () => {
     setLoading(true)
@@ -112,18 +115,31 @@ export default function CodeExecutor() {
 
       {/* Code Editor */}
       <div>
-        <label htmlFor="code-editor" className="block text-sm font-medium mb-2">
-          Cubit Code:
-        </label>
-        <textarea
-          id="code-editor"
+        <div className="flex items-center justify-between mb-2">
+          <label htmlFor="code-editor" className="text-sm font-medium">
+            Cubit Code:
+          </label>
+          <Button
+            variant="secondary"
+            onClick={() => setShowAnalysis(!showAnalysis)}
+            className="text-xs"
+          >
+            {showAnalysis ? 'Hide' : 'Show'} Analysis
+          </Button>
+        </div>
+        <EnhancedCodeEditor
           value={code}
-          onChange={(e) => setCode(e.target.value)}
-          className="w-full h-64 px-4 py-3 rounded-lg bg-[var(--color-surface)] border border-[rgba(255,255,255,0.12)] text-white font-mono text-sm resize-y focus:outline-none focus:border-[var(--color-accent)]"
+          onChange={setCode}
           placeholder="Enter your Cubit code here..."
-          spellCheck={false}
+          language="cubit"
+          showLineNumbers={true}
         />
       </div>
+
+      {/* Code Analysis */}
+      {showAnalysis && (
+        <CodeAnalysis code={code} />
+      )}
 
       {/* Run Button */}
       <div>
