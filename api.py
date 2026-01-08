@@ -6,16 +6,19 @@ Provides REST API endpoints for executing Cubit code
 
 import os
 import json
+import time
 from io import StringIO
 from typing import Optional, Any, Dict, List
 from contextlib import redirect_stdout
 from pathlib import Path
+from datetime import datetime
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, ConfigDict
 from interpreter import Interpreter
 from pedagogical.api import PedagogicalAPI
 from games_executor import parse_game_code
+from module_metrics import metrics_tracker
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -91,6 +94,8 @@ async def root():
             "/": "API information (this page)",
             "/health": "Health check endpoint",
             "/execute": "Execute Cubit code (POST)",
+            "/api/execute/debug": "Execute code with step-by-step debugging (POST)",
+            "/api/modules/status": "Get system modules status (GET)",
             "/progress": "Get learning progress (GET)",
             "/concepts": "Get concept suggestions (GET)",
             "/games": "Get list of available games (GET)",
@@ -104,6 +109,122 @@ async def root():
 async def health():
     """Health check endpoint for monitoring"""
     return {"status": "healthy"}
+
+
+@app.get("/api/modules/status")
+async def get_modules_status():
+    """
+    Get real-time status information for all Cubit system modules
+    
+    Returns:
+        Status information for all modules including metrics and system summary
+    """
+    # Define all system modules
+    modules = [
+        {
+            "id": "lexer",
+            "name": "Lexer",
+            "type": "core",
+            "status": "active",
+            "version": "1.0.0",
+            "metrics": metrics_tracker.get_metrics("lexer")
+        },
+        {
+            "id": "parser",
+            "name": "Parser",
+            "type": "core",
+            "status": "active",
+            "version": "1.0.0",
+            "metrics": metrics_tracker.get_metrics("parser")
+        },
+        {
+            "id": "interpreter",
+            "name": "Interpreter",
+            "type": "core",
+            "status": "active",
+            "version": "1.0.0",
+            "metrics": metrics_tracker.get_metrics("interpreter")
+        },
+        {
+            "id": "ped-api",
+            "name": "Pedagogical API",
+            "type": "pedagogical",
+            "status": "active",
+            "version": "1.0.0",
+            "metrics": metrics_tracker.get_metrics("ped-api")
+        },
+        {
+            "id": "context-analyzer",
+            "name": "Context Analyzer",
+            "type": "pedagogical",
+            "status": "active",
+            "version": "1.0.0",
+            "metrics": metrics_tracker.get_metrics("context-analyzer")
+        },
+        {
+            "id": "skill-inference",
+            "name": "Skill Inference Engine",
+            "type": "pedagogical",
+            "status": "active",
+            "version": "1.0.0",
+            "metrics": metrics_tracker.get_metrics("skill-inference")
+        },
+        {
+            "id": "learning-engine",
+            "name": "Adaptive Learning Engine",
+            "type": "pedagogical",
+            "status": "active",
+            "version": "1.0.0",
+            "metrics": metrics_tracker.get_metrics("learning-engine")
+        },
+        {
+            "id": "concept-mapper",
+            "name": "Concept Dependency Mapper",
+            "type": "pedagogical",
+            "status": "active",
+            "version": "1.0.0",
+            "metrics": metrics_tracker.get_metrics("concept-mapper")
+        },
+        {
+            "id": "insight-delivery",
+            "name": "Insight Delivery",
+            "type": "pedagogical",
+            "status": "active",
+            "version": "1.0.0",
+            "metrics": metrics_tracker.get_metrics("insight-delivery")
+        },
+        {
+            "id": "games-executor",
+            "name": "Games Executor",
+            "type": "game",
+            "status": "active",
+            "version": "1.0.0",
+            "metrics": metrics_tracker.get_metrics("games-executor")
+        },
+        {
+            "id": "fastapi",
+            "name": "FastAPI Server",
+            "type": "api",
+            "status": "active",
+            "version": "1.0.0",
+            "metrics": metrics_tracker.get_metrics("fastapi")
+        }
+    ]
+    
+    # Calculate system summary
+    total_modules = len(modules)
+    active_modules = sum(1 for m in modules if m["status"] == "active")
+    error_modules = sum(1 for m in modules if m["status"] == "error")
+    
+    return {
+        "modules": modules,
+        "system": {
+            "total_modules": total_modules,
+            "active_modules": active_modules,
+            "error_modules": error_modules,
+            "uptime_seconds": int(metrics_tracker.get_uptime())
+        }
+    }
 
 
 @app.post("/execute", response_model=ExecuteResponse)
@@ -146,9 +267,20 @@ async def execute_code(request: ExecuteRequest):
         
         # Get pedagogical data if teaching is enabled
         teaching_data = {}
+        teaching_moment_data = None
+        
         if request.teaching_enabled:
+            # Get the last teaching moment delivered
+            teaching_moment_data = {
+                "type": "skill_level_insight",
+                "level": ped_interpreter.get_skill_level(),
+                "message": f"You're currently at {ped_interpreter.get_skill_level()} level",
+                "timestamp": datetime.now().isoformat()
+            }
+            
             teaching_data = {
-                'skill_level': ped_interpreter._infer_skill_level(),
+                'teaching_moment': teaching_moment_data,
+                'skill_level': ped_interpreter.get_skill_level(),
                 'progress': ped_interpreter.get_learning_progress(),
                 'suggestions': ped_interpreter.suggest_next_concepts()[:5]
             }
@@ -173,17 +305,205 @@ async def execute_code(request: ExecuteRequest):
         )
 
 
+@app.post("/api/execute/debug")
+async def execute_code_debug(request: ExecuteRequest):
+    """
+    Execute Cubit code with step-by-step instrumentation for visualization
+    
+    Args:
+        request: ExecuteRequest containing:
+            - code: The Cubit code to execute
+            - teaching_enabled: Whether to provide teaching insights (default: True)
+            - verbosity: Teaching detail level - minimal/normal/detailed (default: normal)
+        
+    Returns:
+        Execution steps showing processing through Lexer -> Parser -> Interpreter
+    """
+    from lexer import Lexer
+    from parser import Parser
+    
+    steps = []
+    final_result = {
+        "output": None,
+        "result": None,
+        "error": None,
+        "skill_level": "beginner",
+        "progress": {},
+        "suggestions": []
+    }
+    total_start = time.time()
+    
+    try:
+        # Step 1: Lexer
+        lexer_start = time.time()
+        lexer = Lexer(request.code)
+        tokens = lexer.tokenize()
+        lexer_duration = (time.time() - lexer_start) * 1000
+        
+        # Record metrics
+        metrics_tracker.record_request("lexer", lexer_duration, True)
+        
+        # Format tokens for display
+        token_strings = [f"{t.type}({t.value})" if t.value else t.type for t in tokens]
+        
+        steps.append({
+            "id": "lexer-001",
+            "module": "lexer",
+            "timestamp": datetime.now().isoformat(),
+            "duration_ms": round(lexer_duration, 2),
+            "input": request.code,
+            "output": {
+                "tokens": token_strings
+            },
+            "status": "completed"
+        })
+        
+        # Step 2: Parser
+        parser_start = time.time()
+        parser = Parser(tokens)
+        ast = parser.parse()
+        parser_duration = (time.time() - parser_start) * 1000
+        
+        # Record metrics
+        metrics_tracker.record_request("parser", parser_duration, True)
+        
+        # Get AST summary
+        ast_summary = f"{type(ast).__name__}" if ast else "None"
+        
+        steps.append({
+            "id": "parser-001",
+            "module": "parser",
+            "timestamp": datetime.now().isoformat(),
+            "duration_ms": round(parser_duration, 2),
+            "input": "tokens from lexer",
+            "output": {
+                "ast_summary": ast_summary
+            },
+            "status": "completed"
+        })
+        
+        # Step 3: Interpreter
+        interpreter_start = time.time()
+        interpreter = Interpreter()
+        
+        # Wrap with pedagogical API if teaching is enabled
+        if request.teaching_enabled:
+            ped_interpreter = PedagogicalAPI(
+                interpreter,
+                default_verbosity=request.verbosity or 'normal'
+            )
+        
+        # Capture stdout
+        output_buffer = StringIO()
+        with redirect_stdout(output_buffer):
+            if request.teaching_enabled:
+                result = ped_interpreter.call('run', request.code)
+            else:
+                result = interpreter.run(request.code)
+        
+        output = output_buffer.getvalue()
+        interpreter_duration = (time.time() - interpreter_start) * 1000
+        
+        # Record metrics
+        metrics_tracker.record_request("interpreter", interpreter_duration, True)
+        
+        # Get variables from interpreter
+        variables = {}
+        if hasattr(interpreter, 'symbol_table'):
+            variables = {k: v for k, v in interpreter.symbol_table.items() if not k.startswith('_')}
+        
+        steps.append({
+            "id": "interpreter-001",
+            "module": "interpreter",
+            "timestamp": datetime.now().isoformat(),
+            "duration_ms": round(interpreter_duration, 2),
+            "input": "AST from parser",
+            "output": {
+                "result": result,
+                "stdout": output,
+                "variables": variables
+            },
+            "status": "completed"
+        })
+        
+        # Build final result
+        final_result["output"] = output
+        final_result["result"] = result
+        final_result["error"] = None
+        
+        if request.teaching_enabled:
+            final_result["skill_level"] = ped_interpreter.get_skill_level()
+            final_result["progress"] = ped_interpreter.get_learning_progress()
+            final_result["suggestions"] = ped_interpreter.suggest_next_concepts()[:5]
+        
+    except Exception as e:
+        # Record error in the appropriate module
+        error_msg = str(e)
+        if "lexer" in error_msg.lower() or len(steps) == 0:
+            metrics_tracker.record_request("lexer", 0, False)
+            steps.append({
+                "id": "lexer-error",
+                "module": "lexer",
+                "timestamp": datetime.now().isoformat(),
+                "duration_ms": 0,
+                "input": request.code,
+                "output": {},
+                "status": "error",
+                "error": error_msg
+            })
+        elif "parser" in error_msg.lower() or len(steps) == 1:
+            metrics_tracker.record_request("parser", 0, False)
+            steps.append({
+                "id": "parser-error",
+                "module": "parser",
+                "timestamp": datetime.now().isoformat(),
+                "duration_ms": 0,
+                "input": "tokens from lexer",
+                "output": {},
+                "status": "error",
+                "error": error_msg
+            })
+        else:
+            metrics_tracker.record_request("interpreter", 0, False)
+            steps.append({
+                "id": "interpreter-error",
+                "module": "interpreter",
+                "timestamp": datetime.now().isoformat(),
+                "duration_ms": 0,
+                "input": "AST from parser",
+                "output": {},
+                "status": "error",
+                "error": error_msg
+            })
+        
+        final_result["error"] = error_msg
+    
+    total_duration = (time.time() - total_start) * 1000
+    
+    return {
+        "steps": steps,
+        "final_result": final_result,
+        "total_duration_ms": round(total_duration, 2)
+    }
+
+
 @app.get("/progress")
 async def get_progress():
     """
-    Get example learning progress information
+    Get aggregated learning progress information
     
     Returns:
-        Progress metrics and skill level information
+        Progress metrics including total calls, method diversity, skill trajectory
     """
+    # NOTE: This will be session-based in future with user authentication
+    # For now, return example structure
     return {
-        "message": "Progress tracking is session-based in execute endpoint",
-        "info": "Each /execute request with teaching_enabled=true includes progress data"
+        "total_calls": 0,
+        "method_diversity": [],
+        "mastered_concepts": [],
+        "current_skill_level": "beginner",
+        "session_info": "Progress tracking is session-based. Use /execute with teaching_enabled=true to track progress.",
+        "skill_trajectory": []
     }
 
 
