@@ -98,7 +98,17 @@ export default function VisualFlowchartPage() {
         <Flowchart />
       </div>
 
-      {/* Code Converter - This will use the flowchart state once integrated */}
+      {/* Code Converter */}
+      {/* Note: Currently displays placeholder until Flowchart component is refactored to expose state */}
+      <div className="bg-yellow-900/20 border border-yellow-500/50 rounded-lg p-4 mb-4">
+        <h4 className="text-sm font-semibold text-yellow-300 mb-2">⚠️ Integration Status</h4>
+        <p className="text-sm text-yellow-200">
+          The Flowchart component currently manages its own state internally. Full integration requires
+          refactoring the Flowchart component to expose nodes and edges via callbacks. 
+          The code converter algorithm is ready - it just needs access to the flowchart data.
+        </p>
+      </div>
+
       <FlowchartToCodeConverter 
         nodes={nodes} 
         edges={edges} 

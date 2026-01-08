@@ -39,7 +39,7 @@ export default function MainPage() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex min-h-screen overflow-hidden">
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <TabbedHeader activeTab={activeTab} onTabChange={setActiveTab} />
