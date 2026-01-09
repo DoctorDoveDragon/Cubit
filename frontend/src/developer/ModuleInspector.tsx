@@ -66,15 +66,18 @@ export default function ModuleInspector() {
   const [moduleStatus, setModuleStatus] = useState<ModuleStatus[]>([])
   const [selectedModule, setSelectedModule] = useState<ModuleInfo | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [usingFallback, setUsingFallback] = useState(false)
 
   const loadModuleStatus = async () => {
     setIsLoading(true)
+    setUsingFallback(false)
     try {
       const status = await getModuleStatus()
       setModuleStatus(status)
     } catch (error) {
       console.error('Failed to load module status:', error)
       // Use sample data if backend fails
+      setUsingFallback(true)
       setModuleStatus([
         { name: 'core', status: 'active', version: '1.0.0' },
         { name: 'graphics', status: 'active', version: '1.2.0' },
@@ -117,7 +120,14 @@ export default function ModuleInspector() {
       <div className="lg:col-span-1 space-y-4">
         {/* Header with Refresh */}
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-bold text-gray-200">Modules</h3>
+          <div className="flex items-center gap-2">
+            <h3 className="text-lg font-bold text-gray-200">Modules</h3>
+            {usingFallback && (
+              <span className="text-xs px-2 py-1 bg-yellow-900/30 border border-yellow-700 rounded text-yellow-400">
+                Demo Data
+              </span>
+            )}
+          </div>
           <button
             onClick={loadModuleStatus}
             disabled={isLoading}

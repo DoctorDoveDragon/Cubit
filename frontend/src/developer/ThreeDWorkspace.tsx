@@ -94,8 +94,11 @@ export default function ThreeDWorkspace() {
   const [cameraReset, setCameraReset] = useState(0)
 
   const handleRun = () => {
+    // TODO: Implement 3D code parsing
     // In a real implementation, this would parse the code and extract shapes
+    // For now, this is a placeholder for demonstration
     console.log('Running 3D code:', code)
+    alert('3D code parsing not yet implemented. This is a demo workspace.')
   }
 
   const handleResetCamera = () => {

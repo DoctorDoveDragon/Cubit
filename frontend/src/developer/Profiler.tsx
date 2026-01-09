@@ -52,7 +52,8 @@ export default function Profiler() {
       const endTime = performance.now()
       const executionTime = endTime - startTime
 
-      // Generate sample metrics (in a real implementation, this would come from the backend)
+      // NOTE: These are sample metrics for demonstration purposes
+      // In a real implementation, profiling data would come from the backend
       const sampleMetrics: ProfileMetric[] = [
         { name: 'fibonacci', time: executionTime * 0.8, calls: 89, avgTime: (executionTime * 0.8) / 89 },
         { name: 'print', time: executionTime * 0.15, calls: 10, avgTime: (executionTime * 0.15) / 10 },
@@ -76,6 +77,14 @@ export default function Profiler() {
 
   return (
     <div className="space-y-6">
+      {/* Demo Warning */}
+      <div className="bg-yellow-900/20 border border-yellow-700 rounded-lg p-4">
+        <p className="text-sm text-yellow-300">
+          <strong>Note:</strong> The profiler currently shows estimated metrics based on execution time. 
+          Full profiling integration with the backend is planned for future releases.
+        </p>
+      </div>
+
       {/* Code Input */}
       <div>
         <label className="block text-sm font-bold text-gray-400 mb-2">
