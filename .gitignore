@@ -43,3 +43,6 @@ frontend/.env.*.local
 # Next.js compiled config files (prevent stale build artifacts)
 next.config.compiled.js
 frontend/next.config.compiled.js
+
+# Log files
+*.log
