@@ -7,12 +7,9 @@
 
 import React, { useState, Suspense } from 'react'
 import { FiPlay, FiRotateCw } from 'react-icons/fi'
-import { Canvas, extend } from '@react-three/fiber'
+import { Canvas } from '@react-three/fiber'
 import { OrbitControls, Grid, Box, Sphere, Cone } from '@react-three/drei'
 import * as THREE from 'three'
-
-// Extend @react-three/fiber with Three.js elements
-extend(THREE)
 
 interface Shape3D {
   type: 'cube' | 'sphere' | 'cone'
@@ -34,17 +31,12 @@ sphere(0, 2, 0, 0.8, "red")
 cone(2, 0, 0, 1, "green")`
 
 function Scene3D({ shapes }: { shapes: Shape3D[] }) {
-  const AmbientLight = 'ambientLight' as any
-  const DirectionalLight = 'directionalLight' as any
-  const PointLight = 'pointLight' as any
-  const MeshMaterial = 'meshStandardMaterial' as any
-  
   return (
     <>
       {/* Lighting */}
-      <AmbientLight intensity={0.5} />
-      <DirectionalLight position={[10, 10, 5]} intensity={1} />
-      <PointLight position={[-10, -10, -5]} intensity={0.5} />
+      <ambientLight intensity={0.5} />
+      <directionalLight position={[10, 10, 5]} intensity={1} />
+      <pointLight position={[-10, -10, -5]} intensity={0.5} />
 
       {/* Grid */}
       <Grid args={[10, 10]} />
@@ -52,7 +44,7 @@ function Scene3D({ shapes }: { shapes: Shape3D[] }) {
       {/* Shapes */}
       {shapes.map((shape, idx) => {
         const pos = new THREE.Vector3(...shape.position)
-        const material = <MeshMaterial color={shape.color} />
+        const material = <meshStandardMaterial color={shape.color} />
         
         switch (shape.type) {
           case 'cube':
