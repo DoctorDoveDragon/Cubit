@@ -1,8 +1,11 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import SettingsPanel from '../components/SettingsPanel'
 import CubitMascot from '../components/CubitMascot'
+import DeveloperModeToggle from '../components/DeveloperModeToggle'
+import { useDeveloperMode } from '../hooks/useDeveloperMode'
 import dynamic from 'next/dynamic'
 const CourseTabs = dynamic(() => import('../course/CourseTabs'), { ssr: false })
 
@@ -23,12 +26,33 @@ const FunctionExplorer = dynamic(() => import('../course/FunctionExplorer'), { s
 
 
 export default function MainPage() {
+  const router = useRouter()
+  const { isDeveloperMode, isLoaded } = useDeveloperMode()
   const [generated, setGenerated] = useState<string>('');
   const [showCreativePanel, setShowCreativePanel] = useState<boolean>(false);
   const [showProgressDashboard, setShowProgressDashboard] = useState<boolean>(false);
   const [showSettings, setShowSettings] = useState<boolean>(false);
   const [mascotMessage, setMascotMessage] = useState<string>('Welcome to Cubit! Let\'s learn to code! 🚀');
   const [mascotMood, setMascotMood] = useState<'happy' | 'excited' | 'thinking' | 'celebrating' | 'encouraging'>('happy');
+
+  // Redirect to developer mode if enabled
+  useEffect(() => {
+    if (isLoaded && isDeveloperMode) {
+      router.push('/developer')
+    }
+  }, [isDeveloperMode, isLoaded, router])
+
+  // Don't render until preferences are loaded
+  if (!isLoaded) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-gradient-to-br from-purple-100 via-pink-50 to-blue-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="flex h-screen bg-gradient-to-br from-purple-100 via-pink-50 to-blue-50">
@@ -38,6 +62,7 @@ export default function MainPage() {
         
         {/* Action Buttons */}
         <div className="flex justify-end mb-4 gap-2 flex-wrap">
+          <DeveloperModeToggle />
           <Button 
             variant="secondary" 
             onClick={() => setShowSettings(!showSettings)}
