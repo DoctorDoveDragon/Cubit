@@ -2,7 +2,8 @@
 
 import React from 'react'
 import { motion } from 'framer-motion'
-import { FiHome, FiLayers, FiPalette, FiBook, FiAward, FiZap } from 'react-icons/fi'
+import { FiHome, FiLayers, FiBook, FiAward, FiZap } from 'react-icons/fi'
+import { IoBrush } from 'react-icons/io5'
 
 export default function Sidebar() {
   const menuItems = [
@@ -10,7 +11,7 @@ export default function Sidebar() {
     { label: 'Lessons', icon: FiBook, active: false, color: 'from-blue-400 to-cyan-500', emoji: '📚' },
     { label: 'Games', icon: FiZap, active: false, color: 'from-green-400 to-emerald-500', emoji: '🎮' },
     { label: 'Challenges', icon: FiAward, active: false, color: 'from-yellow-400 to-orange-500', emoji: '🏆' },
-    { label: 'Creative', icon: FiPalette, active: false, color: 'from-pink-400 to-rose-500', emoji: '🎨' },
+    { label: 'Creative', icon: IoBrush, active: false, color: 'from-pink-400 to-rose-500', emoji: '🎨' },
   ]
 
   return (

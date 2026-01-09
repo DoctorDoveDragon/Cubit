@@ -47,7 +47,7 @@ export default function CubitMascot({
     transition: {
       duration: 0.5,
       repeat: bouncing ? 4 : 0,
-      ease: "easeInOut"
+      ease: "easeInOut" as const
     }
   }
 
@@ -56,7 +56,7 @@ export default function CubitMascot({
     transition: {
       duration: 2,
       repeat: Infinity,
-      ease: "easeInOut"
+      ease: "easeInOut" as const
     }
   }
 
