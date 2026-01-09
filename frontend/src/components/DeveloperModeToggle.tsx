@@ -18,10 +18,10 @@ interface DeveloperModeToggleProps {
 export default function DeveloperModeToggle({ className = '' }: DeveloperModeToggleProps) {
   const { isDeveloperMode, toggleMode } = useDeveloperMode()
 
-  // Keyboard shortcut: Ctrl+Shift+D
+  // Keyboard shortcut: Ctrl+Shift+D (Windows/Linux) or Cmd+Shift+D (Mac)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'D') {
         e.preventDefault()
         toggleMode()
       }
@@ -48,7 +48,7 @@ export default function DeveloperModeToggle({ className = '' }: DeveloperModeTog
             : 'bg-gradient-to-r from-purple-500 to-pink-500 text-white border-2 border-purple-300'
           }
         `}
-        title="Toggle Developer Mode (Ctrl+Shift+D)"
+        title="Toggle Developer Mode (Ctrl+Shift+D or Cmd+Shift+D)"
       >
         {/* Icon */}
         <motion.div
@@ -85,7 +85,7 @@ export default function DeveloperModeToggle({ className = '' }: DeveloperModeTog
         text-xs px-2 py-1 rounded whitespace-nowrap
         ${isDeveloperMode ? 'bg-gray-700 text-gray-300' : 'bg-purple-100 text-purple-700'}
       `}>
-        Ctrl+Shift+D
+        {typeof navigator !== 'undefined' && navigator.platform.includes('Mac') ? 'Cmd+Shift+D' : 'Ctrl+Shift+D'}
       </div>
     </motion.div>
   )
