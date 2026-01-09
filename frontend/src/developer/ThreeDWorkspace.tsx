@@ -7,6 +7,8 @@
 
 import React, { useState, Suspense } from 'react'
 import { FiPlay, FiRotateCw } from 'react-icons/fi'
+// Note: @react-three/fiber v9 no longer requires extend() for THREE.js elements
+// All THREE primitives are available as lowercase JSX elements by default
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, Grid, Box, Sphere, Cone } from '@react-three/drei'
 import * as THREE from 'three'
@@ -33,7 +35,7 @@ cone(2, 0, 0, 1, "green")`
 function Scene3D({ shapes }: { shapes: Shape3D[] }) {
   return (
     <>
-      {/* Lighting */}
+      {/* Lighting - using lowercase JSX elements (react-three/fiber v9 convention) */}
       <ambientLight intensity={0.5} />
       <directionalLight position={[10, 10, 5]} intensity={1} />
       <pointLight position={[-10, -10, -5]} intensity={0.5} />
