@@ -15,7 +15,7 @@ COPY frontend/package.json frontend/package-lock.json ./
 
 # Install frontend dependencies (skip chromium download for puppeteer)
 ENV PUPPETEER_SKIP_DOWNLOAD=true
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 
 # Copy frontend source code
 COPY frontend/ ./
