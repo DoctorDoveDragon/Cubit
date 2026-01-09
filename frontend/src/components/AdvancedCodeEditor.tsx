@@ -135,11 +135,11 @@ export default function AdvancedCodeEditor() {
             suggest: {
               enabled: preferences.enableAutocomplete,
             },
-            quickSuggestions: {
-              other: preferences.enableAutocomplete,
+            quickSuggestions: preferences.enableAutocomplete ? {
+              other: true,
               comments: false,
               strings: false,
-            },
+            } : false,
           }}
         />
       </div>
