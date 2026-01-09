@@ -8,7 +8,7 @@
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { FiCode, FiActivity, FiCpu, FiDatabase, FiBookOpen, FiPackage } from 'react-icons/fi'
+import { FiCode, FiActivity, FiCpu, FiDatabase, FiBookOpen, FiPackage, FiBox } from 'react-icons/fi'
 import dynamic from 'next/dynamic'
 import DeveloperModeToggle from '../../components/DeveloperModeToggle'
 import { useDeveloperMode } from '../../hooks/useDeveloperMode'
@@ -18,6 +18,8 @@ const AdvancedCodeEditor = dynamic(() => import('../../components/AdvancedCodeEd
 const Documentation = dynamic(() => import('../../developer/Documentation'), { ssr: false })
 const APIExplorer = dynamic(() => import('../../developer/APIExplorer'), { ssr: false })
 const Profiler = dynamic(() => import('../../developer/Profiler'), { ssr: false })
+const ModuleInspector = dynamic(() => import('../../developer/ModuleInspector'), { ssr: false })
+const ThreeDWorkspace = dynamic(() => import('../../developer/ThreeDWorkspace'), { ssr: false })
 
 export default function DeveloperDashboard() {
   const router = useRouter()
@@ -50,6 +52,7 @@ export default function DeveloperDashboard() {
     { id: 'api', label: 'API Explorer', icon: <FiDatabase /> },
     { id: 'docs', label: 'Documentation', icon: <FiBookOpen /> },
     { id: 'modules', label: 'Modules', icon: <FiPackage /> },
+    { id: '3d', label: '3D Workspace', icon: <FiBox /> },
   ]
 
   return (
@@ -185,9 +188,20 @@ export default function DeveloperDashboard() {
               <p className="text-gray-400 mb-4">
                 Explore Cubit's module architecture and dependencies.
               </p>
-              <div className="bg-gray-900 rounded p-4 border border-gray-700">
-                <p className="text-gray-500">Module Inspector coming soon...</p>
-              </div>
+              <ModuleInspector />
+            </div>
+          )}
+
+          {activeTab === '3d' && (
+            <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
+              <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                <FiBox className="text-green-400" />
+                3D Workspace
+              </h2>
+              <p className="text-gray-400 mb-4">
+                Advanced 3D programming environment with Three.js integration.
+              </p>
+              <ThreeDWorkspace />
             </div>
           )}
         </motion.div>
