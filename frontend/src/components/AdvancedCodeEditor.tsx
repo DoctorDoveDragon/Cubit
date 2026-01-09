@@ -132,11 +132,11 @@ export default function AdvancedCodeEditor() {
             tabSize: 4,
             insertSpaces: true,
             wordWrap: 'on',
-            quickSuggestions: {
-              other: preferences.enableAutocomplete,
+            quickSuggestions: preferences.enableAutocomplete ? {
+              other: true,
               comments: false,
               strings: false,
-            },
+            } : false,
           }}
         />
       </div>
