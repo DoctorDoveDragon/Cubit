@@ -15,6 +15,9 @@ import { useDeveloperMode } from '../../hooks/useDeveloperMode'
 
 // Dynamically import heavy components
 const AdvancedCodeEditor = dynamic(() => import('../../components/AdvancedCodeEditor'), { ssr: false })
+const Documentation = dynamic(() => import('../../developer/Documentation'), { ssr: false })
+const APIExplorer = dynamic(() => import('../../developer/APIExplorer'), { ssr: false })
+const Profiler = dynamic(() => import('../../developer/Profiler'), { ssr: false })
 
 export default function DeveloperDashboard() {
   const router = useRouter()
@@ -128,9 +131,7 @@ export default function DeveloperDashboard() {
               <p className="text-gray-400 mb-4">
                 Analyze code performance, identify bottlenecks, and optimize execution time.
               </p>
-              <div className="bg-gray-900 rounded p-4 border border-gray-700">
-                <p className="text-gray-500">Profiler coming soon...</p>
-              </div>
+              <Profiler />
             </div>
           )}
 
@@ -158,9 +159,7 @@ export default function DeveloperDashboard() {
               <p className="text-gray-400 mb-4">
                 Explore all Cubit APIs with interactive examples and documentation.
               </p>
-              <div className="bg-gray-900 rounded p-4 border border-gray-700">
-                <p className="text-gray-500">API Explorer coming soon...</p>
-              </div>
+              <APIExplorer />
             </div>
           )}
 
@@ -173,9 +172,7 @@ export default function DeveloperDashboard() {
               <p className="text-gray-400 mb-4">
                 Comprehensive documentation from fundamentals to advanced topics.
               </p>
-              <div className="bg-gray-900 rounded p-4 border border-gray-700">
-                <p className="text-gray-500">Documentation coming soon...</p>
-              </div>
+              <Documentation />
             </div>
           )}
 
