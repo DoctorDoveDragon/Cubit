@@ -13,15 +13,20 @@ jobs:
 
       - name: Verify Dockerfile present
         run: |
-          # Detect build context Dockerfile; when building frontend in platform, ensure frontend/Dockerfile exists
+          # Detect build-context Dockerfile
           if [ -f frontend/Dockerfile ]; then
-            echo "Found frontend/Dockerfile"
-          elif [ -f Dockerfile ]; then
-            echo "Found root Dockerfile"
-          else
-            echo "ERROR: No Dockerfile found in repo root or frontend/; listing repository contents for debugging"
+            echo "✓ Found frontend/Dockerfile"
+          fi
+          if [ -f Dockerfile ]; then
+            echo "✓ Found root Dockerfile"
+          fi
+          
+          # Fail if neither exists
+          if [ ! -f Dockerfile ] && [ ! -f frontend/Dockerfile ]; then
+            echo "ERROR: No Dockerfile found in repo root or frontend/"
+            echo "--- Repository contents ---"
             ls -la || true
-            echo "--- frontend directory contents ---"
+            echo "--- frontend/ contents ---"
             ls -la frontend || true
             exit 1
           fi
