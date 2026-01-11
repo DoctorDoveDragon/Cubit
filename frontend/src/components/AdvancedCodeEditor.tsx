@@ -136,7 +136,7 @@ export default function AdvancedCodeEditor() {
               other: preferences.enableAutocomplete,
               comments: false,
               strings: false,
-            },
+            } : false,
           }}
         />
       </div>
