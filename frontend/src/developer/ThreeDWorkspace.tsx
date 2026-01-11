@@ -7,12 +7,9 @@
 
 import React, { useState, Suspense } from 'react'
 import { FiPlay, FiRotateCw } from 'react-icons/fi'
-import { Canvas, extend } from '@react-three/fiber'
+import { Canvas } from '@react-three/fiber'
 import { OrbitControls, Grid, Box, Sphere, Cone } from '@react-three/drei'
 import * as THREE from 'three'
-
-// Extend @react-three/fiber with Three.js elements
-extend(THREE)
 
 interface Shape3D {
   type: 'cube' | 'sphere' | 'cone'

@@ -18,7 +18,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 
 # Install dependencies using clean install for reproducible builds
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 
 
 # ------------------------------------------------------------------------------
